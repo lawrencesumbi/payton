@@ -502,65 +502,103 @@ body {
 /* Contact Section */
 .contact {
   padding: 80px 20px;
-  background: #f4f0ff; /* light purple */
+  background: #f4f0ff;
 }
 
 .contact-container {
-  max-width: 800px;
+  max-width: 900px;
   margin: auto;
-  text-align: center;
 }
 
+/* Title stays centered */
 .contact h2 {
   font-size: 36px;
   font-weight: 800;
   color: #7f308f;
   margin-bottom: 15px;
+  text-align: center;
 }
 
-.contact p {
+/* Description stays centered */
+.contact-container > p {
   font-size: 18px;
   color: #09050f;
   margin-bottom: 40px;
+  text-align: center;
+  width: 100%;
 }
 
-/* Contact Info Styling */
+/* Contact Info aligned left */
 .contact-info {
   display: flex;
-  flex-direction: column;
-  gap: 20px;
-  font-size: 18px;
+  width: 80%;
+  margin-top: 70px;
+  justify-content: space-between;
+  font-size: 16px;
   color: #09050f;
-  text-align: center;
+  text-align: left;
+  margin-bottom: 40px;
+  margin: 70px auto 40px auto; /* centers it */
+
+  background: #e9d6ff; /* light purple highlight */
+  padding: 12px 18px;
+  border-radius: 14px;
+  border: 2px solid #9357f5;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+  transition: 0.3s;
 }
 
 .contact-info p {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 10px;
+  gap: 15px;
   font-weight: 600;
+  margin: 0;
 }
 
-/* Optional Hover Effect for Info */
+/* Hover effect */
 .contact-info p:hover {
   color: #7f308f;
-  transform: translateY(-3px);
+  transform: translateX(5px);
   transition: 0.3s;
 }
 
+/* Team Members aligned left */
 .team-members {
-  margin-top: 30px;
+  margin-top: 10px;
   display: flex;
-  justify-content: center;
+  justify-content: space-between; /* LEFT */
   gap: 18px;
-  flex-wrap: wrap;
 }
 
+.team-member {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.team-name {
+  margin-top: 10px;
+  font-weight: 700;
+  font-size: 15px;
+  color: #09050f;
+  text-align: center;
+}
+
+.team-role {
+   margin-top: 3px;
+  font-size: 13px;
+  color: #555;
+  text-align: center;
+}
+
+/* Circle Image */
 .team-img {
-  width: 75px;
-  height: 75px;
+  width: 100px;
+  height: 100px;
   border-radius: 50%;
+  justify-content: center;
   object-fit: cover;
   border: 3px solid #9357f5;
   box-shadow: 0 6px 15px rgba(0, 0, 0, 0.12);
@@ -571,6 +609,98 @@ body {
   transform: scale(1.12);
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.18);
 }
+
+
+.footer {
+  background: #1a0b2e; /* dark purple */
+  color: #fff;
+  padding: 60px 20px 20px;
+}
+
+.footer-container {
+  max-width: 1200px;
+  margin: auto;
+  display: flex;
+  justify-content: space-between;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+
+.footer-left {
+  flex: 1;
+  min-width: 250px;
+}
+
+.footer-left h3 {
+  font-size: 26px;
+  font-weight: 800;
+  margin-bottom: 12px;
+}
+
+.footer-left .pay {
+  color: #9357f5;
+}
+
+.footer-left .ton {
+  color: #d3a6ff;
+}
+
+.footer-left p {
+  font-size: 15px;
+  line-height: 1.7;
+  color: #ddd;
+  max-width: 350px;
+}
+
+.footer-links {
+  flex: 1;
+  min-width: 180px;
+}
+
+.footer-links h4,
+.footer-right h4 {
+  font-size: 18px;
+  margin-bottom: 15px;
+  color: #d3a6ff;
+}
+
+.footer-links a {
+  display: block;
+  text-decoration: none;
+  color: #ddd;
+  margin-bottom: 10px;
+  transition: 0.3s;
+}
+
+.footer-links a:hover {
+  color: #9357f5;
+  transform: translateX(5px);
+}
+
+.footer-right {
+  flex: 1;
+  min-width: 220px;
+}
+
+.footer-right p {
+  margin-bottom: 10px;
+  font-size: 15px;
+  color: #ddd;
+}
+
+.footer-bottom {
+  margin-top: 40px;
+  text-align: center;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  padding-top: 18px;
+}
+
+.footer-bottom p {
+  font-size: 14px;
+  color: #bbb;
+}
+
+
 
 
 /* Responsive */

@@ -1,55 +1,25 @@
-// ===== SMOOTH SCROLL FOR NAV LINKS =====
-const navLinks = document.querySelectorAll('.nav-links li a');
+document.addEventListener("DOMContentLoaded", () => {
 
-navLinks.forEach(link => {
-  link.addEventListener('click', e => {
-    e.preventDefault();
-    const targetId = link.getAttribute('href').substring(1);
-    const targetSection = document.getElementById(targetId);
-    if (targetSection) {
-      window.scrollTo({
-        top: targetSection.offsetTop - 70, // adjust for navbar height
-        behavior: 'smooth'
-      });
-    }
-  });
-});
+  const reveals = document.querySelectorAll(".reveal");
 
-// ===== SCROLL ANIMATIONS =====
-const sections = document.querySelectorAll('.about-container, .services, .contact');
+  function revealOnScroll() {
+    const windowHeight = window.innerHeight;
 
-function handleScrollAnimations() {
-  const scrollY = window.pageYOffset;
-  const windowHeight = window.innerHeight;
+    reveals.forEach(el => {
+      const elementTop = el.getBoundingClientRect().top;
+      const elementVisible = 120;
 
-  sections.forEach(section => {
-    const sectionTop = section.getBoundingClientRect().top + scrollY;
-    if (scrollY + windowHeight * 0.8 > sectionTop) {
-      section.style.opacity = 1;
-      section.style.transform = 'translateY(0)';
-    }
-  });
-}
-
-window.addEventListener('scroll', handleScrollAnimations);
-
-// ===== NAVBAR SHADOW ON SCROLL =====
-const navbar = document.querySelector('.navbar');
-
-window.addEventListener('scroll', () => {
-  if (window.scrollY > 50) {
-    navbar.classList.add('scrolled');
-  } else {
-    navbar.classList.remove('scrolled');
+      if (elementTop < windowHeight - elementVisible) {
+        el.classList.add("active");
+      } else {
+        el.classList.remove("active");
+      }
+    });
   }
-});
 
-// ===== OPTIONAL PARALLAX EFFECT FOR HOME IMAGE =====
-const homeImage = document.querySelector('.home-image');
+  // Initial check
+  revealOnScroll();
 
-window.addEventListener('scroll', () => {
-  if (homeImage) {
-    const scroll = window.scrollY;
-    homeImage.style.transform = `translateY(calc(-50% + ${scroll * 0.2}px))`;
-  }
+  // On scroll
+  window.addEventListener("scroll", revealOnScroll);
 });
