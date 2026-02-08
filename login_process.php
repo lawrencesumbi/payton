@@ -45,7 +45,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $_SESSION["email"] = $user["email"];
 
         // Redirect after login
-        header("Location: dashboard.php"); // change if needed
+        header("Location: option.php"); // change if needed
         exit();
 
     } else {
