@@ -1,3 +1,29 @@
+<?php
+
+require 'db.php';
+
+// Make sure user is logged in
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit;
+}
+
+$user_id = $_SESSION['user_id'];
+
+// Fetch expenses for the current user
+$stmt = $conn->prepare("
+    SELECT e.id, e.description, e.amount, e.expense_date, e.receipt_upload,
+           c.category_name, pm.payment_method_name
+    FROM expenses e
+    JOIN category c ON e.category_id = c.id
+    JOIN payment_method pm ON e.payment_method_id = pm.id
+    WHERE e.user_id = ?
+    ORDER BY e.expense_date DESC
+");
+$stmt->execute([$user_id]);
+$expenses = $stmt->fetchAll(PDO::FETCH_ASSOC);
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,7 +37,59 @@
   <style>
     * { margin:0; padding:0; box-sizing:border-box; font-family: Arial, sans-serif; }
 
-    body { background: #f5f5f5; min-height:100vh; position: relative; }
+    body { background: #f5f5f5; min-height:100vh; position: relative;}
+
+
+h2 {
+    color: #7210c8;
+    margin-bottom: 20px;
+}
+
+.table-container {
+    overflow-x: auto;
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+th {
+    background: #7210c8;
+    color: white;
+    font-weight: 700;
+}
+
+tr:hover {
+    background: #f3f0ff;
+}
+
+.receipt-img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+
+
+
+
+
+
+
+
+
 
     /* FAB */
     .fab {
@@ -91,12 +169,76 @@
     .form-group label { display:block; font-weight:700; margin-bottom:6px; font-size:14px; color:#333; }
     .form-group input { width:100%; padding:12px; border-radius:14px; border:1px solid #dde3ec; font-size:14px; }
     .form-group input:focus { border-color:#9800d4; outline:none; }
+    .form-group select {
+        width: 100%;
+        padding: 12px;
+        border-radius: 14px;
+        border: 1px solid #dde3ec;
+        font-size: 14px;
+        outline: none;
+        background: white;
+        cursor: pointer;
+        transition: 0.2s ease;
+    }
     .btn-save { width:100%; padding:14px; background:#6300d4; color:white; border:none; border-radius:14px; font-weight:800; cursor:pointer; }
     .btn-save:hover { opacity:0.9; }
 
   </style>
 </head>
 <body>
+
+<h2>My Expenses</h2>
+
+<div class="table-container">
+<table>
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Category</th>
+            <th>Description</th>
+            <th>Amount</th>
+            <th>Payment Method</th>
+            <th>Date</th>
+            <th>Receipt</th>
+        </tr>
+    </thead>
+    <tbody>
+    <?php if ($expenses): ?>
+        <?php foreach ($expenses as $index => $exp): ?>
+            <tr>
+                <td><?= $index + 1 ?></td>
+                <td><?= htmlspecialchars($exp['category_name']) ?></td>
+                <td><?= htmlspecialchars($exp['description']) ?></td>
+                <td>₱ <?= number_format($exp['amount'], 2) ?></td>
+                <td><?= htmlspecialchars($exp['payment_method_name']) ?></td>
+                <td><?= date("M d, Y", strtotime($exp['expense_date'])) ?></td>
+                <td>
+                    <?php if ($exp['receipt_upload']): ?>
+                        <img src="uploads/<?= htmlspecialchars($exp['receipt_upload']) ?>" class="receipt-img" alt="Receipt">
+                    <?php else: ?>
+                        -
+                    <?php endif; ?>
+                </td>
+            </tr>
+        <?php endforeach; ?>
+    <?php else: ?>
+        <tr><td colspan="7" style="text-align:center;">No expenses recorded yet.</td></tr>
+    <?php endif; ?>
+    </tbody>
+</table>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
 
   <!-- FAB BUTTON -->
   <button class="fab" title="Add Expense">

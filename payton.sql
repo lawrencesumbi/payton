@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Feb 08, 2026 at 05:10 PM
+-- Generation Time: Feb 08, 2026 at 05:36 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -72,7 +72,8 @@ CREATE TABLE `expenses` (
 --
 
 INSERT INTO `expenses` (`id`, `user_id`, `category_id`, `description`, `amount`, `payment_method_id`, `receipt_upload`, `expense_date`, `created_at`, `updated_at`) VALUES
-(1, 1, 2, 'Minglanilla - SanFernando', 50.00, 1, NULL, '2026-02-09', '2026-02-08 16:08:59', '2026-02-08 16:08:59');
+(1, 1, 2, 'Minglanilla - SanFernando', 50.00, 1, NULL, '2026-02-09', '2026-02-08 16:08:59', '2026-02-08 16:08:59'),
+(2, 1, 1, 'Jolibee', 156.00, 4, NULL, '2026-02-09', '2026-02-08 16:27:13', '2026-02-08 16:27:13');
 
 -- --------------------------------------------------------
 
@@ -169,7 +170,7 @@ ALTER TABLE `category`
 -- AUTO_INCREMENT for table `expenses`
 --
 ALTER TABLE `expenses`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `payment_method`
