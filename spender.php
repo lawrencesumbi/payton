@@ -42,6 +42,7 @@ if (!in_array($page, $allowed_pages)) {
       box-sizing: border-box;
       font-family: Arial, sans-serif;
     }
+    
 
     body {
       background: #f5f7fb;
@@ -90,6 +91,7 @@ if (!in_array($page, $allowed_pages)) {
       display: flex;
       flex-direction: column;
       gap: 10px;
+
     }
 
     .menu a {
@@ -144,6 +146,37 @@ if (!in_array($page, $allowed_pages)) {
       color: #777;
       font-size: 14px;
     }
+    .navbar { width: 100%; background: white; display: flex;box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.08); position: fixed; top: 0;  left: 0;  z-index: 999;}
+    .left-nav{ display: flex; margin-bottom: 20px;}
+    .left-nav img{width: 50px; height: 50px; border-radius: 10px;}
+    .left-nav h3{padding-left: 10px; font-size: 25px; font-weight: bold; color: #111; padding-top: 10px;}
+
+    .profile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: white;
+  padding: 8px 12px;
+  border-radius: 18px;
+  box-shadow: 0 6px 18px rgba(253, 76, 224, 0.06);
+}
+
+.profile img {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+}
+
+.profile h4 {
+  font-size: 13px;
+  font-weight: 800;
+  color: #222;
+}
+
+.profile span {
+  font-size: 12px;
+  color: #777;
+}
 
     /* RESPONSIVE */
     @media (max-width: 800px) {
@@ -163,9 +196,9 @@ if (!in_array($page, $allowed_pages)) {
 
   <!-- SIDEBAR -->
   <aside class="sidebar">
-    <div class="brand">
-      <div class="logo"><i class="fa-solid fa-wallet"></i></div>
-      <h2>Payton</h2>
+    <div class="left-nav">
+      <img src="img/logo.jpg" alt="logo">
+      <h3>payton</h3>
     </div>
 
     <nav class="menu">
@@ -200,11 +233,22 @@ if (!in_array($page, $allowed_pages)) {
   <main class="main">
 
     <header class="topbar">
-      <div>
-        <h1><?= ucfirst(str_replace('_',' ', $page)) ?></h1>
-        <p>Welcome, <?= htmlspecialchars($_SESSION['fullname']) ?></p>
-      </div>
-    </header>
+  <div>
+    <h1><?= ucfirst(str_replace('_',' ', $page)) ?></h1>
+    <p>Welcome, <?= htmlspecialchars($_SESSION['fullname']) ?></p>
+  </div>
+
+  <div class="profile">
+    <img src="https://i.pravatar.cc/40?img=3" alt="profile" />
+    <div class="profile-info">
+      <h4><?= htmlspecialchars($_SESSION['fullname']) ?></h4>
+      <span><?= htmlspecialchars($_SESSION['email']) ?></span>
+    </div>
+  </div>
+</header>
+
+
+          
 
     <section class="content">
       <?php
