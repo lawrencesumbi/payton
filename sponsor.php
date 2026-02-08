@@ -83,6 +83,10 @@ if (!in_array($page, $allowed_pages)) {
     .profile h4 { font-size: 13px; font-weight: 800; color: #222; }
     .profile span { font-size: 12px; color: #777; }
 
+    .navbar { width: 100%; background: white; display: flex;box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.08); position: fixed; top: 0;  left: 0;  z-index: 999;}
+    .left-nav{ display: flex; margin-bottom: 20px;}
+    .left-nav img{width: 50px; height: 50px; border-radius: 10px;}
+    .left-nav h3{padding-left: 10px; font-size: 25px; font-weight: bold; color: #111; padding-top: 10px;}
     /* RESPONSIVE */
     @media (max-width: 800px) {
       .sidebar { display: none; }

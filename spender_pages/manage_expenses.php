@@ -52,7 +52,7 @@
       background: #f5eded;
       padding: 22px;
       border-radius: 18px;
-      max-width: 900px;
+      max-width: 800px;
       width: 90%;
       box-shadow: 0px 6px 18px rgba(0,0,0,0.25);
       position: relative;
@@ -109,36 +109,57 @@
       <button class="close-btn">&times;</button>
       <p class="label">Choose Category</p>
       <div class="cat-grid" id="catGrid">
-        <div class="cat-card active" data-category="food"><div class="cat-icon">🍔</div><p class="cat-name">Food & Dining</p></div>
-        <div class="cat-card" data-category="transport"><div class="cat-icon">🚗</div><p class="cat-name">Transportation</p></div>
-        <div class="cat-card" data-category="bills"><div class="cat-icon">💡</div><p class="cat-name">Bills</p></div>
-        <div class="cat-card" data-category="shopping"><div class="cat-icon">🛍</div><p class="cat-name">Shopping</p></div>
-        <div class="cat-card" data-category="entertainment"><div class="cat-icon">🎮</div><p class="cat-name">Entertainment</p></div>
-        <div class="cat-card" data-category="health"><div class="cat-icon">🏥</div><p class="cat-name">Health</p></div>
-        <div class="cat-card" data-category="education"><div class="cat-icon">📚</div><p class="cat-name">School Supplies</p></div>
-        <div class="cat-card" data-category="subscriptions"><div class="cat-icon">💻</div><p class="cat-name">Subscriptions</p></div>
-        <div class="cat-card" data-category="miscellaneous"><div class="cat-icon">📝</div><p class="cat-name">Miscellaneous</p></div>
-        <div class="cat-card" data-category="insurance"><div class="cat-icon">🛡️</div><p class="cat-name">Insurance</p></div>
-        <div class="cat-card" data-category="utilities"><div class="cat-icon">🔌</div><p class="cat-name">Utilities</p></div>
-        <div class="cat-card" data-category="load_internet"><div class="cat-icon">📱</div><p class="cat-name">Load / Internet</p></div>
+        <div class="cat-card active" data-category-id="1"><div class="cat-icon">🍔</div><p class="cat-name">Food & Dining</p></div>
+        <div class="cat-card" data-category-id="2"><div class="cat-icon">🚗</div><p class="cat-name">Transportation</p></div>
+        <div class="cat-card" data-category-id="3"><div class="cat-icon">🏡</div><p class="cat-name">Housing / Rent</p></div>
+        <div class="cat-card" data-category-id="4"><div class="cat-icon">💡</div><p class="cat-name">Bills & Utilities</p></div>
+        <div class="cat-card" data-category-id="5"><div class="cat-icon">🏥</div><p class="cat-name">Health & Personal Care</p></div>
+        <div class="cat-card" data-category-id="6"><div class="cat-icon">📚</div><p class="cat-name">Education</p></div>
+        <div class="cat-card" data-category-id="7"><div class="cat-icon">🎮</div><p class="cat-name">Entertainment & Leisure</p></div>
+        <div class="cat-card" data-category-id="8"><div class="cat-icon">🛍</div><p class="cat-name">Shopping</p></div>
+        <div class="cat-card" data-category-id="9"><div class="cat-icon">💰</div><p class="cat-name">Savings & Investments</p></div>
+        <div class="cat-card" data-category-id="10"><div class="cat-icon">📝</div><p class="cat-name">Miscellaneous</p></div>
       </div>
 
-      <form class="expense-form">
-        <input type="hidden" name="category" id="categoryInput" value="food">
-        <div class="form-group">
-          <label>Transaction Name</label>
-          <input type="text" name="trx_name" placeholder="e.g. Jollibee" required>
-        </div>
-        <div class="form-group">
-          <label>Amount</label>
-          <input type="number" name="trx_amount" placeholder="e.g. 250" required min="1">
-        </div>
-        <div class="form-group">
-          <label>Proof of Purchase</label>
-          <input type="file" name="proof_photo" accept="image/*">
-        </div>
-        <button type="submit" class="btn-save">Add Expense</button>
-      </form>
+      <form class="expense-form" 
+      action="add_expense_process.php" 
+      method="POST" 
+      enctype="multipart/form-data">
+      
+    <input type="hidden" name="category_id" id="categoryInput" value="1">
+
+    <div class="form-group">
+      <label>Description</label>
+      <input type="text" name="description" placeholder="e.g. Jollibee" required>
+    </div>
+
+    <div class="form-group">
+      <label>Amount</label>
+      <input type="number" name="amount" placeholder="e.g. 250" required min="1">
+    </div>
+
+    <div class="form-group">
+      <label>Payment Method</label>
+      <select name="payment_method_id" required>
+        <option value="1">Cash</option>
+        <option value="2">Credit Card</option>
+        <option value="3">Debit Card</option>
+        <option value="4">GCash</option>
+        <option value="5">Maya / Paymaya</option>
+        <option value="6">Bank Transfer</option>
+        <option value="7">Online Payment</option>
+        <option value="8">Check</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Proof of Purchase</label>
+      <input type="file" name="receipt_upload" accept="image/*">
+    </div>
+
+    <button type="submit" class="btn-save">Add Expense</button>
+</form>
+
     </div>
   </div>
 
@@ -161,7 +182,7 @@
       card.addEventListener('click', () => {
         catCards.forEach(c => c.classList.remove('active'));
         card.classList.add('active');
-        categoryInput.value = card.getAttribute('data-category');
+        categoryInput.value = card.getAttribute('data-category-id');
       });
     });
   </script>
