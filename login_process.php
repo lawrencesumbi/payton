@@ -32,7 +32,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     }
 
     /* ===== FETCH USER ===== */
-    $stmt = $pdo->prepare("SELECT id, fullname, email, password FROM users WHERE email = ?");
+    $stmt = $pdo->prepare("SELECT id, fullname, email, password, role FROM users WHERE email = ?");
     $stmt->execute([$email]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -43,10 +43,25 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $_SESSION["user_id"] = $user["id"];
         $_SESSION["fullname"] = $user["fullname"];
         $_SESSION["email"] = $user["email"];
+        $_SESSION["role"]     = $user["role"];
 
-        // Redirect after login
-        header("Location: option.php"); // change if needed
-        exit();
+    // Redirect based on role
+    if (!empty($user["role"])) {
+
+        if ($user["role"] === "spender") {
+            header("Location: spender.php");
+        } elseif ($user["role"] === "sponsor") {
+            header("Location: sponsor.php");
+        } else {
+            header("Location: option.php");
+        }
+
+    } else {
+        // No role yet → choose role
+        header("Location: option.php");
+    }
+    exit();
+
 
     } else {
         $_SESSION["error"] = "Invalid email or password.";

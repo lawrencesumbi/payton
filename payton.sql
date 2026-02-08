@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Feb 07, 2026 at 06:20 PM
+-- Generation Time: Feb 08, 2026 at 01:32 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -32,6 +32,7 @@ CREATE TABLE `users` (
   `fullname` varchar(100) NOT NULL,
   `email` varchar(100) NOT NULL,
   `password` varchar(255) NOT NULL,
+  `role` varchar(20) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -39,8 +40,9 @@ CREATE TABLE `users` (
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `fullname`, `email`, `password`, `created_at`) VALUES
-(1, 'Lawrence Guian P. Sumbi', 'guiansumbi@gmail.com', '$2y$10$cBMSdIAe4mV6vulqcLCEoeAZ/qWbna0I9ITZ8FQTfDid8u0KNkFkK', '2026-02-07 17:08:23');
+INSERT INTO `users` (`id`, `fullname`, `email`, `password`, `role`, `created_at`) VALUES
+(1, 'Lawrence Guian P. Sumbi', 'guiansumbi@gmail.com', '$2y$10$cBMSdIAe4mV6vulqcLCEoeAZ/qWbna0I9ITZ8FQTfDid8u0KNkFkK', 'spender', '2026-02-07 17:08:23'),
+(2, 'Patricia Ann Mae Obaob', 'patriciaannmaeobaob721@gmail.com', '$2y$10$gVokRQej23KaxSKKUZPiSOn/mL5IE0kvfoGyPRTZfN1in/ZpNAQku', '', '2026-02-08 11:52:14');
 
 --
 -- Indexes for dumped tables
@@ -61,7 +63,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

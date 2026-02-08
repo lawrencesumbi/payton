@@ -8,6 +8,21 @@ if (!isset($_SESSION["user_id"])) {
   exit;
 }
 
+// Fetch user's role
+$stmt = $conn->prepare("SELECT role FROM users WHERE id = ?");
+$stmt->execute([$_SESSION["user_id"]]);
+$user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+// If role already exists → redirect immediately
+if (!empty($user["role"])) {
+    if ($user["role"] === "user") {
+        header("Location: spender.php");
+    } elseif ($user["role"] === "parent") {
+        header("Location: sponsor.php");
+    }
+    exit;
+}
+
 // Handle role selection
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["role"])) {
 
@@ -120,19 +135,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["role"])) {
     }
 
     .role-icon {
-      width: 70px;
-      height: 70px;
-      border-radius: 50%;
-      background: rgba(147, 87, 245, 0.12);
-      display: flex;
-      justify-content: center;
-      align-items: center;
       margin: 0 auto 18px auto;
     }
 
-    .role-icon i {
-      font-size: 28px;
-      color: #7f308f;
+    .role-icon img {
+      width: 135px;
+      height: 135px;
+      object-fit: cover;
     }
 
     .role-card h3 {
@@ -208,7 +217,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["role"])) {
       <!-- Spender -->
       <form action="option.php" method="POST" class="role-card">
         <div class="role-icon">
-          <i class="fa-solid fa-wallet"></i>
+          <img src="img/option_spender.jpg" alt="">
         </div>
 
         <h3>Spender</h3>
@@ -223,7 +232,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["role"])) {
       <!-- Sponsor -->
       <form action="option.php" method="POST" class="role-card">
         <div class="role-icon">
-          <i class="fa-solid fa-user-shield"></i>
+          <img src="img/option_sponsor.jpg" alt="">
         </div>
 
         <h3>Sponsor</h3>
