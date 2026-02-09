@@ -441,26 +441,41 @@ h2 {
     box-shadow: 0 6px 15px rgba(0,0,0,0.1);
 }
 
+/* MODIFIED */
 table {
     width: 100%;
-    border-collapse: collapse;
+    border-collapse: separate;
+    border-spacing: 0;
 }
 
+/* SAME */
 th, td { 
     padding: 12px 15px;
     text-align: left;
     border-bottom: 1px solid #eee;
 }
 
+/* MODIFIED */
 th {
     background: #7210c8;
     color: white;
     font-weight: 700;
 }
 
+/* ADDED (this is the key part) */
+thead th:first-child {
+    border-top-left-radius: 12px;
+}
+
+thead th:last-child {
+    border-top-right-radius: 12px;
+}
+
+/* SAME */
 tr:hover {
     background: #f3f0ff;
 }
+
 
 .receipt-img {
     width: 60px;
