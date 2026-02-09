@@ -119,8 +119,7 @@ if ($prevMonthTotal > 0) {
 .analytics-container {
   background: #ffffff;
   border-radius: 18px;
-  padding: 26px;
-  margin-bottom: 25px;
+  padding: 15px;
   border: 1px solid #eef1f6;
   box-shadow: 0 10px 35px rgba(15, 23, 42, 0.06);
   max-width: 100%;
@@ -131,7 +130,7 @@ if ($prevMonthTotal > 0) {
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-bottom: 22px;
+  margin-bottom: 10px;
 }
 
 .analytics-header i {
@@ -159,7 +158,7 @@ if ($prevMonthTotal > 0) {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
   gap: 10px;
-  margin-bottom: 18px;
+  margin-bottom: 5px;
 }
 
 /* STAT CARD (PASTEL LOOK) */
@@ -438,6 +437,7 @@ h2 {
     background: white;
     border-radius: 12px;
     padding: 20px;
+    margin-top: 10px;
     box-shadow: 0 6px 15px rgba(0,0,0,0.1);
 }
 
@@ -446,7 +446,7 @@ table {
     border-collapse: collapse;
 }
 
-th, td {
+th, td { 
     padding: 12px 15px;
     text-align: left;
     border-bottom: 1px solid #eee;
@@ -466,13 +466,14 @@ tr:hover {
     width: 60px;
     height: 60px;
     object-fit: cover;
-    border-radius: 8px;
+    border-radius: 6px;
 }
 
-
 .actions {
-  display: flex;
   gap: 8px;
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #eee;     
 }
 
 .btn-edit,
@@ -483,6 +484,11 @@ tr:hover {
   font-weight: 700;
   text-decoration: none;
   cursor: pointer;
+
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .btn-edit {
@@ -494,6 +500,51 @@ tr:hover {
   background: #c181f8;
   color: white;
 }
+
+/* Receipt View Button (inside table) */
+.btn-view-receipt {
+  border: none;
+  cursor: pointer;
+
+  padding: 6px 10px;
+  border-radius: 8px;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  background: #f5efff;
+  color: #7210c8;
+
+
+  border: 1px solid #e7d6ff;
+  transition: 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 18px rgba(91, 33, 182, 0.08);
+}
+
+/* Hover */
+.btn-view-receipt:hover {
+  background: #f3eaff;
+  color: #7210c8;  
+  border-color: #c4b5fd;
+  transform: translateY(-2px);
+  box-shadow: 0 16px 30px rgba(91, 33, 182, 0.16);
+}
+
+/* Click */
+.btn-view-receipt:active {
+  transform: translateY(0);
+  box-shadow: 0 8px 16px rgba(91, 33, 182, 0.12);
+}
+
+/* Focus (keyboard friendly) */
+.btn-view-receipt:focus {
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.18);
+}
+
 
 .btn-delete {
   background: #ffecec;
@@ -678,7 +729,7 @@ tr:hover {
 </div>
 
 <!-- DETAILED CATEGORY BREAKDOWN -->
-<div class="categories-breakdown" style="margin-top:18px;">
+<div class="categories-breakdown" style="margin-top:10px;">
   <div class="breakdown-title">Category Breakdown</div>
 
   <div class="categories-grid">
@@ -728,7 +779,7 @@ tr:hover {
                 <td><?= date("M d, Y", strtotime($exp['expense_date'])) ?></td>
                 <td>
                     <?php if ($exp['receipt_upload']): ?>
-                        <button class="btn-view-receipt" data-receipt="<?= htmlspecialchars($exp['receipt_upload']) ?>">View</button>
+                        <button class="btn-view-receipt" data-receipt="<?= htmlspecialchars($exp['receipt_upload']) ?>">👁 View</button>
                     <?php else: ?>
                         -
                     <?php endif; ?>

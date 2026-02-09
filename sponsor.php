@@ -53,7 +53,7 @@ if (!in_array($page, $allowed_pages)) {
 
     /* SIDEBAR */
     .sidebar {
-      width: 260px;
+      width: 200px;
       background: #ffffff;
       padding: 25px 18px;
       border-right: 1px solid #eee;
@@ -111,15 +111,15 @@ if (!in_array($page, $allowed_pages)) {
       </a>
 
       <a href="?page=manage_budgets" class="<?= $page=='manage_budgets'?'active':'' ?>">
-        <i class="fa-solid fa-wallet"></i> Manage Budgets
+        <i class="fa-solid fa-wallet"></i> Budgets
       </a>
 
       <a href="?page=overspending_alerts" class="<?= $page=='overspending_alerts'?'active':'' ?>">
-        <i class="fa-solid fa-triangle-exclamation"></i> Overspending Alerts
+        <i class="fa-solid fa-triangle-exclamation"></i> Alerts
       </a>
 
       <a href="?page=reminder_timing" class="<?= $page=='reminder_timing'?'active':'' ?>">
-        <i class="fa-solid fa-bell"></i> Reminder Timing
+        <i class="fa-solid fa-bell"></i> Reminders
       </a>
 
       <a href="?page=manage_loans" class="<?= $page=='manage_loans'?'active':'' ?>">
@@ -142,7 +142,7 @@ if (!in_array($page, $allowed_pages)) {
     <header class="topbar">
       <div>
         <h1><?= ucfirst(str_replace('_',' ', $page)) ?></h1>
-        <p>Welcome, <?= htmlspecialchars($_SESSION['fullname']) ?></p>
+        
       </div>
 
       <div class="profile">
