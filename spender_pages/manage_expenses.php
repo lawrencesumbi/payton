@@ -12,8 +12,16 @@ $user_id = $_SESSION['user_id'];
 
 // Fetch expenses for the current user
 $stmt = $conn->prepare("
-    SELECT e.id, e.description, e.amount, e.expense_date, e.receipt_upload,
-           c.category_name, pm.payment_method_name
+    SELECT 
+        e.id,
+        e.description,
+        e.amount,
+        e.expense_date,
+        e.receipt_upload,
+        e.category_id,
+        e.payment_method_id,
+        c.category_name,
+        pm.payment_method_name
     FROM expenses e
     JOIN category c ON e.category_id = c.id
     JOIN payment_method pm ON e.payment_method_id = pm.id
@@ -22,6 +30,43 @@ $stmt = $conn->prepare("
 ");
 $stmt->execute([$user_id]);
 $expenses = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Fetch all categories
+$catStmt = $conn->prepare("SELECT id, category_name FROM category");
+$catStmt->execute();
+$allCategories = $catStmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Calculate category-wise breakdown
+$categoryBreakdown = [];
+$totalExpenses = 0;
+
+// Initialize all categories with 0
+foreach ($allCategories as $cat) {
+    $categoryBreakdown[$cat['category_name']] = 0;
+}
+
+// Add expenses to categories
+foreach ($expenses as $exp) {
+    $category = $exp['category_name'];
+    $amount = floatval($exp['amount']);
+    
+    $categoryBreakdown[$category] += $amount;
+    $totalExpenses += $amount;
+}
+
+// Calculate percentages
+$categoryPercentages = [];
+if ($totalExpenses > 0) {
+    foreach ($categoryBreakdown as $category => $amount) {
+        $categoryPercentages[$category] = round(($amount / $totalExpenses) * 100, 1);
+    }
+} else {
+    // If no expenses, all percentages are 0
+    foreach ($categoryBreakdown as $category => $amount) {
+        $categoryPercentages[$category] = 0;
+    }
+}
+arsort($categoryBreakdown); // Sort by amount descending
 ?>
 
 <!DOCTYPE html>
@@ -39,11 +84,238 @@ $expenses = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     body { background: #f5f5f5; min-height:100vh; position: relative;}
 
+    /* =========================
+   ANALYTICS SECTION (CLEAN)
+========================= */
 
-h2 {
-    color: #7210c8;
-    margin-bottom: 20px;
+.analytics-container {
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 26px;
+  margin-bottom: 25px;
+  border: 1px solid #eef1f6;
+  box-shadow: 0 10px 35px rgba(15, 23, 42, 0.06);
+  max-width: 100%;
+  width: 100%;
 }
+
+.analytics-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 22px;
+}
+
+.analytics-header i {
+  font-size: 20px;
+  color: #2f7cff;
+  background: #eaf2ff;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14px;
+  border: 1px solid #dbe7ff;
+}
+
+.analytics-header h2 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+/* GRID */
+.analytics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+  margin-bottom: 22px;
+}
+
+/* STAT CARD (PASTEL LOOK) */
+.stat-card {
+  background: #ffffff;
+  padding: 14px 14px;
+  border-radius: 14px;
+  border: 1px solid #eef1f6;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
+  transition: 0.25s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.08);
+}
+
+/* Small colored top bar like dashboard cards */
+.stat-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 3px;
+  width: 100%;
+  background: #2f7cff;
+}
+
+/* CONTENT */
+.stat-card-content {
+  position: relative;
+  z-index: 1;
+}
+
+.stat-label {
+  font-size: 10px;
+  color: #64748b;
+  margin-bottom: 6px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  text-transform: uppercase;
+}
+
+.stat-value {
+  font-size: 20px;
+  font-weight: 900;
+  color: #0f172a;
+  margin-bottom: 4px;
+}
+
+.stat-subtitle {
+  font-size: 10px;
+  color: #94a3b8;
+  font-weight: 600;
+}
+
+/* =========================
+   COLOR VARIANTS (INSPO)
+========================= */
+/* You can add these classes in HTML:
+   class="stat-card stat-blue"
+   class="stat-card stat-purple"
+   class="stat-card stat-green"
+   class="stat-card stat-orange"
+*/
+
+.stat-blue {
+  background: #f3f8ff;
+  border: 1px solid #dbe7ff;
+}
+.stat-blue::before { background: #8994f7; }
+
+.stat-purple {
+  background: #f7f3ff;
+  border: 1px solid #e7dcff;
+}
+.stat-purple::before { background: #8b5cf6; }
+
+.stat-green {
+  background: #f0fdf7;
+  border: 1px solid #ccf3df;
+}
+.stat-green::before { background: #f590e8; }
+
+.stat-orange {
+  background: #fff7ed;
+  border: 1px solid #ffe2c3;
+}
+.stat-orange::before { background: #f8bf5c; }
+
+/* =========================
+   BREAKDOWN SECTION
+========================= */
+
+.categories-breakdown {
+  background: #ffffff;
+  padding: 22px;
+  border-radius: 18px;
+  border: 1px solid #eef1f6;
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.05);
+}
+
+.breakdown-title {
+  font-weight: 900;
+  color: #0f172a;
+  margin-bottom: 18px;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.breakdown-title::before {
+  content: "";
+  width: 6px;
+  height: 18px;
+  background: #2f7cff;
+  border-radius: 99px;
+}
+
+.category-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 0;
+  border-bottom: 1px solid #f1f5f9;
+  transition: 0.2s ease;
+}
+
+.category-item:last-child {
+  border-bottom: none;
+}
+
+.category-item:hover {
+  background: rgba(47, 124, 255, 0.05);
+  padding: 14px 12px;
+  margin: 0 -12px;
+  border-radius: 12px;
+}
+
+.category-name {
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 8px;
+  font-size: 13px;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 7px;
+  background: #eaf0fb;
+  border-radius: 99px;
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #2f7cff, #60a5fa);
+  transition: width 0.4s ease;
+  border-radius: 99px;
+}
+
+.category-percent {
+  font-size: 11px;
+  color: #94a3b8;
+  font-weight: 700;
+}
+
+.category-amount {
+  font-weight: 900;
+  color: #2f7cff;
+  min-width: 100px;
+  text-align: right;
+  font-size: 14px;
+}
+
+/* Remove global purple override */
+h2 {
+  color: #0f172a;
+}
+
 
 .table-container {
     overflow-x: auto;
@@ -82,7 +354,40 @@ tr:hover {
 }
 
 
+.actions {
+  display: flex;
+  gap: 8px;
+}
 
+.btn-edit,
+.btn-delete {
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.btn-edit {
+  background: #f3eaff;
+  color: #7210c8;
+}
+
+.btn-edit:hover {
+  background: #c181f8;
+  color: white;
+}
+
+.btn-delete {
+  background: #ffecec;
+  color: #a30000;
+}
+
+.btn-delete:hover {
+  background: #a30000;
+  color: white;
+}
 
 
 
@@ -187,7 +492,72 @@ tr:hover {
 </head>
 <body>
 
-<h2>My Expenses</h2>
+<!-- ANALYTICS SECTION -->
+<div class="analytics-container">
+    <div class="analytics-header">
+        <i class="fas fa-chart-pie"></i>
+        <h2>Expense Analytics</h2>
+    </div>
+
+    <div class="analytics-grid">
+
+    <div class="stat-card stat-blue">
+    <div class="stat-icon">
+        <i class="fa-solid fa-wallet"></i>
+    </div>
+
+    <div class="stat-card-content">
+        <div class="stat-label">Total Expenses</div>
+        <div class="stat-value">₱ <?= number_format($totalExpenses, 2) ?></div>
+        <div class="stat-subtitle"><?= count($expenses) ?> transaction<?= count($expenses) !== 1 ? 's' : '' ?></div>
+    </div>
+</div>
+
+<div class="stat-card stat-purple">
+    <div class="stat-icon">
+        <i class="fa-solid fa-chart-line"></i>
+    </div>
+
+    <div class="stat-card-content">
+        <div class="stat-label">Average Expense</div>
+        <div class="stat-value">
+            ₱ <?= count($expenses) > 0 ? number_format($totalExpenses / count($expenses), 2) : '0.00' ?>
+        </div>
+        <div class="stat-subtitle">per transaction</div>
+    </div>
+</div>
+
+<div class="stat-card stat-green">
+    <div class="stat-icon">
+        <i class="fa-solid fa-layer-group"></i>
+    </div>
+
+    <div class="stat-card-content">
+        <div class="stat-label">Categories Tracked</div>
+        <div class="stat-value"><?= count($categoryBreakdown) ?></div>
+        <div class="stat-subtitle">expense types</div>
+    </div>
+</div>
+
+<?php 
+// Show all categories as stat cards
+foreach ($categoryBreakdown as $category => $amount): 
+    $colors = ['stat-blue', 'stat-purple', 'stat-green', 'stat-orange'];
+    $colorIndex = array_search($category, array_keys($categoryBreakdown)) % count($colors);
+    $colorClass = $colors[$colorIndex];
+?>
+    <div class="stat-card <?= $colorClass ?>">
+        <div class="stat-card-content">
+            <div class="stat-label"><?= htmlspecialchars($category) ?></div>
+            <div class="stat-value">₱ <?= number_format($amount, 2) ?></div>
+            <div class="stat-subtitle"><?= $categoryPercentages[$category] ?>% of total</div>
+        </div>
+    </div>
+<?php endforeach; ?>
+
+    </div>
+</div>
+
 
 <div class="table-container">
 <table>
@@ -200,6 +570,7 @@ tr:hover {
             <th>Payment Method</th>
             <th>Date</th>
             <th>Receipt</th>
+            <th>Actions</th>
         </tr>
     </thead>
     <tbody>
@@ -218,6 +589,21 @@ tr:hover {
                     <?php else: ?>
                         -
                     <?php endif; ?>
+                </td>
+
+                <!-- ACTIONS -->
+                <td class="actions"> 
+                    <a href="#"
+                        class="btn-edit"
+                        data-id="<?= $exp['id'] ?>"
+                        data-category="<?= $exp['category_id'] ?>"
+                        data-description="<?= htmlspecialchars($exp['description']) ?>"
+                        data-amount="<?= $exp['amount'] ?>"
+                        data-payment="<?= $exp['payment_method_id'] ?>">
+                        ✏️ Edit
+                    </a>
+
+                    <a href="delete_expense.php?id=<?= $exp['id'] ?>" class="btn-delete" onclick="return confirm('Delete this expense?');">🗑 Delete</a>
                 </td>
             </tr>
         <?php endforeach; ?>
@@ -269,20 +655,21 @@ tr:hover {
       enctype="multipart/form-data">
       
     <input type="hidden" name="category_id" id="categoryInput" value="1">
+    <input type="hidden" name="expense_id" id="expenseId">
 
     <div class="form-group">
       <label>Description</label>
-      <input type="text" name="description" placeholder="e.g. Jollibee" required>
+      <input type="text" name="description" id="descInput" placeholder="e.g. Jollibee" required>
     </div>
 
     <div class="form-group">
       <label>Amount</label>
-      <input type="number" name="amount" placeholder="e.g. 250" required min="1">
+      <input type="number" name="amount" id="amountInput" placeholder="e.g. 250" required min="1">
     </div>
 
     <div class="form-group">
       <label>Payment Method</label>
-      <select name="payment_method_id" required>
+      <select name="payment_method_id" id="paymentInput" required>
         <option value="1">Cash</option>
         <option value="2">Credit Card</option>
         <option value="3">Debit Card</option>
@@ -299,7 +686,7 @@ tr:hover {
       <input type="file" name="receipt_upload" accept="image/*">
     </div>
 
-    <button type="submit" class="btn-save">Add Expense</button>
+    <button type="submit" class="btn-save" id="submitBtn">Add Expense</button>
 </form>
 
     </div>
@@ -327,6 +714,60 @@ tr:hover {
         categoryInput.value = card.getAttribute('data-category-id');
       });
     });
+
+
+
+
+
+
+    const editButtons = document.querySelectorAll('.btn-edit');
+const form = document.querySelector('.expense-form');
+const submitBtn = document.getElementById('submitBtn');
+const expenseIdInput = document.getElementById('expenseId');
+
+const descInput = document.getElementById('descInput');
+const amountInput = document.getElementById('amountInput');
+const paymentInput = document.getElementById('paymentInput');
+
+// EDIT MODE
+editButtons.forEach(btn => {
+  btn.addEventListener('click', e => {
+    e.preventDefault();
+
+    // Fill inputs
+    expenseIdInput.value = btn.dataset.id;
+    descInput.value = btn.dataset.description;
+    amountInput.value = btn.dataset.amount;
+    paymentInput.value = btn.dataset.payment;
+
+    // Set category
+    const catId = btn.dataset.category;
+    categoryInput.value = catId;
+
+    catCards.forEach(c => {
+      c.classList.toggle(
+        'active',
+        c.dataset.categoryId === catId
+      );
+    });
+
+    // Switch form to UPDATE
+    form.action = "update_expense_process.php";
+    submitBtn.textContent = "Update Expense";
+
+    modalOverlay.style.display = 'flex';
+  });
+});
+
+// ADD MODE (FAB)
+fab.addEventListener('click', () => {
+  form.reset();
+  expenseIdInput.value = "";
+  form.action = "add_expense_process.php";
+  submitBtn.textContent = "Add Expense";
+  modalOverlay.style.display = 'flex';
+});
+    
   </script>
 
 </body>

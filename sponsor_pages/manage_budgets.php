@@ -176,7 +176,146 @@
   font-size: 14px;
   color: #666;
   line-height: 1.5;
-  margin: 0;
+  margin: 0 0 16px 0;
+}
+
+.btn-link-spender {
+  display: inline-block;
+  background: #7f308f;
+  color: #fff;
+  padding: 12px 24px;
+  border-radius: 12px;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 14px;
+  transition: 0.2s;
+}
+
+.btn-link-spender:hover {
+  background: #61216c;
+  transform: translateY(-2px);
+}
+
+.page-wrapper {
+  padding: 30px;
+}
+
+.header-section {
+  margin-bottom: 24px;
+}
+
+.link-form-container {
+  background: #fff;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+  margin-bottom: 24px;
+  max-width: 500px;
+  display: none;
+  animation: slideDown 0.3s ease-out;
+}
+
+.link-form-container.show {
+  display: block;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.link-form-container h3 {
+  font-size: 16px;
+  font-weight: 800;
+  color: #222;
+  margin-bottom: 8px;
+}
+
+.link-form-container p {
+  font-size: 13px;
+  color: #666;
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+
+.form-group {
+  margin-bottom: 14px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 6px;
+  color: #333;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+  font-size: 14px;
+  outline: none;
+  transition: 0.2s;
+}
+
+.form-group input:focus {
+  border-color: #7f308f;
+  box-shadow: 0 0 0 3px rgba(127, 48, 143, 0.12);
+}
+
+.btn-submit {
+  width: 100%;
+  padding: 10px 14px;
+  background: #7f308f;
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 700;
+  transition: 0.2s;
+}
+
+.btn-submit:hover {
+  background: #61216c;
+}
+
+.tip-box {
+  background: #f9f2fb;
+  border: 1px solid #f1d7f6;
+  padding: 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  color: #5c1c69;
+  line-height: 1.5;
+  margin-top: 12px;
+}
+
+.btn-toggle-form {
+  display: inline-block;
+  background: #7f308f;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 12px;
+  border: none;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn-toggle-form:hover {
+  background: #61216c;
+  transform: translateY(-2px);
 }
 
   /* Responsive */
@@ -195,18 +334,39 @@
 </head>
 <body>
 
+<div class="page-wrapper">
+  
+  <!-- LINK SPENDER FORM (Always visible) -->
+  <div class="link-form-container">
+    <h3>Link a New Spender Account</h3>
+    <p>Enter the spender's email to send them a link request. They must accept your request before you can manage their budget.</p>
+    
+    <form method="post" action="">
+      <div class="form-group">
+        <label for="spender_email">Spender Email</label>
+        <input type="email" id="spender_email" name="spender_email" placeholder="spender@email.com" required>
+      </div>
+      
+      <button type="submit" name="link_spender" class="btn-submit">Send Link Request</button>
+    </form>
+    
+    <div class="tip-box">
+      💡 Tip: Make sure the spender has already registered as a <b>Spender</b> account.
+    </div>
+  </div>
 
 <div class="budget-container">
 
-  <?php if (empty($spenders)): ?>
-  <div class="empty-wrap">
+ <?php if (empty($spenders)): ?>
+  <div class="empty-wrap" id="emptyState">
     <div class="empty-box">
       <div class="empty-icon">⚠️</div>
       <h3>No Linked Spender Accounts</h3>
       <p>
-        You currently have no linked spender accounts. Please link a spender first
+        You currently have no linked spender accounts. Use the form above to link a spender first
         so you can assign budgets and monitor spending activity.
       </p>
+      <button class="btn-toggle-form" onclick="toggleFormContainer()">Link a Spender Account</button>
     </div>
   </div>
 <?php else: ?>
@@ -255,6 +415,25 @@
   <?php endif; ?>
 
 </div>
+
+</div>
+
+<script>
+function toggleFormContainer() {
+  const formContainer = document.querySelector('.link-form-container');
+  const emptyState = document.querySelector('#emptyState');
+  
+  formContainer.classList.toggle('show');
+  
+  // Toggle empty state visibility
+  if (formContainer.classList.contains('show')) {
+    emptyState.style.display = 'none';
+    formContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  } else {
+    emptyState.style.display = 'flex';
+  }
+}
+</script>
 
 </body>
 </html>
