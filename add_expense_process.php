@@ -17,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Handle file upload
     $receiptPath = null;
     if (!empty($_FILES['receipt_upload']['name']) && $_FILES['receipt_upload']['error'] === UPLOAD_ERR_OK) {
-        $uploadDir = 'uploads/receipts/';
+        $uploadDir = 'uploads/';
         if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
         $filename = time() . '_' . basename($_FILES['receipt_upload']['name']);
         $targetFile = $uploadDir . $filename;

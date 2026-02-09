@@ -67,6 +67,34 @@ if ($totalExpenses > 0) {
     }
 }
 arsort($categoryBreakdown); // Sort by amount descending
+
+// Calculate current month and previous month totals for trend
+$thisMonthTotal = 0;
+$prevMonthTotal = 0;
+
+$now = new DateTime();
+$startOfThisMonth = (clone $now)->modify('first day of this month')->setTime(0,0,0);
+$startOfNextMonth = (clone $startOfThisMonth)->modify('+1 month');
+$startOfPrevMonth = (clone $startOfThisMonth)->modify('-1 month');
+
+foreach ($expenses as $exp) {
+  $d = new DateTime($exp['expense_date']);
+  if ($d >= $startOfThisMonth && $d < $startOfNextMonth) {
+    $thisMonthTotal += floatval($exp['amount']);
+  }
+  if ($d >= $startOfPrevMonth && $d < $startOfThisMonth) {
+    $prevMonthTotal += floatval($exp['amount']);
+  }
+}
+
+$monthChangePct = null;
+if ($prevMonthTotal > 0) {
+  $monthChangePct = round((($thisMonthTotal - $prevMonthTotal) / $prevMonthTotal) * 100, 1);
+} elseif ($thisMonthTotal > 0) {
+  $monthChangePct = 100.0; // from 0 to some value
+} else {
+  $monthChangePct = 0.0;
+}
 ?>
 
 <!DOCTYPE html>
@@ -129,21 +157,51 @@ arsort($categoryBreakdown); // Sort by amount descending
 /* GRID */
 .analytics-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 12px;
-  margin-bottom: 22px;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px;
+  margin-bottom: 18px;
 }
 
 /* STAT CARD (PASTEL LOOK) */
 .stat-card {
   background: #ffffff;
-  padding: 14px 14px;
-  border-radius: 14px;
+  padding: 10px 10px;
+  border-radius: 12px;
   border: 1px solid #eef1f6;
-  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
-  transition: 0.25s ease;
+  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.05);
+  transition: 0.18s ease;
   position: relative;
   overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* move icon to the right inside stat cards */
+.stat-card { display:flex; align-items:center; gap:10px; }
+.stat-card-content { order:1; flex:1; }
+.stat-icon { order:2; width:40px; height:40px; display:flex; align-items:center; justify-content:center; border-radius:10px; }
+.stat-icon i { font-size:18px; }
+
+/* place icon on the right and content on the left */
+.stat-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.stat-card-content { flex: 1; order: 1; text-align: left; }
+
+.stat-icon { 
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  font-size: 18px;
+  order: 2;
 }
 
 .stat-card:hover {
@@ -166,7 +224,24 @@ arsort($categoryBreakdown); // Sort by amount descending
 .stat-card-content {
   position: relative;
   z-index: 1;
+  flex: 1 1 auto;
 }
+
+.stat-icon {
+  font-size: 20px;
+  color: #ffffff;
+  background: #7c3aed;
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  border: none;
+}
+
+.trend-up { color: #059669; font-weight:800; }
+.trend-down { color: #dc2626; font-weight:800; }
 
 .stat-label {
   font-size: 10px;
@@ -178,7 +253,7 @@ arsort($categoryBreakdown); // Sort by amount descending
 }
 
 .stat-value {
-  font-size: 20px;
+  font-size: 16px;
   font-weight: 900;
   color: #0f172a;
   margin-bottom: 4px;
@@ -236,6 +311,42 @@ arsort($categoryBreakdown); // Sort by amount descending
   box-shadow: 0 8px 22px rgba(15, 23, 42, 0.05);
 }
 
+.categories-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.categories-grid .category-item {
+  padding: 10px;
+  border-bottom: none;
+  border: 1px solid #e8ecf1;
+  border-radius: 8px;
+  background: #fafbfc;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+
+
+@media (max-width: 1200px) {
+  .categories-grid { grid-template-columns: repeat(4, 1fr); }
+}
+
+@media (max-width: 920px) {
+  .categories-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (max-width: 680px) {
+  .categories-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 480px) {
+  .categories-grid { grid-template-columns: 1fr; }
+}
+
 .breakdown-title {
   font-weight: 900;
   color: #0f172a;
@@ -250,7 +361,7 @@ arsort($categoryBreakdown); // Sort by amount descending
   content: "";
   width: 6px;
   height: 18px;
-  background: #2f7cff;
+  background: #3d13f8;
   border-radius: 99px;
 }
 
@@ -268,26 +379,31 @@ arsort($categoryBreakdown); // Sort by amount descending
 }
 
 .category-item:hover {
-  background: rgba(47, 124, 255, 0.05);
-  padding: 14px 12px;
-  margin: 0 -12px;
-  border-radius: 12px;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.08);
+}
+
+.category-left { flex: 1; margin-right: 12px; }
+.category-right { text-align: right; min-width: 120px; }
+
+@media (max-width: 700px) {
+  .stat-card { padding: 12px; }
 }
 
 .category-name {
-  font-weight: 800;
+  font-weight: 700;
   color: #0f172a;
-  margin-bottom: 8px;
-  font-size: 13px;
+  margin-bottom: 6px;
+  font-size: 11px;
 }
 
 .progress-bar {
   width: 100%;
-  height: 7px;
+  height: 4px;
   background: #eaf0fb;
   border-radius: 99px;
   overflow: hidden;
-  margin-bottom: 6px;
+  margin-bottom: 5px;
 }
 
 .progress-fill {
@@ -305,7 +421,7 @@ arsort($categoryBreakdown); // Sort by amount descending
 
 .category-amount {
   font-weight: 900;
-  color: #2f7cff;
+  color: #7c3aed;
   min-width: 100px;
   text-align: right;
   font-size: 14px;
@@ -539,25 +655,52 @@ tr:hover {
     </div>
 </div>
 
-<?php 
-// Show all categories as stat cards
-foreach ($categoryBreakdown as $category => $amount): 
-    $colors = ['stat-blue', 'stat-purple', 'stat-green', 'stat-orange'];
-    $colorIndex = array_search($category, array_keys($categoryBreakdown)) % count($colors);
-    $colorClass = $colors[$colorIndex];
-?>
-    <div class="stat-card <?= $colorClass ?>">
-        <div class="stat-card-content">
-            <div class="stat-label"><?= htmlspecialchars($category) ?></div>
-            <div class="stat-value">₱ <?= number_format($amount, 2) ?></div>
-            <div class="stat-subtitle"><?= $categoryPercentages[$category] ?>% of total</div>
-        </div>
+<div class="stat-card stat-orange">
+  <div class="stat-card-content">
+    <div class="stat-label">This Month</div>
+    <div class="stat-value">₱ <?= number_format($thisMonthTotal, 2) ?></div>
+    <div class="stat-subtitle">
+      <?php if ($monthChangePct > 0): ?>
+        <span class="trend-up"><i class="fa-solid fa-arrow-up"></i> <?= abs($monthChangePct) ?>%</span> vs last month
+      <?php elseif ($monthChangePct < 0): ?>
+        <span class="trend-down"><i class="fa-solid fa-arrow-down"></i> <?= abs($monthChangePct) ?>%</span> vs last month
+      <?php else: ?>
+        <span><?= $monthChangePct ?>% vs last month</span>
+      <?php endif; ?>
     </div>
-<?php endforeach; ?>
+  </div>
+  <div class="stat-icon"><i class="fa-solid fa-calendar-days"></i></div>
+</div>
+
+<?php // Categories are shown in the detailed breakdown below ?>
 
     </div>
 </div>
 
+<!-- DETAILED CATEGORY BREAKDOWN -->
+<div class="categories-breakdown" style="margin-top:18px;">
+  <div class="breakdown-title">Category Breakdown</div>
+
+  <div class="categories-grid">
+  <?php foreach ($allCategories as $cat):
+        $name = $cat['category_name'];
+        $amt = isset($categoryBreakdown[$name]) ? $categoryBreakdown[$name] : 0;
+        $pct = isset($categoryPercentages[$name]) ? $categoryPercentages[$name] : 0;
+  ?>
+    <div class="category-item">
+      <div style="flex:1; margin-right:12px;">
+        <div class="category-name"><?= htmlspecialchars($name) ?></div>
+        <div class="progress-bar"><div class="progress-fill" style="width: <?= $pct ?>%;"></div></div>
+      </div>
+      <div style="text-align:right; min-width:120px;">
+        <div class="category-amount">₱ <?= number_format($amt, 2) ?></div>
+        <div class="category-percent"><?= $pct ?>%</div>
+      </div>
+    </div>
+  <?php endforeach; ?>
+  </div>
+
+</div>
 
 <div class="table-container">
 <table>
@@ -585,12 +728,11 @@ foreach ($categoryBreakdown as $category => $amount):
                 <td><?= date("M d, Y", strtotime($exp['expense_date'])) ?></td>
                 <td>
                     <?php if ($exp['receipt_upload']): ?>
-                        <img src="uploads/<?= htmlspecialchars($exp['receipt_upload']) ?>" class="receipt-img" alt="Receipt">
+                        <button class="btn-view-receipt" data-receipt="<?= htmlspecialchars($exp['receipt_upload']) ?>">View</button>
                     <?php else: ?>
                         -
                     <?php endif; ?>
                 </td>
-
                 <!-- ACTIONS -->
                 <td class="actions"> 
                     <a href="#"
@@ -599,7 +741,8 @@ foreach ($categoryBreakdown as $category => $amount):
                         data-category="<?= $exp['category_id'] ?>"
                         data-description="<?= htmlspecialchars($exp['description']) ?>"
                         data-amount="<?= $exp['amount'] ?>"
-                        data-payment="<?= $exp['payment_method_id'] ?>">
+                        data-payment="<?= $exp['payment_method_id'] ?>"
+                        data-receipt="<?= htmlspecialchars($exp['receipt_upload']) ?>">
                         ✏️ Edit
                     </a>
 
@@ -612,6 +755,8 @@ foreach ($categoryBreakdown as $category => $amount):
     <?php endif; ?>
     </tbody>
 </table>
+
+
 </div>
 
 
@@ -682,8 +827,9 @@ foreach ($categoryBreakdown as $category => $amount):
     </div>
 
     <div class="form-group">
-      <label>Proof of Purchase</label>
-      <input type="file" name="receipt_upload" accept="image/*">
+        <label>Proof of Purchase</label>
+        <input type="file" name="receipt_upload" accept="image/*">
+        <p id="currentReceipt" style="font-size:12px; color:#555;">No receipt uploaded</p>
     </div>
 
     <button type="submit" class="btn-save" id="submitBtn">Add Expense</button>
@@ -691,6 +837,51 @@ foreach ($categoryBreakdown as $category => $amount):
 
     </div>
   </div>
+
+
+
+
+<!-- RECEIPT VIEW MODAL -->
+<div class="modal-overlay" id="receiptModal">
+  <div class="receipt-area">
+    <button class="close-receipt-btn">&times;</button>
+    <img id="receiptImage" src="" alt="Receipt" style="max-width:100%; max-height:80vh; display:block; margin:auto; border-radius:12px;">
+  </div>
+</div>
+
+<style>
+  #receiptModal {
+    display: none;
+    position: fixed;
+    top:0; left:0;
+    width:100%; height:100%;
+    background: rgba(0,0,0,0.7);
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+  }
+  .receipt-area {
+    background: #fff;
+    padding: 20px;
+    border-radius: 18px;
+    position: relative;
+    max-width: 90%;
+  }
+  .close-receipt-btn {
+    position: absolute;
+    top:10px;
+    right:10px;
+    font-size:24px;
+    background:#d9534f;
+    color:white;
+    border:none;
+    border-radius:50%;
+    width:40px;
+    height:40px;
+    cursor:pointer;
+  }
+</style>
+
 
   <script>
     const fab = document.querySelector('.fab');
@@ -721,52 +912,81 @@ foreach ($categoryBreakdown as $category => $amount):
 
 
     const editButtons = document.querySelectorAll('.btn-edit');
-const form = document.querySelector('.expense-form');
-const submitBtn = document.getElementById('submitBtn');
-const expenseIdInput = document.getElementById('expenseId');
 
-const descInput = document.getElementById('descInput');
-const amountInput = document.getElementById('amountInput');
-const paymentInput = document.getElementById('paymentInput');
-
-// EDIT MODE
 editButtons.forEach(btn => {
-  btn.addEventListener('click', e => {
+  btn.addEventListener('click', function(e) {
     e.preventDefault();
 
-    // Fill inputs
-    expenseIdInput.value = btn.dataset.id;
-    descInput.value = btn.dataset.description;
-    amountInput.value = btn.dataset.amount;
-    paymentInput.value = btn.dataset.payment;
+    const id = this.dataset.id;
+    const category = this.dataset.category;
+    const description = this.dataset.description;
+    const amount = this.dataset.amount;
+    const payment = this.dataset.payment;
+    const receipt = this.dataset.receipt; // NEW
 
-    // Set category
-    const catId = btn.dataset.category;
-    categoryInput.value = catId;
-
-    catCards.forEach(c => {
-      c.classList.toggle(
-        'active',
-        c.dataset.categoryId === catId
-      );
-    });
-
-    // Switch form to UPDATE
-    form.action = "update_expense_process.php";
-    submitBtn.textContent = "Update Expense";
-
+    // Open modal
     modalOverlay.style.display = 'flex';
+
+    // Fill the form fields
+    categoryInput.value = category;
+    catCards.forEach(c => c.classList.remove('active'));
+    document.querySelector(`.cat-card[data-category-id="${category}"]`)?.classList.add('active');
+
+    document.querySelector('input[name="description"]').value = description;
+    document.querySelector('input[name="amount"]').value = amount;
+    document.querySelector('select[name="payment_method_id"]').value = payment;
+
+    // If you want, display current receipt file name somewhere
+    const receiptLabel = document.getElementById('currentReceipt');
+    if(receipt) {
+        receiptLabel.textContent = `Current Receipt: ${receipt.split('/').pop()}`;
+    } else {
+        receiptLabel.textContent = 'No receipt uploaded';
+    }
+
+    // Change button text
+    const btnSave = document.querySelector('.btn-save');
+    btnSave.textContent = 'Update Expense';
+
+    // Add hidden input for expense ID
+    let hiddenInput = document.querySelector('input[name="expense_id"]');
+    if(!hiddenInput) {
+        hiddenInput = document.createElement('input');
+        hiddenInput.type = 'hidden';
+        hiddenInput.name = 'expense_id';
+        document.querySelector('.expense-form').appendChild(hiddenInput);
+    }
+    hiddenInput.value = id;
+
+    // Change form action to update
+    document.querySelector('.expense-form').action = 'update_expense_process.php';
   });
 });
 
-// ADD MODE (FAB)
-fab.addEventListener('click', () => {
-  form.reset();
-  expenseIdInput.value = "";
-  form.action = "add_expense_process.php";
-  submitBtn.textContent = "Add Expense";
-  modalOverlay.style.display = 'flex';
+
+
+
+
+const viewButtons = document.querySelectorAll('.btn-view-receipt');
+const receiptModal = document.getElementById('receiptModal');
+const receiptImage = document.getElementById('receiptImage');
+const closeReceiptBtn = document.querySelector('.close-receipt-btn');
+
+viewButtons.forEach(btn => {
+  btn.addEventListener('click', () => {
+    const imgSrc = btn.dataset.receipt; // "uploads/filename.png"
+    receiptImage.src = imgSrc;
+    receiptModal.style.display = 'flex';
+  });
 });
+
+closeReceiptBtn.addEventListener('click', () => {
+  receiptModal.style.display = 'none';
+  receiptImage.src = ''; // clear image
+});
+
+
+
     
   </script>
 

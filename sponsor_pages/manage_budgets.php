@@ -1,99 +1,223 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Manage Spender Budgets</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Invite Spender</title>
 
 <style>
-  .page-title {
-    font-size: 26px;
-    font-weight: 800;
-    margin-bottom: 6px;
-    color: #222;
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
   }
 
-  .page-subtitle {
-    font-size: 14px;
-    color: #666;
-    margin-bottom: 18px;
-    max-width: 700px;
-    line-height: 1.5;
+  body {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #f5f3ff, #f8f7ff, #f3f7ff);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 30px 16px;
   }
 
-  .budget-container {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 18px;
+  /* MAIN WRAPPER */
+  .wizard-wrap {
+    width: 100%;
+    max-width: 1050px;
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(10px);
+    border-radius: 22px;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    overflow: hidden;
   }
 
-  .budget-card {
-    background: #fff;
-    border-radius: 16px;
-    padding: 18px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
-    transition: 0.2s;
-    border: 1px solid #f1f1f1;
+  /* TOP BAR */
+  .wizard-topbar {
+    padding: 18px 26px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.7);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
   }
 
-  .budget-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 18px 35px rgba(0, 0, 0, 0.08);
-  }
-
-  .spender-row {
+  .brand {
     display: flex;
     align-items: center;
-    gap: 12px;
-    margin-bottom: 14px;
+    gap: 10px;
+    font-weight: 900;
+    color: #5b21b6;
+    font-size: 16px;
   }
 
-  .spender-avatar {
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    background: #7f308f;
-    color: #fff;
-    font-weight: 800;
+  .brand .logo {
+    width: 28px;
+    height: 28px;
+    border-radius: 10px;
+    background: #ede9fe;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 15px;
+    font-weight: 900;
+    color: #5b21b6;
   }
 
-  .spender-info h3 {
-    font-size: 15px;
-    font-weight: 800;
-    margin: 0;
-    color: #222;
-  }
-
-  .spender-info span {
-    font-size: 12px;
+  .user-mini {
+    font-size: 13px;
     color: #777;
   }
 
-  .budget-meta {
-    background: #f7f7fb;
-    border-radius: 14px;
-    padding: 12px;
-    margin-bottom: 12px;
+  /* MAIN BODY */
+  .wizard-body {
+    padding: 26px;
   }
 
-  .budget-meta p {
-    margin: 0;
+  .wizard-header {
+    text-align: center;
+    margin-bottom: 18px;
+  }
+
+  .wizard-header h1 {
+    font-size: 26px;
+    font-weight: 900;
+    color: #222;
+  }
+
+  .wizard-header p {
     font-size: 13px;
+    color: #777;
+    margin-top: 6px;
+  }
+
+  /* 2 COLUMN GRID */
+  .wizard-grid {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 22px;
+    margin-top: 18px;
+  }
+
+  /* LEFT SIDEBAR */
+  .wizard-sidebar {
+    background: rgba(255, 255, 255, 0.85);
+    border-radius: 18px;
+    padding: 18px 14px;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+  }
+
+  .step {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 12px;
+    border-radius: 14px;
+    cursor: pointer;
+    transition: 0.2s;
+    margin-bottom: 8px;
+  }
+
+  .step:hover {
+    background: #f6f2ff;
+  }
+
+  .step-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    font-size: 13px;
+    background: #f1f5f9;
+    color: #666;
+  }
+
+  .step span {
+    font-size: 13px;
+    font-weight: 700;
     color: #444;
   }
 
-  .budget-meta strong {
-    font-size: 18px;
-    display: block;
-    margin-top: 5px;
-    color: #111;
+  /* ACTIVE STEP */
+  .step.active {
+    background: #f5efff;
+    border: 1px solid #e8d8ff;
   }
 
-  .budget-form label {
+  .step.active .step-icon {
+    background: linear-gradient(135deg, #7c3aed, #a855f7);
+    color: white;
+  }
+
+  .step.active span {
+    color: #4c1d95;
+  }
+
+  /* RIGHT CONTENT CARD */
+  .wizard-card {
+    background: rgba(255, 255, 255, 0.88);
+    border-radius: 18px;
+    padding: 22px;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+  }
+
+  /* PROGRESS */
+  .progress-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+
+  .progress-bar {
+    width: 100%;
+    height: 7px;
+    background: #eee;
+    border-radius: 99px;
+    overflow: hidden;
+    margin-right: 14px;
+  }
+
+  .progress-fill {
+    width: 42%;
+    height: 100%;
+    background: linear-gradient(90deg, #7c3aed, #a855f7);
+    border-radius: 99px;
+  }
+
+  .progress-percent {
+    font-size: 12px;
+    font-weight: 700;
+    color: #777;
+    min-width: 40px;
+    text-align: right;
+  }
+
+  /* TITLE */
+  .wizard-card h2 {
+    font-size: 18px;
+    font-weight: 900;
+    color: #222;
+    margin-bottom: 6px;
+  }
+
+  .wizard-card p {
+    font-size: 13px;
+    color: #666;
+    margin-bottom: 16px;
+    line-height: 1.5;
+  }
+
+  /* FORM */
+  .form-group {
+    margin-bottom: 14px;
+  }
+
+  .form-group label {
     display: block;
     font-size: 13px;
     font-weight: 700;
@@ -101,339 +225,164 @@
     color: #333;
   }
 
-  .budget-form input {
+  .form-group input {
     width: 100%;
-    padding: 10px 12px;
-    border-radius: 12px;
+    padding: 12px 14px;
+    border-radius: 14px;
     border: 1px solid #ddd;
     font-size: 14px;
     outline: none;
     transition: 0.2s;
+    background: #fff;
   }
 
-  .budget-form input:focus {
-    border-color: #7f308f;
-    box-shadow: 0 0 0 3px rgba(127, 48, 143, 0.12);
+  .form-group input:focus {
+    border-color: #7c3aed;
+    box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.12);
   }
 
-  .btn-save {
-    width: 100%;
-    margin-top: 12px;
-    padding: 10px 14px;
-    background: #7f308f;
-    color: #fff;
-    border: none;
-    border-radius: 12px;
+  /* BUTTON ROW (like image) */
+  .btn-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    margin-top: 18px;
+  }
+
+  .circle-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 1px solid #ddd;
+    background: white;
     cursor: pointer;
-    font-size: 14px;
-    font-weight: 700;
+    font-size: 18px;
     transition: 0.2s;
   }
 
-  .btn-save:hover {
-    background: #61216c;
+  .circle-btn:hover {
+    background: #f6f2ff;
+    border-color: #c4b5fd;
   }
 
-  .empty-wrap {
-  width: 100%;
-  min-height: 55vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.empty-box {
-  width: 100%;
-  max-width: 520px;
-  background: #ffffff;
-  border: 1px solid #f0d6d6;
-  border-radius: 18px;
-  padding: 22px 20px;
-  text-align: center;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
-}
-
-.empty-icon {
-  width: 52px;
-  height: 52px;
-  margin: 0 auto 12px;
-  border-radius: 16px;
-  background: #ffecec;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 22px;
-}
-
-.empty-box h3 {
-  font-size: 18px;
-  font-weight: 900;
-  color: #222;
-  margin-bottom: 6px;
-}
-
-.empty-box p {
-  font-size: 14px;
-  color: #666;
-  line-height: 1.5;
-  margin: 0 0 16px 0;
-}
-
-.btn-link-spender {
-  display: inline-block;
-  background: #7f308f;
-  color: #fff;
-  padding: 12px 24px;
-  border-radius: 12px;
-  text-decoration: none;
-  font-weight: 700;
-  font-size: 14px;
-  transition: 0.2s;
-}
-
-.btn-link-spender:hover {
-  background: #61216c;
-  transform: translateY(-2px);
-}
-
-.page-wrapper {
-  padding: 30px;
-}
-
-.header-section {
-  margin-bottom: 24px;
-}
-
-.link-form-container {
-  background: #fff;
-  border-radius: 16px;
-  padding: 24px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
-  margin-bottom: 24px;
-  max-width: 500px;
-  display: none;
-  animation: slideDown 0.3s ease-out;
-}
-
-.link-form-container.show {
-  display: block;
-}
-
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.link-form-container h3 {
-  font-size: 16px;
-  font-weight: 800;
-  color: #222;
-  margin-bottom: 8px;
-}
-
-.link-form-container p {
-  font-size: 13px;
-  color: #666;
-  margin-bottom: 16px;
-  line-height: 1.5;
-}
-
-.form-group {
-  margin-bottom: 14px;
-}
-
-.form-group label {
-  display: block;
-  font-size: 13px;
-  font-weight: 700;
-  margin-bottom: 6px;
-  color: #333;
-}
-
-.form-group input {
-  width: 100%;
-  padding: 10px 12px;
-  border-radius: 12px;
-  border: 1px solid #ddd;
-  font-size: 14px;
-  outline: none;
-  transition: 0.2s;
-}
-
-.form-group input:focus {
-  border-color: #7f308f;
-  box-shadow: 0 0 0 3px rgba(127, 48, 143, 0.12);
-}
-
-.btn-submit {
-  width: 100%;
-  padding: 10px 14px;
-  background: #7f308f;
-  color: #fff;
-  border: none;
-  border-radius: 12px;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 700;
-  transition: 0.2s;
-}
-
-.btn-submit:hover {
-  background: #61216c;
-}
-
-.tip-box {
-  background: #f9f2fb;
-  border: 1px solid #f1d7f6;
-  padding: 12px;
-  border-radius: 12px;
-  font-size: 12px;
-  color: #5c1c69;
-  line-height: 1.5;
-  margin-top: 12px;
-}
-
-.btn-toggle-form {
-  display: inline-block;
-  background: #7f308f;
-  color: #fff;
-  padding: 10px 20px;
-  border-radius: 12px;
-  border: none;
-  text-decoration: none;
-  font-weight: 700;
-  font-size: 14px;
-  cursor: pointer;
-  transition: 0.2s;
-}
-
-.btn-toggle-form:hover {
-  background: #61216c;
-  transform: translateY(-2px);
-}
-
-  /* Responsive */
-  @media (max-width: 1100px) {
-    .budget-container {
-      grid-template-columns: repeat(2, 1fr);
-    }
+  .main-btn {
+    min-width: 150px;
+    padding: 12px 18px;
+    border: none;
+    border-radius: 999px;
+    cursor: pointer;
+    background: linear-gradient(135deg, #7c3aed, #a855f7);
+    color: white;
+    font-weight: 800;
+    font-size: 14px;
+    transition: 0.2s;
+    box-shadow: 0 14px 30px rgba(124, 58, 237, 0.25);
   }
 
-  @media (max-width: 700px) {
-    .budget-container {
+  .main-btn:hover {
+    transform: translateY(-2px);
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 900px) {
+    .wizard-grid {
       grid-template-columns: 1fr;
     }
   }
 </style>
 </head>
+
 <body>
 
-<div class="page-wrapper">
-  
-  <!-- LINK SPENDER FORM (Always visible) -->
-  <div class="link-form-container">
-    <h3>Link a New Spender Account</h3>
-    <p>Enter the spender's email to send them a link request. They must accept your request before you can manage their budget.</p>
-    
-    <form method="post" action="">
-      <div class="form-group">
-        <label for="spender_email">Spender Email</label>
-        <input type="email" id="spender_email" name="spender_email" placeholder="spender@email.com" required>
+<div class="wizard-wrap">
+
+  <!-- TOP BAR -->
+  <div class="wizard-topbar">
+    <div class="brand">
+      <div class="logo">✦</div>
+      Payton
+    </div>
+    <div class="user-mini">Hi, Sponsor 👋</div>
+  </div>
+
+  <!-- BODY -->
+  <div class="wizard-body">
+
+    <div class="wizard-header">
+      <h1>Invite a Spender</h1>
+      <p>Complete the steps to link and manage spender budgets</p>
+    </div>
+
+    <div class="wizard-grid">
+
+      <!-- LEFT STEPS -->
+      <div class="wizard-sidebar">
+        <div class="step active">
+          <div class="step-icon">1</div>
+          <span>Send Invite</span>
+        </div>
+
+        <div class="step">
+          <div class="step-icon">2</div>
+          <span>Pending Requests</span>
+        </div>
+
+        <div class="step">
+          <div class="step-icon">3</div>
+          <span>Linked Spenders</span>
+        </div>
+
+        <div class="step">
+          <div class="step-icon">4</div>
+          <span>Assign Budgets</span>
+        </div>
+
+        <div class="step">
+          <div class="step-icon">5</div>
+          <span>Monitor Spending</span>
+        </div>
       </div>
-      
-      <button type="submit" name="link_spender" class="btn-submit">Send Link Request</button>
-    </form>
-    
-    <div class="tip-box">
-      💡 Tip: Make sure the spender has already registered as a <b>Spender</b> account.
-    </div>
-  </div>
 
-<div class="budget-container">
+      <!-- RIGHT FORM -->
+      <div class="wizard-card">
 
- <?php if (empty($spenders)): ?>
-  <div class="empty-wrap" id="emptyState">
-    <div class="empty-box">
-      <div class="empty-icon">⚠️</div>
-      <h3>No Linked Spender Accounts</h3>
-      <p>
-        You currently have no linked spender accounts. Use the form above to link a spender first
-        so you can assign budgets and monitor spending activity.
-      </p>
-      <button class="btn-toggle-form" onclick="toggleFormContainer()">Link a Spender Account</button>
-    </div>
-  </div>
-<?php else: ?>
-
-
-    <?php foreach ($spenders as $sp): ?>
-      <?php
-        // Avatar initials
-        $name = $sp['fullname'] ?? 'Spender';
-        $parts = explode(" ", trim($name));
-        $initials = strtoupper(substr($parts[0], 0, 1) . (isset($parts[1]) ? substr($parts[1], 0, 1) : ''));
-        $budget = $sp['budget'] ?? 0;
-      ?>
-
-      <div class="budget-card">
-
-        <div class="spender-row">
-          <div class="spender-avatar"><?= htmlspecialchars($initials) ?></div>
-
-          <div class="spender-info">
-            <h3><?= htmlspecialchars($sp['fullname']) ?></h3>
-            <span><?= htmlspecialchars($sp['email']) ?></span>
+        <div class="progress-row">
+          <div class="progress-bar">
+            <div class="progress-fill"></div>
           </div>
+          <div class="progress-percent">42%</div>
         </div>
 
-        <div class="budget-meta">
-          <p>Current Monthly Budget</p>
-          <strong>₱<?= number_format($budget, 2) ?></strong>
-        </div>
+        <h2>Send Spender Invitation</h2>
+        <p>
+          Enter the spender’s email address. They must accept your request before you can assign a monthly budget.
+        </p>
 
-        <!-- FORM (backend will follow) -->
-        <form class="budget-form" method="post" action="">
-          <input type="hidden" name="spender_id" value="<?= (int)$sp['id'] ?>">
+        <!-- YOUR PHP FORM GOES HERE -->
+        <form method="post" action="">
+          <div class="form-group">
+            <label for="spender_email">Spender Email</label>
+            <input type="email" id="spender_email" name="spender_email"
+              placeholder="spender@email.com" required>
+          </div>
 
-          <label>Set New Budget (₱)</label>
-          <input type="number" name="new_budget" min="0" placeholder="Enter amount..." required>
+          <div class="btn-row">
+            <button type="button" class="circle-btn">‹</button>
 
-          <button class="btn-save" type="submit">
-            Save Budget
-          </button>
+            <button type="submit" name="link_spender" class="main-btn">
+              Send Invite
+            </button>
+
+            <button type="button" class="circle-btn">›</button>
+          </div>
         </form>
 
       </div>
-    <?php endforeach; ?>
 
-  <?php endif; ?>
-
+    </div>
+  </div>
 </div>
-
-</div>
-
-<script>
-function toggleFormContainer() {
-  const formContainer = document.querySelector('.link-form-container');
-  const emptyState = document.querySelector('#emptyState');
-  
-  formContainer.classList.toggle('show');
-  
-  // Toggle empty state visibility
-  if (formContainer.classList.contains('show')) {
-    emptyState.style.display = 'none';
-    formContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  } else {
-    emptyState.style.display = 'flex';
-  }
-}
-</script>
 
 </body>
 </html>
