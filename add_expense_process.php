@@ -35,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->execute([$user_id, $category_id, $description, $amount, $payment_method_id, $receiptPath]);
 
     $_SESSION['success'] = "Expense added successfully!";
-    header("Location: spender.php");
+    header("Location: http://localhost/payton/spender.php?page=manage_expenses");
     exit;
 }
 ?>

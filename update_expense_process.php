@@ -57,5 +57,5 @@ if (isset($_FILES['receipt_upload']) && $_FILES['receipt_upload']['error'] === U
     ]);
 }
 
-header("Location: spender.php");
+header("Location: http://localhost/payton/spender.php?page=manage_expenses");
 exit;

@@ -40,5 +40,5 @@ if ($receipt_path && file_exists($receipt_path)) {
 }
 
 // Redirect back with success message
-header("Location: spender.php?deleted=1");
+header("Location: http://localhost/payton/spender.php?page=manage_expenses&deleted=1");
 exit;
