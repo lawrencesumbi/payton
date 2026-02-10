@@ -181,6 +181,8 @@ $profilePath = !empty($userData['profile_pic']) && file_exists($userData['profil
 
 $fullname = $userData['fullname'] ?? "Unknown User";
 $email    = $userData['email'] ?? "No email";
+
+
 ?>
 
 
@@ -261,14 +263,14 @@ $email    = $userData['email'] ?? "No email";
 
     /* CARD */
     .acc-card{
-      background: #fff;
+      background: white;
       border-radius: 20px;
       padding: 22px;
       box-shadow: 0 18px 45px rgba(0,0,0,0.06);
       border: 1px solid rgba(0,0,0,0.05);
     }
 
-    .acc-card h3{
+    .acc-card h3{ 
       font-size: 15px;
       font-weight: 900;
       margin-bottom: 14px;
@@ -279,13 +281,15 @@ $email    = $userData['email'] ?? "No email";
        PROFILE HEADER
     ========================= */
     .profile-head{
+      
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 18px;
     }
 
-    .profile-left{
+    .profile-left{  
+      
       display: flex;
       align-items: center;
       gap: 18px;
@@ -295,7 +299,7 @@ $email    = $userData['email'] ?? "No email";
       width: 92px;
       height: 92px;
       border-radius: 50%;
-      background: #e5e7eb;
+      
       overflow: hidden;
       border: 3px solid #fff;
       box-shadow: 0 12px 30px rgba(0,0,0,0.12);
@@ -307,6 +311,11 @@ $email    = $userData['email'] ?? "No email";
       height: 100%;
       object-fit: cover;
       display: block;
+    }
+
+    .profile-meta{
+      width: 520px;
+      
     }
 
     .profile-meta h4{
@@ -322,10 +331,14 @@ $email    = $userData['email'] ?? "No email";
       line-height: 1.4;
     }
 
+    .btn-2{
+      padding-top: 12px;
+    }
+
     .btn-upload{
       border: 1px solid #e5e7eb;
       background: #9225eb;
-      padding: 12px 18px;
+      padding: 5px 12px;
       border-radius: 14px;
       font-weight: 900;
       cursor: pointer;
@@ -336,6 +349,12 @@ $email    = $userData['email'] ?? "No email";
       align-items: center;
       gap: 8px;
       white-space: nowrap;
+      
+    }
+
+
+    .btn-upload i{
+      
     }
 
     .btn-upload:hover{
@@ -343,10 +362,13 @@ $email    = $userData['email'] ?? "No email";
       transform: translateY(-2px);
     }
 
+
+
     /* =========================
        FORM
     ========================= */
     .acc-form{
+      
       display: grid;
       gap: 16px;
       margin-top: 4px;
@@ -385,7 +407,7 @@ $email    = $userData['email'] ?? "No email";
 
     /* BUTTON */
     .btn-save-changes{
-      padding: 12px 18px;
+      padding: 5px 12px;
       border: none;
       border-radius: 14px;
       cursor: pointer;
@@ -484,32 +506,40 @@ $email    = $userData['email'] ?? "No email";
       <section class="acc-main">
 
         <!-- Profile photo card -->
-<div class="acc-card profile-head">
+<div class="acc-card">
   <form method="post" enctype="multipart/form-data">
 
     <div class="profile-left">
       <div class="profile-pic">
-    <img src="<?= htmlspecialchars($profilePath) ?>" alt="Profile">
-</div>
+          <img src="<?= htmlspecialchars($profilePath) ?>" alt="Profile">
+      </div>
 
       <div class="profile-meta">
         <h4>Upload new photo</h4>
         <p>At least 800×800 px recommended.<br>JPG or PNG is allowed</p>
       </div>
+
+
+      <button class="btn-upload" type="button"
+        onclick="document.getElementById('profilePicInput').click()">
+        <i class="fa-solid fa-cloud-arrow-up"></i>
+        Upload Photo
+      </button>
     </div>
 
     <!-- Hidden file input -->
     <input type="file" name="profile_pic" id="profilePicInput" hidden accept=".jpg,.jpeg,.png">
 
-    <button class="btn-upload" type="button"
-      onclick="document.getElementById('profilePicInput').click()">
-      <i class="fa-solid fa-cloud-arrow-up"></i>
-      Upload Photo
-    </button>
 
-    <button class="btn-save-changes" type="submit" name="update_photo">
-      Save Photo
-    </button>
+    
+
+    <div class="btn-2">
+
+
+      <button class="btn-save-changes" type="submit" name="update_photo">
+        Save Photo
+      </button>
+    </div>
 
   </form>
 </div>

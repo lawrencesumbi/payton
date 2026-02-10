@@ -28,6 +28,26 @@ $allowed_pages = [
 if (!in_array($page, $allowed_pages)) {
     $page = 'dashboard';
 }
+
+
+
+
+
+// Example fetching from DB
+$userId = $_SESSION['user_id'];
+$query = "SELECT profile_pic, fullname, email FROM users WHERE id = ?";
+$stmt = $conn->prepare($query);
+$stmt->execute([$userId]);
+$user = $stmt->fetch();
+
+$profilePath = $user['profile_pic']; // this goes into our check above
+$_SESSION['fullname'] = $user['fullname'];
+$_SESSION['email'] = $user['email'];
+
+
+
+
+
 ?>
 <!DOCTYPE html>
 <html>
@@ -361,7 +381,7 @@ if (!in_array($page, $allowed_pages)) {
 
     <!-- Profile -->
     <div class="profile">
-      <img src="https://i.pravatar.cc/40?img=3" alt="profile" />
+      <img src="<?= htmlspecialchars($profilePath) ?>" alt="Profile">
       <div class="profile-info">
         <h4><?= htmlspecialchars($_SESSION['fullname']) ?></h4>
         <span><?= htmlspecialchars($_SESSION['email']) ?></span>

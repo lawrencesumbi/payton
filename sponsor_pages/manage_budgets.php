@@ -13,14 +13,7 @@
     font-family: Arial, sans-serif;
   }
 
-  body {
-    min-height: 100vh;
-    background: linear-gradient(135deg, #f5f3ff, #f8f7ff, #f3f7ff);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 30px 16px;
-  }
+  
 
   /* MAIN WRAPPER */
   .wizard-wrap {
