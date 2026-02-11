@@ -29,7 +29,7 @@
 
   /* TOP BAR */
   .wizard-topbar {
-    padding: 18px 26px;
+    padding: 0px 26px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -357,7 +357,7 @@
           <div class="form-group">
             <label for="spender_email">Spender Email</label>
             <input type="email" id="spender_email" name="spender_email"
-              placeholder="spender@email.com" required>
+              placeholder="spender@gmail.com" required>
           </div>
 
           <div class="btn-row">

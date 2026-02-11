@@ -20,7 +20,7 @@ $page = $_GET['page'] ?? 'dashboard';
 $allowed_pages = [
     'dashboard',
     'manage_expenses',
-    'manage_payments',
+    'scheduler',
     'manage_reminders',
     'my_account'
 ];
@@ -241,26 +241,37 @@ $_SESSION['email'] = $user['email'];
   font-weight: 700;
 }
 
-/* Profile */
-.profile {
+/* PROFILE DROPDOWN */
+.profile-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.profile-btn {
+  border: none;
+  cursor: pointer;
   display: flex;
   align-items: center;
   gap: 10px;
-  padding-left: 8px;
+  background: white;
+  padding: 8px 12px;
+  border-radius: 18px;
+  box-shadow: 0 6px 18px rgba(109, 40, 217, 0.08);
 }
 
-.profile img {
-  width: 40px;
-  height: 40px;
+.profile-btn img {
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
   object-fit: cover;
 }
 
 .profile-info h4 {
-  font-size: 14px;
-  margin: 0;
-  font-weight: 700;
+  font-size: 13px;
+  font-weight: 800;
   color: #222;
+  margin: 0;
+  line-height: 1.2;
 }
 
 .profile-info span {
@@ -268,6 +279,67 @@ $_SESSION['email'] = $user['email'];
   color: #777;
 }
 
+.profile-btn i {
+  font-size: 12px;
+  color: #666;
+  margin-left: 6px;
+}
+
+/* DROPDOWN MENU */
+.profile-menu {
+  position: absolute;
+  top: 58px;
+  right: 0;
+  width: 230px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 18px 40px rgba(0,0,0,0.12);
+  padding: 10px;
+  display: none;
+  z-index: 999;
+  border: 1px solid #f1f5f9;
+}
+
+.profile-menu.show {
+  display: block;
+}
+
+.profile-menu a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 700;
+  color: #111827;
+  transition: 0.2s ease;
+}
+
+.profile-menu a:hover {
+  background: #f3f4f6;
+}
+
+.profile-menu a i {
+  width: 18px;
+  text-align: center;
+  color: #6d28d9;
+}
+
+.profile-menu .menu-divider {
+  height: 1px;
+  background: #eef2ff;
+  margin: 8px 0;
+}
+
+.profile-menu a.danger {
+  color: #b91c1c;
+}
+
+.profile-menu a.danger i {
+  color: #b91c1c;
+}
 
     .navbar { width: 100%; background: white; display: flex;box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.08); position: fixed; top: 0;  left: 0;  z-index: 999;}
     .left-nav{ display: flex; margin-bottom: 20px;}
@@ -284,22 +356,6 @@ $_SESSION['email'] = $user['email'];
   box-shadow: 0 6px 18px rgba(253, 76, 224, 0.06);
 }
 
-.profile img {
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-}
-
-.profile h4 {
-  font-size: 13px;
-  font-weight: 800;
-  color: #222;
-}
-
-.profile span {
-  font-size: 12px;
-  color: #777;
-}
 
     /* RESPONSIVE */
     @media (max-width: 800px) {
@@ -333,21 +389,12 @@ $_SESSION['email'] = $user['email'];
         <i class="fa-solid fa-receipt"></i> Expenses
       </a>
 
-      <a href="?page=manage_payments" class="<?= $page=='manage_payments'?'active':'' ?>">
-        <i class="fa-solid fa-coins"></i> Payments
+      <a href="?page=scheduler" class="<?= $page=='scheduler'?'active':'' ?>">
+        <i class="fa-solid fa-calendar"></i> Scheduler
       </a>
 
       <a href="?page=manage_reminders" class="<?= $page=='manage_reminders'?'active':'' ?>">
         <i class="fa-solid fa-bell"></i> Reminders
-      </a>
-
-      <a href="?page=my_account" class="<?= $page=='my_account'?'active':'' ?>">
-        <i class="fa-solid fa-user"></i> My Account
-      </a>
-
-      <a href="logout.php" class="logout"
-         onclick="return confirm('Logout?');">
-        <i class="fa-solid fa-right-from-bracket"></i> Logout
       </a>
     </nav>
   </aside>
@@ -380,13 +427,44 @@ $_SESSION['email'] = $user['email'];
     </a>
 
     <!-- Profile -->
-    <div class="profile">
-      <img src="<?= htmlspecialchars($profilePath) ?>" alt="Profile">
-      <div class="profile-info">
-        <h4><?= htmlspecialchars($_SESSION['fullname']) ?></h4>
-        <span><?= htmlspecialchars($_SESSION['email']) ?></span>
-      </div>
+    <div class="profile-dropdown">
+  <button class="profile-btn" id="profileBtn">
+    <img src="<?= htmlspecialchars($profilePath) ?>" alt="Profile">
+
+    <div class="profile-info">
+      <h4><?= htmlspecialchars($_SESSION['fullname']) ?></h4>
+      <span><?= htmlspecialchars($_SESSION['email']) ?></span>
     </div>
+
+    <i class="fa-solid fa-chevron-down"></i>
+  </button>
+
+  <div class="profile-menu" id="profileMenu">
+    <a href="create_group.php">
+      <i class="fa-solid fa-users"></i> Create Group
+    </a>
+
+    <a href="sponsor_linked.php">
+      <i class="fa-solid fa-hand-holding-dollar"></i> Sponsor Linked Account
+    </a>
+
+    <a href="?page=my_account">
+      <i class="fa-solid fa-user"></i> My Account
+    </a>
+
+    <a href="activity_logs.php">
+      <i class="fa-solid fa-clock-rotate-left"></i> Activity Logs
+    </a>
+
+    <div class="menu-divider"></div>
+
+    <a href="logout.php" class="danger"
+       onclick="return confirm('Logout?');">
+      <i class="fa-solid fa-right-from-bracket"></i> Logout
+    </a>
+  </div>
+</div>
+
 
   </div>
 </header>
@@ -411,4 +489,19 @@ $_SESSION['email'] = $user['email'];
 </div>
 
 </body>
+  <script>
+  const profileBtn = document.getElementById("profileBtn");
+  const profileMenu = document.getElementById("profileMenu");
+
+  profileBtn.addEventListener("click", function(e){
+    e.stopPropagation();
+    profileMenu.classList.toggle("show");
+  });
+
+  document.addEventListener("click", function(){
+    profileMenu.classList.remove("show");
+  });
+</script>
+
+
 </html>
