@@ -19,6 +19,7 @@ $page = $_GET['page'] ?? 'dashboard';
 
 $allowed_pages = [
     'dashboard',
+    'manage_budget',
     'manage_expenses',
     'scheduler',
     'manage_reminders',
@@ -78,7 +79,7 @@ $_SESSION['email'] = $user['email'];
     .sidebar {
       width: 200px;
       background: #ffffff;
-      padding: 25px 18px;
+      padding: 13px 18px;
       border-right: 1px solid #eee;
     }
 
@@ -151,6 +152,7 @@ $_SESSION['email'] = $user['email'];
     /* TOPBAR */
    /* TOPBAR */
 .topbar {
+  
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -385,6 +387,10 @@ $_SESSION['email'] = $user['email'];
         <i class="fa-solid fa-house"></i> Dashboard
       </a>
 
+      <a href="?page=manage_budget" class="<?= $page=='manage_budget'?'active':'' ?>">
+        <i class="fa-solid fa-receipt"></i> Budget
+      </a>
+      
       <a href="?page=manage_expenses" class="<?= $page=='manage_expenses'?'active':'' ?>">
         <i class="fa-solid fa-receipt"></i> Expenses
       </a>

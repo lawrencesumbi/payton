@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Feb 10, 2026 at 03:35 AM
+-- Generation Time: Feb 18, 2026 at 04:43 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -105,6 +105,30 @@ INSERT INTO `payment_method` (`id`, `payment_method_name`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `scheduled_payments`
+--
+
+CREATE TABLE `scheduled_payments` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `payment_name` varchar(255) NOT NULL,
+  `amount` decimal(10,2) NOT NULL,
+  `payment_date` date NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `scheduled_payments`
+--
+
+INSERT INTO `scheduled_payments` (`id`, `user_id`, `payment_name`, `amount`, `payment_date`, `created_at`, `updated_at`) VALUES
+(1, 1, 'Water Bill', 143.00, '2026-02-18', '2026-02-18 03:23:15', '2026-02-18 03:23:15'),
+(2, 1, 'Electricity', 386.75, '2026-02-26', '2026-02-18 03:34:42', '2026-02-18 03:34:42');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `users`
 --
 
@@ -155,6 +179,13 @@ ALTER TABLE `payment_method`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `scheduled_payments`
+--
+ALTER TABLE `scheduled_payments`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `user_id` (`user_id`);
+
+--
 -- Indexes for table `users`
 --
 ALTER TABLE `users`
@@ -184,6 +215,12 @@ ALTER TABLE `payment_method`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
+-- AUTO_INCREMENT for table `scheduled_payments`
+--
+ALTER TABLE `scheduled_payments`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
@@ -200,6 +237,12 @@ ALTER TABLE `expenses`
   ADD CONSTRAINT `expenses_category_id_fr` FOREIGN KEY (`category_id`) REFERENCES `category` (`id`),
   ADD CONSTRAINT `expenses_payment_method_id_fr` FOREIGN KEY (`payment_method_id`) REFERENCES `payment_method` (`id`),
   ADD CONSTRAINT `expenses_user_id_fr` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
+
+--
+-- Constraints for table `scheduled_payments`
+--
+ALTER TABLE `scheduled_payments`
+  ADD CONSTRAINT `scheduled_payments_user_id_fr` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
