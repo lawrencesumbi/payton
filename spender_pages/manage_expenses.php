@@ -846,19 +846,7 @@ tr:hover {
   <div class="modal-overlay" id="modalOverlay">
     <div class="expense-area">
       <button class="close-btn">&times;</button>
-      <p class="label">Choose Category</p>
-      <div class="cat-grid" id="catGrid">
-        <div class="cat-card active" data-category-id="1"><div class="cat-icon">🍔</div><p class="cat-name">Food & Dining</p></div>
-        <div class="cat-card" data-category-id="2"><div class="cat-icon">🚗</div><p class="cat-name">Transportation</p></div>
-        <div class="cat-card" data-category-id="3"><div class="cat-icon">🏡</div><p class="cat-name">Housing / Rent</p></div>
-        <div class="cat-card" data-category-id="4"><div class="cat-icon">💡</div><p class="cat-name">Bills & Utilities</p></div>
-        <div class="cat-card" data-category-id="5"><div class="cat-icon">🏥</div><p class="cat-name">Health & Personal Care</p></div>
-        <div class="cat-card" data-category-id="6"><div class="cat-icon">📚</div><p class="cat-name">Education</p></div>
-        <div class="cat-card" data-category-id="7"><div class="cat-icon">🎮</div><p class="cat-name">Entertainment & Leisure</p></div>
-        <div class="cat-card" data-category-id="8"><div class="cat-icon">🛍</div><p class="cat-name">Shopping</p></div>
-        <div class="cat-card" data-category-id="9"><div class="cat-icon">💰</div><p class="cat-name">Savings & Investments</p></div>
-        <div class="cat-card" data-category-id="10"><div class="cat-icon">📝</div><p class="cat-name">Miscellaneous</p></div>
-      </div>
+      
 
       <form class="expense-form" 
       action="add_expense_process.php" 
@@ -872,6 +860,20 @@ tr:hover {
       <label>Description</label>
       <input type="text" name="description" id="descInput" placeholder="e.g. Jollibee" required>
     </div>
+
+    <p class="label">Category</p>
+      <div class="cat-grid" id="catGrid">
+        <div class="cat-card active" data-category-id="1"><div class="cat-icon">🍔</div><p class="cat-name">Food & Dining</p></div>
+        <div class="cat-card" data-category-id="2"><div class="cat-icon">🚗</div><p class="cat-name">Transportation</p></div>
+        <div class="cat-card" data-category-id="3"><div class="cat-icon">🏡</div><p class="cat-name">Housing / Rent</p></div>
+        <div class="cat-card" data-category-id="4"><div class="cat-icon">💡</div><p class="cat-name">Bills & Utilities</p></div>
+        <div class="cat-card" data-category-id="5"><div class="cat-icon">🏥</div><p class="cat-name">Health & Personal Care</p></div>
+        <div class="cat-card" data-category-id="6"><div class="cat-icon">📚</div><p class="cat-name">Education</p></div>
+        <div class="cat-card" data-category-id="7"><div class="cat-icon">🎮</div><p class="cat-name">Entertainment & Leisure</p></div>
+        <div class="cat-card" data-category-id="8"><div class="cat-icon">🛍</div><p class="cat-name">Shopping</p></div>
+        <div class="cat-card" data-category-id="9"><div class="cat-icon">💰</div><p class="cat-name">Savings & Investments</p></div>
+        <div class="cat-card" data-category-id="10"><div class="cat-icon">📝</div><p class="cat-name">Miscellaneous</p></div>
+      </div>
 
     <div class="form-group">
       <label>Amount</label>

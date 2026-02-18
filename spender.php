@@ -21,6 +21,7 @@ $allowed_pages = [
     'dashboard',
     'manage_budget',
     'manage_expenses',
+    'manage_payments',
     'scheduler',
     'manage_reminders',
     'my_account'
@@ -393,6 +394,10 @@ $_SESSION['email'] = $user['email'];
       
       <a href="?page=manage_expenses" class="<?= $page=='manage_expenses'?'active':'' ?>">
         <i class="fa-solid fa-receipt"></i> Expenses
+      </a>
+
+      <a href="?page=manage_payments" class="<?= $page=='manage_payments'?'active':'' ?>">
+        <i class="fa-solid fa-receipt"></i> Payments
       </a>
 
       <a href="?page=scheduler" class="<?= $page=='scheduler'?'active':'' ?>">

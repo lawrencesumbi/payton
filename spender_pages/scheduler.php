@@ -49,10 +49,27 @@ body {
 }
 
 .header {
-    text-align: center;
-    font-size: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 22px;
     margin-bottom: 20px;
+    font-weight: bold;
 }
+
+.header button {
+    background: #3b82f6;
+    border: none;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.header button:hover {
+    background: #1d4ed8;
+}
+
 
 .grid {
     display: grid;
@@ -118,14 +135,37 @@ body {
     color: #fff;
 }
 
+.weekday {
+    text-align: center;
+    font-weight: bold;
+    padding: 8px;
+    background: #e5e7eb;
+    border-radius: 6px;
+}
+
+
 </style>
 </head>
 
 <body>
 
 <div class="calendar">
-    <div class="header" id="monthYear"></div>
-    <div class="grid" id="calendarGrid"></div>
+    <div class="header">
+        <button onclick="changeMonth(-1)">◀ Prev</button>
+        <span id="monthYear"></span>
+        <button onclick="changeMonth(1)">Next ▶</button>
+    </div>
+    <div class="grid" id="calendarGrid">
+        <!-- Weekday Headers -->
+        <div class="weekday">Sun</div>
+        <div class="weekday">Mon</div>
+        <div class="weekday">Tue</div>
+        <div class="weekday">Wed</div>
+        <div class="weekday">Thu</div>
+        <div class="weekday">Fri</div>
+        <div class="weekday">Sat</div>
+    </div>
+
 </div>
 
 <!-- Modal -->
@@ -151,69 +191,106 @@ body {
 const grid = document.getElementById("calendarGrid");
 const monthYear = document.getElementById("monthYear");
 
-const today = new Date();
-const year = today.getFullYear();
-const month = today.getMonth();
+// Today's real date
+const realToday = new Date();
 
-const todayDate = today.getDate();
-const todayMonth = today.getMonth();
-const todayYear = today.getFullYear();
-
+// Active calendar date
+let currentDate = new Date();
 
 const monthNames = [
     "January","February","March","April","May","June",
     "July","August","September","October","November","December"
 ];
 
-monthYear.innerText = monthNames[month] + " " + year;
-
-const daysInMonth = new Date(year, month + 1, 0).getDate();
-
 // Payments from PHP
 const payments = <?php echo json_encode($groupedPayments); ?>;
 
-for (let i = 1; i <= daysInMonth; i++) {
+/* ================= RENDER CALENDAR ================= */
+function renderCalendar() {
 
-    const formattedDate = year + "-" +
-        String(month+1).padStart(2,'0') + "-" +
-        String(i).padStart(2,'0');
-
-    const day = document.createElement("div");
-    day.classList.add("day");
-
-    // Highlight today's date
-    if (i === todayDate && month === todayMonth && year === todayYear) {
-        day.classList.add("today");
-    }
-
-    let paymentList = "";
-
-    if (payments[formattedDate]) {
-        paymentList += "<ul style='padding-left:15px; margin-top:5px;'>";
-
-        payments[formattedDate].forEach(function(payment){
-            const formattedAmount = "₱" + Number(payment.amount).toLocaleString();
-
-            paymentList += `
-                <li style="font-size:12px;">
-                    ${payment.name} - <strong>${formattedAmount}</strong>
-                </li>`;
-        });
-
-        paymentList += "</ul>";
-    }
-
-    day.innerHTML = `
-        <div class="date-number">${i}</div>
-        ${paymentList}
+    // Keep weekday headers
+    grid.innerHTML = `
+        <div class="weekday">Sun</div>
+        <div class="weekday">Mon</div>
+        <div class="weekday">Tue</div>
+        <div class="weekday">Wed</div>
+        <div class="weekday">Thu</div>
+        <div class="weekday">Fri</div>
+        <div class="weekday">Sat</div>
     `;
 
-    day.onclick = () => openModal(i);
-    grid.appendChild(day);
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+
+    monthYear.innerText = monthNames[month] + " " + year;
+
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+    const todayDate = realToday.getDate();
+    const todayMonth = realToday.getMonth();
+    const todayYear = realToday.getFullYear();
+
+    // Add empty boxes before month starts
+    for (let i = 0; i < firstDay; i++) {
+        const empty = document.createElement("div");
+        empty.classList.add("day");
+        empty.style.background = "transparent";
+        empty.style.cursor = "default";
+        grid.appendChild(empty);
+    }
+
+    // Add actual days
+    for (let i = 1; i <= daysInMonth; i++) {
+
+        const formattedDate = year + "-" +
+            String(month+1).padStart(2,'0') + "-" +
+            String(i).padStart(2,'0');
+
+        const day = document.createElement("div");
+        day.classList.add("day");
+
+        // Highlight today
+        if (i === todayDate && month === todayMonth && year === todayYear) {
+            day.classList.add("today");
+        }
+
+        let paymentList = "";
+
+        if (payments[formattedDate]) {
+            paymentList += "<ul style='padding-left:15px; margin-top:5px;'>";
+
+            payments[formattedDate].forEach(function(payment){
+                const formattedAmount = "₱" + Number(payment.amount).toLocaleString();
+
+                paymentList += `
+                    <li style="font-size:12px;">
+                        ${payment.name} - <strong>${formattedAmount}</strong>
+                    </li>`;
+            });
+
+            paymentList += "</ul>";
+        }
+
+        day.innerHTML = `
+            <div class="date-number">${i}</div>
+            ${paymentList}
+        `;
+
+        day.onclick = () => openModal(year, month, i);
+        grid.appendChild(day);
+    }
 }
 
-/* MODAL FUNCTIONS */
-function openModal(day) {
+
+/* ================= CHANGE MONTH ================= */
+function changeMonth(offset) {
+    currentDate.setMonth(currentDate.getMonth() + offset);
+    renderCalendar();
+}
+
+/* ================= MODAL ================= */
+function openModal(year, month, day) {
     const date = year + "-" +
         String(month+1).padStart(2,'0') + "-" +
         String(day).padStart(2,'0');
@@ -225,7 +302,11 @@ function openModal(day) {
 function closeModal() {
     document.getElementById("paymentModal").style.display = "none";
 }
+
+// Initial render
+renderCalendar();
 </script>
+
 
 </body>
 </html>
