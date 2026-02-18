@@ -9,7 +9,7 @@ $amount = $_POST['amount'];
 $date = $_POST['date'];
 
 $stmt = $pdo->prepare("
-    INSERT INTO scheduled_payments (user_id, payment_name, amount, payment_date)
+    INSERT INTO scheduled_payments (user_id, payment_name, amount, due_date)
     VALUES (?, ?, ?, ?)
 ");
 $stmt->execute([$user_id, $name, $amount, $date]);

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Feb 18, 2026 at 04:43 AM
+-- Generation Time: Feb 18, 2026 at 10:03 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -51,6 +51,26 @@ INSERT INTO `category` (`id`, `category_name`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `due_status`
+--
+
+CREATE TABLE `due_status` (
+  `id` int(11) NOT NULL,
+  `due_status_name` varchar(50) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `due_status`
+--
+
+INSERT INTO `due_status` (`id`, `due_status_name`) VALUES
+(1, 'unpaid'),
+(2, 'paid'),
+(3, 'overdue');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `expenses`
 --
 
@@ -75,7 +95,8 @@ INSERT INTO `expenses` (`id`, `user_id`, `category_id`, `description`, `amount`,
 (2, 1, 1, 'Jolibee', 230.00, 4, 'uploads/69899a990334e-47599096_TUYsQ8e0eKU1dtXcuxCEs44flSOjBrapqgbDXB-JuyI.jpg', '2026-02-09', '2026-02-08 16:27:13', '2026-02-09 08:29:07'),
 (3, 1, 1, 'Angels Burger', 40.00, 1, NULL, '2026-02-09', '2026-02-09 02:06:22', '2026-02-09 03:30:59'),
 (4, 1, 2, 'Gasoline', 1000.00, 1, 'uploads/698955dc227ca-gas receipt- May 2010a.jpg', '2026-02-09', '2026-02-09 02:13:32', '2026-02-09 03:34:52'),
-(5, 1, 8, 'CCTV', 899.00, 1, NULL, '2026-02-09', '2026-02-09 03:33:46', '2026-02-09 03:33:46');
+(5, 1, 8, 'CCTV', 899.00, 1, NULL, '2026-02-09', '2026-02-09 03:33:46', '2026-02-09 03:33:46'),
+(6, 1, 6, 'Paper', 30.00, 1, NULL, '2026-02-18', '2026-02-18 04:01:04', '2026-02-18 04:01:18');
 
 -- --------------------------------------------------------
 
@@ -105,6 +126,27 @@ INSERT INTO `payment_method` (`id`, `payment_method_name`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `recurrence_type`
+--
+
+CREATE TABLE `recurrence_type` (
+  `id` int(11) NOT NULL,
+  `recurrence_type_name` varchar(50) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `recurrence_type`
+--
+
+INSERT INTO `recurrence_type` (`id`, `recurrence_type_name`) VALUES
+(1, 'once'),
+(2, 'weekly'),
+(3, 'monthly'),
+(4, 'yearly');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `scheduled_payments`
 --
 
@@ -113,18 +155,15 @@ CREATE TABLE `scheduled_payments` (
   `user_id` int(11) NOT NULL,
   `payment_name` varchar(255) NOT NULL,
   `amount` decimal(10,2) NOT NULL,
-  `payment_date` date NOT NULL,
+  `due_date` date NOT NULL,
+  `is_recurring` tinyint(1) NOT NULL DEFAULT 0,
+  `recurrence_type_id` int(11) NOT NULL,
+  `paid_date` date DEFAULT NULL,
+  `payment_method_id` int(11) NOT NULL,
+  `due_status_id` int(11) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `scheduled_payments`
---
-
-INSERT INTO `scheduled_payments` (`id`, `user_id`, `payment_name`, `amount`, `payment_date`, `created_at`, `updated_at`) VALUES
-(1, 1, 'Water Bill', 143.00, '2026-02-18', '2026-02-18 03:23:15', '2026-02-18 03:23:15'),
-(2, 1, 'Electricity', 386.75, '2026-02-26', '2026-02-18 03:34:42', '2026-02-18 03:34:42');
 
 -- --------------------------------------------------------
 
@@ -163,6 +202,12 @@ ALTER TABLE `category`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `due_status`
+--
+ALTER TABLE `due_status`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `expenses`
 --
 ALTER TABLE `expenses`
@@ -179,11 +224,20 @@ ALTER TABLE `payment_method`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `recurrence_type`
+--
+ALTER TABLE `recurrence_type`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `scheduled_payments`
 --
 ALTER TABLE `scheduled_payments`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `user_id` (`user_id`);
+  ADD KEY `user_id` (`user_id`),
+  ADD KEY `due_status_id` (`due_status_id`),
+  ADD KEY `payment_method_id` (`payment_method_id`),
+  ADD KEY `recurrence_type_id` (`recurrence_type_id`);
 
 --
 -- Indexes for table `users`
@@ -203,16 +257,28 @@ ALTER TABLE `category`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
+-- AUTO_INCREMENT for table `due_status`
+--
+ALTER TABLE `due_status`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
 -- AUTO_INCREMENT for table `expenses`
 --
 ALTER TABLE `expenses`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `payment_method`
 --
 ALTER TABLE `payment_method`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+
+--
+-- AUTO_INCREMENT for table `recurrence_type`
+--
+ALTER TABLE `recurrence_type`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `scheduled_payments`
@@ -242,6 +308,9 @@ ALTER TABLE `expenses`
 -- Constraints for table `scheduled_payments`
 --
 ALTER TABLE `scheduled_payments`
+  ADD CONSTRAINT `scheduled_payments_due_status_id_fr` FOREIGN KEY (`due_status_id`) REFERENCES `due_status` (`id`),
+  ADD CONSTRAINT `scheduled_payments_payment_method_id_fr` FOREIGN KEY (`payment_method_id`) REFERENCES `payment_method` (`id`),
+  ADD CONSTRAINT `scheduled_payments_recurrence_type_id_fr` FOREIGN KEY (`recurrence_type_id`) REFERENCES `recurrence_type` (`id`),
   ADD CONSTRAINT `scheduled_payments_user_id_fr` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
 COMMIT;
 

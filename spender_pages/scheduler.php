@@ -8,7 +8,7 @@ $user_id = $_SESSION['user_id'] ?? 1;
 
 /* ================= FETCH PAYMENTS ================= */
 $stmt = $pdo->prepare("
-    SELECT payment_name, amount, payment_date
+    SELECT payment_name, amount, due_date
     FROM scheduled_payments
     WHERE user_id = ?
 ");
@@ -18,7 +18,7 @@ $payments = $stmt->fetchAll(PDO::FETCH_ASSOC);
 /* GROUP BY DATE */
 $groupedPayments = [];
 foreach ($payments as $payment) {
-    $date = $payment['payment_date'];
+    $date = $payment['due_date'];
     $groupedPayments[$date][] = [
         'name' => $payment['payment_name'],
         'amount' => $payment['amount']
