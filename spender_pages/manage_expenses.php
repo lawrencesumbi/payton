@@ -580,24 +580,19 @@ tr:hover {
 
     /* FAB */
     .fab {
-      position: fixed;
-      bottom: 100px;
-      right: 100px;
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      border: none;
-      background: #7210c8;
-      color: white;
-      font-size: 28px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 6px 15px rgba(0,0,0,0.2);
-      z-index: 1000;
-      transition: 0.3s;
-    }
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background: #3b82f6;
+    color: white;
+    font-size: 26px;
+    border: none;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
 
     .fab:hover { background: #af35e8; transform: translateY(-3px); }
 

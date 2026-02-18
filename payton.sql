@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Feb 18, 2026 at 10:03 AM
+-- Generation Time: Feb 18, 2026 at 10:33 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -165,6 +165,14 @@ CREATE TABLE `scheduled_payments` (
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `scheduled_payments`
+--
+
+INSERT INTO `scheduled_payments` (`id`, `user_id`, `payment_name`, `amount`, `due_date`, `is_recurring`, `recurrence_type_id`, `paid_date`, `payment_method_id`, `due_status_id`, `created_at`, `updated_at`) VALUES
+(3, 1, 'Water Bill', 143.00, '2026-02-19', 0, 1, NULL, 1, 1, '2026-02-18 09:29:20', '2026-02-18 09:29:20'),
+(4, 1, 'Electricity', 389.00, '2026-02-26', 0, 1, NULL, 1, 1, '2026-02-18 09:30:55', '2026-02-18 09:30:55');
+
 -- --------------------------------------------------------
 
 --
@@ -284,7 +292,7 @@ ALTER TABLE `recurrence_type`
 -- AUTO_INCREMENT for table `scheduled_payments`
 --
 ALTER TABLE `scheduled_payments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `users`
