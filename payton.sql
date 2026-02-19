@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Feb 18, 2026 at 10:33 AM
+-- Generation Time: Feb 19, 2026 at 08:26 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -156,10 +156,9 @@ CREATE TABLE `scheduled_payments` (
   `payment_name` varchar(255) NOT NULL,
   `amount` decimal(10,2) NOT NULL,
   `due_date` date NOT NULL,
-  `is_recurring` tinyint(1) NOT NULL DEFAULT 0,
-  `recurrence_type_id` int(11) NOT NULL,
+  `recurrence_type_id` int(11) DEFAULT NULL,
   `paid_date` date DEFAULT NULL,
-  `payment_method_id` int(11) NOT NULL,
+  `payment_method_id` int(11) DEFAULT NULL,
   `due_status_id` int(11) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
@@ -169,9 +168,14 @@ CREATE TABLE `scheduled_payments` (
 -- Dumping data for table `scheduled_payments`
 --
 
-INSERT INTO `scheduled_payments` (`id`, `user_id`, `payment_name`, `amount`, `due_date`, `is_recurring`, `recurrence_type_id`, `paid_date`, `payment_method_id`, `due_status_id`, `created_at`, `updated_at`) VALUES
-(3, 1, 'Water Bill', 143.00, '2026-02-19', 0, 1, NULL, 1, 1, '2026-02-18 09:29:20', '2026-02-18 09:29:20'),
-(4, 1, 'Electricity', 389.00, '2026-02-26', 0, 1, NULL, 1, 1, '2026-02-18 09:30:55', '2026-02-18 09:30:55');
+INSERT INTO `scheduled_payments` (`id`, `user_id`, `payment_name`, `amount`, `due_date`, `recurrence_type_id`, `paid_date`, `payment_method_id`, `due_status_id`, `created_at`, `updated_at`) VALUES
+(5, 1, 'Water Bill', 143.00, '2026-02-18', 1, NULL, NULL, 1, '2026-02-19 05:53:13', '2026-02-19 05:53:13'),
+(6, 1, 'Electricity', 349.00, '2026-02-21', 1, '2026-02-20', 1, 2, '2026-02-19 06:04:46', '2026-02-19 06:04:46'),
+(7, 1, 'Tuition', 2000.00, '2026-02-28', 1, '2026-02-27', 1, 2, '2026-02-19 06:12:03', '2026-02-19 06:12:03'),
+(10, 1, 'Rental', 5000.00, '2026-02-26', 1, '2026-02-27', 1, 2, '2026-02-19 06:51:39', '2026-02-19 06:51:39'),
+(11, 1, 'Sample', 2000.00, '2026-02-20', 2, NULL, NULL, 1, '2026-02-19 06:53:01', '2026-02-19 06:53:01'),
+(14, 1, 'YT', 199.00, '2026-02-27', NULL, NULL, NULL, 1, '2026-02-19 07:24:41', '2026-02-19 07:24:41'),
+(15, 1, 'fb', 100.00, '2026-02-19', NULL, NULL, NULL, 1, '2026-02-19 07:24:48', '2026-02-19 07:24:48');
 
 -- --------------------------------------------------------
 
@@ -292,7 +296,7 @@ ALTER TABLE `recurrence_type`
 -- AUTO_INCREMENT for table `scheduled_payments`
 --
 ALTER TABLE `scheduled_payments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT for table `users`

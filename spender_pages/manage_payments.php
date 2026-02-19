@@ -12,7 +12,6 @@ $stmt = $pdo->prepare("
         sp.payment_name,
         sp.amount,
         sp.due_date,
-        sp.is_recurring,
         rt.recurrence_type_name AS recurrence_type,
         sp.paid_date,
         pm.payment_method_name AS payment_method,
@@ -128,6 +127,10 @@ th {
     border-radius: 10px;
 }
 
+.title-payment{
+    text-align: center;
+}
+
 /* FORM */
 .modal input,
 .modal select {
@@ -168,7 +171,6 @@ th {
                 <th>Payment Name</th>
                 <th>Amount</th>
                 <th>Due Date</th>
-                <th>Recurring</th>
                 <th>Recurrence Type</th>
                 <th>Paid Date</th>
                 <th>Payment Method</th>
@@ -188,8 +190,6 @@ th {
 
                 <td><?= $p['due_date'] ?></td>
 
-                <td><?= $p['is_recurring'] ? 'Yes' : 'No' ?></td>
-
                 <td><?= $p['recurrence_type'] ?? '-' ?></td>
 
                 <td><?= $p['paid_date'] ?? '-' ?></td>
@@ -201,10 +201,7 @@ th {
                 </td>
 
                 <td>
-                    <a href="edit_payment.php?id=<?= $p['id'] ?>">
-                        <button class="btn edit">Edit</button>
-                    </a>
-
+                    <button class="btn edit" onclick="openEditModal(<?= $p['id'] ?>)">Update</button>
                     <a href="delete_payment.php?id=<?= $p['id'] ?>"
                        onclick="return confirm('Delete this payment?')">
                         <button class="btn delete">Delete</button>
@@ -222,10 +219,13 @@ th {
 <!-- ADD PAYMENT MODAL -->
 <div class="modal" id="addPaymentModal">
     <div class="modal-content">
-        <h3>Add Payment</h3>
+        <div class="title-payment">
+            <h3>Add Payment</h3>
+        </div>
 
-        <form method="POST" action="add_payment.php">
-            
+        <form method="POST" action="save_payment.php">
+            <input type="hidden" name="id" id="payment_id">
+
             <label>Payment Name</label>
             <input type="text" name="payment_name" required>
 
@@ -234,12 +234,6 @@ th {
 
             <label>Due Date</label>
             <input type="date" name="due_date" required>
-
-            <label>Recurring?</label>
-            <select name="is_recurring">
-                <option value="0">No</option>
-                <option value="1">Yes</option>
-            </select>
 
             <label>Recurrence Type</label>
             <select name="recurrence_type_id">
@@ -252,6 +246,10 @@ th {
                 ?>
             </select>
 
+            <label>Paid Date</label>
+            <input type="date" name="paid_date" required>
+
+            <div id="paymentFields">
             <label>Payment Method</label>
             <select name="payment_method_id">
                 <?php
@@ -271,6 +269,11 @@ th {
                 }
                 ?>
             </select>
+        </div>
+
+            
+
+            
 
             <div style="margin-top:15px;">
                 <button type="submit" class="save">Save</button>
@@ -291,6 +294,51 @@ function openAddModal() {
 function closeAddModal() {
     document.getElementById("addPaymentModal").style.display = "none";
 }
+
+
+function openEditModal(id, name, amount, due_date, recurrence) {
+
+    document.getElementById("addPaymentModal").style.display = "block";
+    document.getElementById("payment_id").value = id;
+
+    document.querySelector("input[name='payment_name']").value = name;
+    document.querySelector("input[name='amount']").value = amount;
+    document.querySelector("input[name='due_date']").value = due_date;
+    document.querySelector("select[name='recurrence_type_id']").value = recurrence ?? "";
+}
+
+function openAddModal() {
+
+    document.getElementById("addPaymentModal").style.display = "block";
+    document.getElementById("payment_id").value = "";
+
+    document.querySelector("form").reset();
+}
+
+function openEditModal(id) {
+    // Show the modal
+    document.getElementById("addPaymentModal").style.display = "block";
+    document.querySelector("h3").innerText = "Edit Payment";
+
+    // Show payment fields
+    document.getElementById("paymentFields").style.display = "block";
+
+    // Fetch data via AJAX
+    fetch('get_payment.php?id=' + id)
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById("payment_id").value = data.id;
+            document.querySelector("input[name='payment_name']").value = data.payment_name;
+            document.querySelector("input[name='amount']").value = data.amount;
+            document.querySelector("input[name='due_date']").value = data.due_date;
+            document.querySelector("select[name='recurrence_type_id']").value = data.recurrence_type_id ?? "";
+            document.querySelector("select[name='payment_method_id']").value = data.payment_method_id ?? "";
+            document.querySelector("select[name='due_status_id']").value = data.due_status_id ?? 1;
+        })
+        .catch(error => console.error('Error fetching payment:', error));
+}
+
+
 </script>
 
 
