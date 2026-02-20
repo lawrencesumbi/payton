@@ -76,74 +76,111 @@ $_SESSION['email'] = $user['email'];
       min-height: 100vh;
     }
 
-    /* SIDEBAR */
-    .sidebar {
-      width: 200px;
-      background: #ffffff;
-      padding: 13px 18px;
-      border-right: 1px solid #eee;
-    }
+  /* ===== WHITE SIDEBAR: HOVER TO EXPAND ===== */
+.sidebar {
+  width: 85px; /* Collapsed width */
+  background: #ffffff; /* Original White Background */
+  padding: 20px 0;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden; 
+  border-right: 1px solid #eee; /* Original border */
+  z-index: 1000;
+}
 
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 30px;
-    }
+/* Expand on Hover */
+.sidebar:hover {
+  width: 260px;
+}
 
-    .logo {
-      width: 42px;
-      height: 42px;
-      border-radius: 12px;
-      background: #7f308f;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-size: 18px;
-    }
+/* BRANDING (payton logo/name) */
+.left-nav {
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  margin-bottom: 40px;
+  gap: 15px;
+  white-space: nowrap;
+}
 
-    .brand h2 {
-      font-size: 20px;
-      font-weight: 800;
-      color: #222;
-    }
+.left-nav img {
+  width: 45px;
+  min-width: 45px;
+  height: 45px;
+  border-radius: 12px;
+  object-fit: cover;
+}
 
-    .menu {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
+.left-nav h3 {
+  font-size: 22px;
+  font-weight: 800;
+  color: #222; /* Original dark text */
+  opacity: 0;
+  transition: opacity 0.2s;
+}
 
-    }
+.sidebar:hover .left-nav h3 {
+  opacity: 1;
+}
 
-    .menu a {
-      text-decoration: none;
-      padding: 12px 14px;
-      border-radius: 14px;
-      color: #444;
-      font-weight: 600;
-      font-size: 14px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      transition: 0.25s;
-    }
+/* MENU LAYOUT */
+.menu {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-left: 15px;
+}
 
-    .menu a:hover {
-      background: #f3eaff;
-      color: #7f308f;
-    }
+.menu a {
+  text-decoration: none;
+  padding: 14px 20px;
+  color: #444; /* Original dark gray text */
+  font-weight: 600;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  transition: all 0.2s ease;
+  border-radius: 30px 0 0 30px; /* Capsule shape */
+  white-space: nowrap;
+}
 
-    .menu a.active {
-      background: #7f308f;
-      color: white;
-    }
+.menu a i {
+  font-size: 18px;
+  min-width: 25px;
+  text-align: center;
+  color: #7f308f; /* Original Purple for icons */
+}
 
-    .menu a.logout {
-      margin-top: 15px;
-      background: #f6f6f6;
-    }
+/* Hide labels when collapsed */
+.menu a span {
+  opacity: 0;
+  transition: opacity 0.2s;
+}
 
+.sidebar:hover .menu a span {
+  opacity: 1;
+}
+
+/* ACTIVE STATE (Light Purple Capsule) */
+.menu a.active {
+  background: #e0c7fa; /* Light Purple / Lavender background */
+  color: #fdfafd !important; /* Original Purple text */
+}
+
+.menu a.active i {
+  color: #7f308f;
+}
+
+.menu a:hover:not(.active) {
+  background: #f9f9f9;
+  color: #7f308f;
+}
     /* MAIN */
     .main {
       flex: 1;
@@ -378,38 +415,38 @@ $_SESSION['email'] = $user['email'];
 
   <!-- SIDEBAR -->
   <aside class="sidebar">
-    <div class="left-nav">
-      <img src="img/logo.jpg" alt="logo">
-      <h3>payton</h3>
-    </div>
+  <div class="left-nav">
+    <img src="img/logo.jpg" alt="logo">
+    <h3>payton</h3>
+  </div>
 
-    <nav class="menu">
-      <a href="?page=dashboard" class="<?= $page=='dashboard'?'active':'' ?>">
-        <i class="fa-solid fa-house"></i> Dashboard
-      </a>
+  <nav class="menu">
+    <a href="?page=dashboard" class="<?= $page=='dashboard'?'active':'' ?>">
+      <i class="fa-solid fa-house"></i>
+      <span>Dashboard</span>
+    </a>
 
-      <a href="?page=manage_budget" class="<?= $page=='manage_budget'?'active':'' ?>">
-        <i class="fa-solid fa-receipt"></i> Budget
-      </a>
-      
-      <a href="?page=manage_expenses" class="<?= $page=='manage_expenses'?'active':'' ?>">
-        <i class="fa-solid fa-receipt"></i> Expenses
-      </a>
+    <a href="?page=manage_budget" class="<?= $page=='manage_budget'?'active':'' ?>">
+      <i class="fa-solid fa-wallet"></i>
+      <span>Budget</span>
+    </a>
+    
+    <a href="?page=manage_expenses" class="<?= $page=='manage_expenses'?'active':'' ?>">
+      <i class="fa-solid fa-file-invoice-dollar"></i>
+      <span>Expenses</span>
+    </a>
 
-      <a href="?page=manage_payments" class="<?= $page=='manage_payments'?'active':'' ?>">
-        <i class="fa-solid fa-receipt"></i> Payments
-      </a>
+    <a href="?page=manage_payments" class="<?= $page=='manage_payments'?'active':'' ?>">
+      <i class="fa-solid fa-money-bill-transfer"></i>
+      <span>Payments</span>
+    </a>
 
-      <a href="?page=scheduler" class="<?= $page=='scheduler'?'active':'' ?>">
-        <i class="fa-solid fa-calendar"></i> Scheduler
-      </a>
-
-      <a href="?page=manage_reminders" class="<?= $page=='manage_reminders'?'active':'' ?>">
-        <i class="fa-solid fa-bell"></i> Reminders
-      </a>
-    </nav>
-  </aside>
-
+    <a href="?page=scheduler" class="<?= $page=='scheduler'?'active':'' ?>">
+      <i class="fa-solid fa-calendar-days"></i>
+      <span>Scheduler</span>
+    </a>
+  </nav>
+</aside>
   <!-- MAIN -->
   <main class="main">
 
