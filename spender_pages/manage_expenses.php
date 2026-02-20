@@ -116,14 +116,17 @@ if ($prevMonthTotal > 0) {
    ANALYTICS SECTION (CLEAN)
 ========================= */
 
+.dashboard-top-row {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 20px;
+    align-items: flex-start;
+}
+
+/* LEFT SIDE: ANALYTICS */
 .analytics-container {
-  background: #ffffff;
-  border-radius: 18px;
-  padding: 15px;
-  border: 1px solid #eef1f6;
-  box-shadow: 0 10px 35px rgba(15, 23, 42, 0.06);
-  max-width: 100%;
-  width: 100%;
+    flex: 1; /* Takes about half the space */
+    min-width: 450px;
 }
 
 .analytics-header {
@@ -153,11 +156,12 @@ if ($prevMonthTotal > 0) {
   font-weight: 800;
 }
 
-/* GRID */
+/* UPDATED 2x2 GRID LAYOUT */
 .analytics-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 10px;
+  /* This forces exactly 2 columns */
+  grid-template-columns: repeat(2, 1fr); 
+  gap: 15px; /* Increased gap slightly for a cleaner look */
   margin-bottom: 5px;
 }
 
@@ -301,50 +305,72 @@ if ($prevMonthTotal > 0) {
 /* =========================
    BREAKDOWN SECTION
 ========================= */
-
 .categories-breakdown {
-  background: #ffffff;
-  padding: 22px;
-  border-radius: 18px;
-  border: 1px solid #eef1f6;
-  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.05);
+    flex: 1;
+    min-width: 400px;
+    background: #ffffff;
+    padding: 22px;
+    border-radius: 18px;
+    border: 1px solid #eef1f6;
+    box-shadow: 0 10px 35px rgba(15, 23, 42, 0.06);
+    height: 100%; /* Ensure it matches the height of the left box */
 }
 
-.categories-grid {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 10px;
-  margin-top: 12px;
+/* THE SINGLE LINE CATEGORY STYLE */
+.categories-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 15px;
 }
 
-.categories-grid .category-item {
-  padding: 10px;
-  border-bottom: none;
-  border: 1px solid #e8ecf1;
-  border-radius: 8px;
-  background: #fafbfc;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+.category-row {
+    display: flex;
+    align-items: center;
+    gap: 15px;
 }
 
-
-
-@media (max-width: 1200px) {
-  .categories-grid { grid-template-columns: repeat(4, 1fr); }
+.cat-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: #475569;
+    min-width: 100px; /* Aligns the start of the lines */
 }
 
-@media (max-width: 920px) {
-  .categories-grid { grid-template-columns: repeat(3, 1fr); }
+.cat-line-container {
+    flex: 1;
+    height: 6px;
+    background: #f1f5f9;
+    border-radius: 10px;
+    position: relative;
+    overflow: hidden;
 }
 
-@media (max-width: 680px) {
-  .categories-grid { grid-template-columns: repeat(2, 1fr); }
+.cat-line-fill {
+    height: 100%;
+    border-radius: 10px;
+    /* Uses the purple from your theme */
+    background: linear-gradient(90deg, #7c3aed, #a855f7);
 }
 
-@media (max-width: 480px) {
-  .categories-grid { grid-template-columns: 1fr; }
+.cat-pct {
+    font-size: 12px;
+    font-weight: 800;
+    color: #1e293b;
+    min-width: 45px;
+    text-align: right;
 }
+
+/* Responsive fix */
+@media (max-width: 1024px) {
+    .dashboard-top-row {
+        flex-direction: column;
+    }
+    .analytics-container, .categories-breakdown {
+        width: 100%;
+    }
+}
+
 
 .breakdown-title {
   font-weight: 900;
@@ -670,98 +696,82 @@ tr:hover {
 <body>
 
 <!-- ANALYTICS SECTION -->
-<div class="analytics-container">
-    <div class="analytics-header">
-        <i class="fas fa-chart-pie"></i>
-        <h2>Expense Analytics</h2>
-    </div>
+<div class="dashboard-top-row">
 
-    <div class="analytics-grid">
-
-    <div class="stat-card stat-blue">
-    <div class="stat-icon">
-        <i class="fa-solid fa-wallet"></i>
-    </div>
-
-    <div class="stat-card-content">
-        <div class="stat-label">Total Expenses</div>
-        <div class="stat-value">₱ <?= number_format($totalExpenses, 2) ?></div>
-        <div class="stat-subtitle"><?= count($expenses) ?> transaction<?= count($expenses) !== 1 ? 's' : '' ?></div>
-    </div>
-</div>
-
-<div class="stat-card stat-purple">
-    <div class="stat-icon">
-        <i class="fa-solid fa-chart-line"></i>
-    </div>
-
-    <div class="stat-card-content">
-        <div class="stat-label">Average Expense</div>
-        <div class="stat-value">
-            ₱ <?= count($expenses) > 0 ? number_format($totalExpenses / count($expenses), 2) : '0.00' ?>
+    <div class="analytics-container">
+        <div class="analytics-header">
+            <i class="fas fa-chart-pie"></i>
+            <h2>Expense Analytics</h2>
         </div>
-        <div class="stat-subtitle">per transaction</div>
+
+        <div class="analytics-grid">
+            <div class="stat-card stat-blue">
+                <div class="stat-icon"><i class="fa-solid fa-wallet"></i></div>
+                <div class="stat-card-content">
+                    <div class="stat-label">Total Expenses</div>
+                    <div class="stat-value">₱ <?= number_format($totalExpenses, 2) ?></div>
+                    <div class="stat-subtitle"><?= count($expenses) ?> transactions</div>
+                </div>
+            </div>
+
+            <div class="stat-card stat-purple">
+                <div class="stat-icon"><i class="fa-solid fa-chart-line"></i></div>
+                <div class="stat-card-content">
+                    <div class="stat-label">Average</div>
+                    <div class="stat-value">₱ <?= count($expenses) > 0 ? number_format($totalExpenses / count($expenses), 2) : '0.00' ?></div>
+                    <div class="stat-subtitle">per transaction</div>
+                </div>
+            </div>
+
+            <div class="stat-card stat-green">
+                <div class="stat-icon"><i class="fa-solid fa-layer-group"></i></div>
+                <div class="stat-card-content">
+                    <div class="stat-label">Tracked</div>
+                    <div class="stat-value"><?= count($categoryBreakdown) ?></div>
+                    <div class="stat-subtitle">Categories</div>
+                </div>
+            </div>
+
+            <div class="stat-card stat-orange">
+                <div class="stat-icon"><i class="fa-solid fa-calendar-days"></i></div>
+                <div class="stat-card-content">
+                    <div class="stat-label">This Month</div>
+                    <div class="stat-value">₱ <?= number_format($thisMonthTotal, 2) ?></div>
+                    <div class="stat-subtitle">
+                        <?php if ($monthChangePct > 0): ?>
+                            <span class="trend-up">↑ <?= abs($monthChangePct) ?>%</span>
+                        <?php else: ?>
+                            <span class="trend-down">↓ <?= abs($monthChangePct) ?>%</span>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
+
+    <div class="categories-breakdown">
+        <div class="breakdown-title">Category Breakdown</div>
+        <div class="categories-list">
+            <?php foreach ($allCategories as $cat):
+                $name = $cat['category_name'];
+                $pct = isset($categoryPercentages[$name]) ? $categoryPercentages[$name] : 0;
+            ?>
+                <div class="category-row">
+                    <div class="cat-label"><?= htmlspecialchars($name) ?></div>
+                    <div class="cat-line-container">
+                        <div class="cat-line-fill" style="width: <?= $pct ?>%;"></div>
+                    </div>
+                    <div class="cat-pct"><?= $pct ?>%</div>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
+
 </div>
 
-<div class="stat-card stat-green">
-    <div class="stat-icon">
-        <i class="fa-solid fa-layer-group"></i>
-    </div>
 
-    <div class="stat-card-content">
-        <div class="stat-label">Categories Tracked</div>
-        <div class="stat-value"><?= count($categoryBreakdown) ?></div>
-        <div class="stat-subtitle">expense types</div>
-    </div>
-</div>
 
-<div class="stat-card stat-orange">
-  <div class="stat-card-content">
-    <div class="stat-label">This Month</div>
-    <div class="stat-value">₱ <?= number_format($thisMonthTotal, 2) ?></div>
-    <div class="stat-subtitle">
-      <?php if ($monthChangePct > 0): ?>
-        <span class="trend-up"><i class="fa-solid fa-arrow-up"></i> <?= abs($monthChangePct) ?>%</span> vs last month
-      <?php elseif ($monthChangePct < 0): ?>
-        <span class="trend-down"><i class="fa-solid fa-arrow-down"></i> <?= abs($monthChangePct) ?>%</span> vs last month
-      <?php else: ?>
-        <span><?= $monthChangePct ?>% vs last month</span>
-      <?php endif; ?>
-    </div>
-  </div>
-  <div class="stat-icon"><i class="fa-solid fa-calendar-days"></i></div>
-</div>
 
-<?php // Categories are shown in the detailed breakdown below ?>
-
-    </div>
-</div>
-
-<!-- DETAILED CATEGORY BREAKDOWN -->
-<div class="categories-breakdown" style="margin-top:10px;">
-  <div class="breakdown-title">Category Breakdown</div>
-
-  <div class="categories-grid">
-  <?php foreach ($allCategories as $cat):
-        $name = $cat['category_name'];
-        $amt = isset($categoryBreakdown[$name]) ? $categoryBreakdown[$name] : 0;
-        $pct = isset($categoryPercentages[$name]) ? $categoryPercentages[$name] : 0;
-  ?>
-    <div class="category-item">
-      <div style="flex:1; margin-right:12px;">
-        <div class="category-name"><?= htmlspecialchars($name) ?></div>
-        <div class="progress-bar"><div class="progress-fill" style="width: <?= $pct ?>%;"></div></div>
-      </div>
-      <div style="text-align:right; min-width:120px;">
-        <div class="category-amount">₱ <?= number_format($amt, 2) ?></div>
-        <div class="category-percent"><?= $pct ?>%</div>
-      </div>
-    </div>
-  <?php endforeach; ?>
-  </div>
-
-</div>
 
 <div class="table-container">
 <table>

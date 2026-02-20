@@ -79,7 +79,7 @@ $_SESSION['email'] = $user['email'];
   /* ===== WHITE SIDEBAR: HOVER TO EXPAND ===== */
 .sidebar {
   width: 85px; /* Collapsed width */
-  background: #ffffff; /* Original White Background */
+  background: #f4edf8; /* Original White Background */
   padding: 20px 0;
   display: flex;
   flex-direction: column;
@@ -169,8 +169,8 @@ $_SESSION['email'] = $user['email'];
 
 /* ACTIVE STATE (Light Purple Capsule) */
 .menu a.active {
-  background: #e0c7fa; /* Light Purple / Lavender background */
-  color: #fdfafd !important; /* Original Purple text */
+  background: #ebe0f7; /* Light Purple / Lavender background */
+  color: #7f308f !important; /* Original Purple text */
 }
 
 .menu a.active i {
