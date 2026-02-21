@@ -26,7 +26,7 @@ $stmt = $conn->prepare("
     JOIN category c ON e.category_id = c.id
     JOIN payment_method pm ON e.payment_method_id = pm.id
     WHERE e.user_id = ?
-    ORDER BY e.expense_date DESC
+    ORDER BY id DESC
 ");
 $stmt->execute([$user_id]);
 $expenses = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -121,7 +121,7 @@ if ($prevMonthTotal > 0) {
 .dashboard-top-row {
    
 display: flex;
-    gap: 20px;
+    gap: 10px;
     margin-bottom: 10px;
     align-items: flex-start;
     height: 300px;
@@ -476,13 +476,13 @@ h2 {
 
 .table-container {
   flex: 1;
-  max-height: calc(100vh - 425px); /* viewport - topbar - margin/padding */
+  max-height: calc(100vh - 400px); /* viewport - topbar - margin/padding */
   overflow-y: auto;
   overflow-x: auto;
   background: white;
   border-radius: 12px;
   padding: 0; /* important for sticky header alignment */
-  margin-top: 10px;
+  margin-top: 5px;
   box-shadow: 0 6px 15px rgba(0,0,0,0.1);
   border: 1px solid #ddd;
 }
@@ -632,7 +632,7 @@ tr:hover {
     position: fixed;
     bottom: 30px;
     right: 30px;
-    background: #3b82f6;
+    background: #7f00d4;
     color: white;
     font-size: 26px;
     border: none;
@@ -713,6 +713,7 @@ tr:hover {
     }
     .btn-save { width:100%; padding:14px; background:#6300d4; color:white; border:none; border-radius:14px; font-weight:800; cursor:pointer; }
     .btn-save:hover { opacity:0.9; }
+
 
   </style>
 </head>
@@ -803,7 +804,7 @@ tr:hover {
 <table>
     <thead>
         <tr>
-            <th>#</th>
+            <th>No.</th>
             <th>Description</th>
             <th>Category</th>
             
@@ -893,7 +894,7 @@ tr:hover {
 
     <div class="form-group">
       <label>Description</label>
-      <input type="text" name="description" id="descInput" placeholder="e.g. Jollibee" required>
+      <input type="text" name="description" id="descInput" placeholder="Transaction Name" required>
     </div>
 
     <p class="label">Category</p>
@@ -912,7 +913,7 @@ tr:hover {
 
     <div class="form-group">
       <label>Amount</label>
-      <input type="number" name="amount" id="amountInput" placeholder="e.g. 250" required min="1">
+      <input type="number" name="amount" id="amountInput" placeholder="₱" required min="1">
     </div>
 
     <div class="form-group">
@@ -930,7 +931,7 @@ tr:hover {
     </div>
 
     <div class="form-group">
-        <label>Proof of Purchase</label>
+        <label>Proof of Transaction</label>
         <input type="file" name="receipt_upload" accept="image/*">
         <p id="currentReceipt" style="font-size:12px; color:#555;">No receipt uploaded</p>
     </div>
@@ -986,112 +987,131 @@ tr:hover {
 </style>
 
 
-  <script>
-    const fab = document.querySelector('.fab');
-    const modalOverlay = document.getElementById('modalOverlay');
-    const closeBtn = document.querySelector('.close-btn');
-    const catCards = document.querySelectorAll('.cat-card');
-    const categoryInput = document.getElementById('categoryInput');
+<script>
+document.addEventListener("DOMContentLoaded", () => {
 
-    fab.addEventListener('click', () => {
-      modalOverlay.style.display = 'flex';
-    });
+  const fab = document.querySelector('.fab');
+  const modalOverlay = document.getElementById('modalOverlay');
+  const closeBtn = document.querySelector('.close-btn');
+  const catCards = document.querySelectorAll('.cat-card');
+  const categoryInput = document.getElementById('categoryInput');
+  const descInput = document.getElementById("descInput");
 
-    closeBtn.addEventListener('click', () => {
-      modalOverlay.style.display = 'none';
-    });
-
-    catCards.forEach(card => {
-      card.addEventListener('click', () => {
-        catCards.forEach(c => c.classList.remove('active'));
-        card.classList.add('active');
-        categoryInput.value = card.getAttribute('data-category-id');
-      });
-    });
-
-
-
-
-
-
-    const editButtons = document.querySelectorAll('.btn-edit');
-
-editButtons.forEach(btn => {
-  btn.addEventListener('click', function(e) {
-    e.preventDefault();
-
-    const id = this.dataset.id;
-    const category = this.dataset.category;
-    const description = this.dataset.description;
-    const amount = this.dataset.amount;
-    const payment = this.dataset.payment;
-    const receipt = this.dataset.receipt; // NEW
-
-    // Open modal
+  // ================= MODAL OPEN/CLOSE =================
+  fab?.addEventListener('click', () => {
     modalOverlay.style.display = 'flex';
-
-    // Fill the form fields
-    categoryInput.value = category;
-    catCards.forEach(c => c.classList.remove('active'));
-    document.querySelector(`.cat-card[data-category-id="${category}"]`)?.classList.add('active');
-
-    document.querySelector('input[name="description"]').value = description;
-    document.querySelector('input[name="amount"]').value = amount;
-    document.querySelector('select[name="payment_method_id"]').value = payment;
-
-    // If you want, display current receipt file name somewhere
-    const receiptLabel = document.getElementById('currentReceipt');
-    if(receipt) {
-        receiptLabel.textContent = `Current Receipt: ${receipt.split('/').pop()}`;
-    } else {
-        receiptLabel.textContent = 'No receipt uploaded';
-    }
-
-    // Change button text
-    const btnSave = document.querySelector('.btn-save');
-    btnSave.textContent = 'Update Expense';
-
-    // Add hidden input for expense ID
-    let hiddenInput = document.querySelector('input[name="expense_id"]');
-    if(!hiddenInput) {
-        hiddenInput = document.createElement('input');
-        hiddenInput.type = 'hidden';
-        hiddenInput.name = 'expense_id';
-        document.querySelector('.expense-form').appendChild(hiddenInput);
-    }
-    hiddenInput.value = id;
-
-    // Change form action to update
-    document.querySelector('.expense-form').action = 'update_expense_process.php';
   });
-});
 
-
-
-
-
-const viewButtons = document.querySelectorAll('.btn-view-receipt');
-const receiptModal = document.getElementById('receiptModal');
-const receiptImage = document.getElementById('receiptImage');
-const closeReceiptBtn = document.querySelector('.close-receipt-btn');
-
-viewButtons.forEach(btn => {
-  btn.addEventListener('click', () => {
-    const imgSrc = btn.dataset.receipt; // "uploads/filename.png"
-    receiptImage.src = imgSrc;
-    receiptModal.style.display = 'flex';
+  closeBtn?.addEventListener('click', () => {
+    modalOverlay.style.display = 'none';
   });
+
+  // ================= CATEGORY CLICK =================
+  catCards.forEach(card => {
+    card.addEventListener('click', () => {
+      catCards.forEach(c => c.classList.remove('active'));
+      card.classList.add('active');
+      categoryInput.value = card.getAttribute('data-category-id');
+    });
+  });
+
+  // ================= EDIT EXPENSE =================
+  document.querySelectorAll('.btn-edit').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+      e.preventDefault();
+
+      const id = this.dataset.id;
+      const category = this.dataset.category;
+      const description = this.dataset.description;
+      const amount = this.dataset.amount;
+      const payment = this.dataset.payment;
+      const receipt = this.dataset.receipt;
+
+      modalOverlay.style.display = 'flex';
+
+      categoryInput.value = category;
+      catCards.forEach(c => c.classList.remove('active'));
+      document.querySelector(`.cat-card[data-category-id="${category}"]`)?.classList.add('active');
+
+      document.querySelector('input[name="description"]').value = description;
+      document.querySelector('input[name="amount"]').value = amount;
+      document.querySelector('select[name="payment_method_id"]').value = payment;
+
+      const receiptLabel = document.getElementById('currentReceipt');
+      receiptLabel.textContent = receipt
+        ? `Current Receipt: ${receipt.split('/').pop()}`
+        : 'No receipt uploaded';
+
+      const btnSave = document.querySelector('.btn-save');
+      btnSave.textContent = 'Update Expense';
+
+      let hiddenInput = document.querySelector('input[name="expense_id"]');
+      if(!hiddenInput) {
+          hiddenInput = document.createElement('input');
+          hiddenInput.type = 'hidden';
+          hiddenInput.name = 'expense_id';
+          document.querySelector('.expense-form').appendChild(hiddenInput);
+      }
+      hiddenInput.value = id;
+
+      document.querySelector('.expense-form').action = 'update_expense_process.php';
+    });
+  });
+
+  // ================= VIEW RECEIPT =================
+  const receiptModal = document.getElementById('receiptModal');
+  const receiptImage = document.getElementById('receiptImage');
+
+  document.querySelectorAll('.btn-view-receipt').forEach(btn => {
+    btn.addEventListener('click', () => {
+      receiptImage.src = btn.dataset.receipt;
+      receiptModal.style.display = 'flex';
+    });
+  });
+
+  document.querySelector('.close-receipt-btn')?.addEventListener('click', () => {
+    receiptModal.style.display = 'none';
+    receiptImage.src = '';
+  });
+
+  // ================= AI AUTO CATEGORIZE =================
+  let typingTimer;
+const delay = 300; // faster for offline
+
+descInput.addEventListener("input", () => {
+  clearTimeout(typingTimer);
+
+  typingTimer = setTimeout(() => {
+    classifyOffline(descInput.value);
+  }, delay);
 });
 
-closeReceiptBtn.addEventListener('click', () => {
-  receiptModal.style.display = 'none';
-  receiptImage.src = ''; // clear image
+function classifyOffline(text) {
+  if (!text.trim()) return;
+
+  fetch("local_categorize.php", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: "description=" + encodeURIComponent(text)
+  })
+  .then(res => res.json())
+  .then(data => {
+    const detectedCategory = data.category_id || 10;
+
+    // Update UI
+    catCards.forEach(card => card.classList.remove("active"));
+
+    const selectedCard = document.querySelector(`[data-category-id="${detectedCategory}"]`);
+    if (selectedCard) {
+      selectedCard.classList.add("active");
+      categoryInput.value = detectedCategory;
+    }
+  })
+  .catch(err => console.error("Offline AI error:", err));
+}
+
 });
-
-
-
-    
-  </script>
+</script>
 
 </body>
 </html>
