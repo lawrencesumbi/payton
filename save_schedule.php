@@ -8,6 +8,7 @@ $name = $_POST['payment_name'];
 $amount = $_POST['amount'];
 $date = $_POST['date'];
 
+
 // Set default status: 1 = unpaid
 $due_status_id = 1;
 

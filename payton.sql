@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Feb 19, 2026 at 08:26 AM
+-- Generation Time: Feb 21, 2026 at 04:15 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -96,7 +96,11 @@ INSERT INTO `expenses` (`id`, `user_id`, `category_id`, `description`, `amount`,
 (3, 1, 1, 'Angels Burger', 40.00, 1, NULL, '2026-02-09', '2026-02-09 02:06:22', '2026-02-09 03:30:59'),
 (4, 1, 2, 'Gasoline', 1000.00, 1, 'uploads/698955dc227ca-gas receipt- May 2010a.jpg', '2026-02-09', '2026-02-09 02:13:32', '2026-02-09 03:34:52'),
 (5, 1, 8, 'CCTV', 899.00, 1, NULL, '2026-02-09', '2026-02-09 03:33:46', '2026-02-09 03:33:46'),
-(6, 1, 6, 'Paper', 30.00, 1, NULL, '2026-02-18', '2026-02-18 04:01:04', '2026-02-18 04:01:18');
+(6, 1, 6, 'Paper', 30.00, 1, NULL, '2026-02-18', '2026-02-18 04:01:04', '2026-02-18 04:01:18'),
+(7, 1, 4, 'Water Bill', 143.00, 1, NULL, '2026-02-21', '2026-02-21 07:37:51', '2026-02-21 07:37:51'),
+(8, 1, 6, 'Tuition', 1555.00, 1, NULL, '2026-02-21', '2026-02-21 07:44:37', '2026-02-21 07:44:37'),
+(9, 1, 1, 'lumpia', 5.00, 1, NULL, '2026-02-21', '2026-02-21 08:10:04', '2026-02-21 08:10:04'),
+(10, 1, 7, 'Subscription', 299.00, 2, NULL, '2026-02-21', '2026-02-21 08:29:46', '2026-02-21 12:29:31');
 
 -- --------------------------------------------------------
 
@@ -156,6 +160,7 @@ CREATE TABLE `scheduled_payments` (
   `payment_name` varchar(255) NOT NULL,
   `amount` decimal(10,2) NOT NULL,
   `due_date` date NOT NULL,
+  `is_recurring` tinyint(1) NOT NULL DEFAULT 0,
   `recurrence_type_id` int(11) DEFAULT NULL,
   `paid_date` date DEFAULT NULL,
   `payment_method_id` int(11) DEFAULT NULL,
@@ -168,14 +173,17 @@ CREATE TABLE `scheduled_payments` (
 -- Dumping data for table `scheduled_payments`
 --
 
-INSERT INTO `scheduled_payments` (`id`, `user_id`, `payment_name`, `amount`, `due_date`, `recurrence_type_id`, `paid_date`, `payment_method_id`, `due_status_id`, `created_at`, `updated_at`) VALUES
-(5, 1, 'Water Bill', 143.00, '2026-02-18', 1, NULL, NULL, 1, '2026-02-19 05:53:13', '2026-02-19 05:53:13'),
-(6, 1, 'Electricity', 349.00, '2026-02-21', 1, '2026-02-20', 1, 2, '2026-02-19 06:04:46', '2026-02-19 06:04:46'),
-(7, 1, 'Tuition', 2000.00, '2026-02-28', 1, '2026-02-27', 1, 2, '2026-02-19 06:12:03', '2026-02-19 06:12:03'),
-(10, 1, 'Rental', 5000.00, '2026-02-26', 1, '2026-02-27', 1, 2, '2026-02-19 06:51:39', '2026-02-19 06:51:39'),
-(11, 1, 'Sample', 2000.00, '2026-02-20', 2, NULL, NULL, 1, '2026-02-19 06:53:01', '2026-02-19 06:53:01'),
-(14, 1, 'YT', 199.00, '2026-02-27', NULL, NULL, NULL, 1, '2026-02-19 07:24:41', '2026-02-19 07:24:41'),
-(15, 1, 'fb', 100.00, '2026-02-19', NULL, NULL, NULL, 1, '2026-02-19 07:24:48', '2026-02-19 07:24:48');
+INSERT INTO `scheduled_payments` (`id`, `user_id`, `payment_name`, `amount`, `due_date`, `is_recurring`, `recurrence_type_id`, `paid_date`, `payment_method_id`, `due_status_id`, `created_at`, `updated_at`) VALUES
+(3, 1, 'Water Bill', 143.00, '2026-02-19', 0, 1, NULL, 1, 1, '2026-02-18 09:29:20', '2026-02-18 09:29:20'),
+(4, 1, 'Electricity', 389.00, '2026-02-26', 0, 1, NULL, 1, 1, '2026-02-18 09:30:55', '2026-02-18 09:30:55'),
+(10, 1, 'Tuition', 2000.00, '2026-02-14', 0, NULL, NULL, NULL, 1, '2026-02-21 12:48:51', '2026-02-21 12:48:51'),
+(11, 1, 'Load', 100.00, '2026-02-21', 0, NULL, NULL, NULL, 1, '2026-02-21 12:49:21', '2026-02-21 12:49:21'),
+(13, 1, 'sample', 100.00, '2026-02-20', 0, NULL, NULL, NULL, 1, '2026-02-21 12:53:24', '2026-02-21 12:53:24'),
+(14, 1, '25', 100.00, '2026-02-27', 0, NULL, NULL, NULL, 1, '2026-02-21 12:54:53', '2026-02-21 12:54:53'),
+(15, 1, 'data', 40.00, '2026-02-21', 0, NULL, NULL, NULL, 1, '2026-02-21 12:55:05', '2026-02-21 12:55:05'),
+(16, 1, '28', 28.00, '2026-02-28', 0, NULL, NULL, NULL, 1, '2026-02-21 13:00:07', '2026-02-21 13:00:07'),
+(19, 1, 'Loklok', 149.00, '2026-02-22', 0, NULL, NULL, NULL, 1, '2026-02-21 14:45:12', '2026-02-21 14:45:12'),
+(20, 1, '280', 280.00, '2026-02-28', 0, NULL, NULL, NULL, 1, '2026-02-21 15:11:01', '2026-02-21 15:11:01');
 
 -- --------------------------------------------------------
 
@@ -198,7 +206,7 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `fullname`, `email`, `password`, `role`, `profile_pic`, `created_at`) VALUES
-(1, 'Lawrence Guian P. Sumbi', 'guiansumbi@gmail.com', '$2y$10$cKIACjgglVTrRjDZaKSZjulwkdA0CIDUwOBkU12h2PPGKK03U0aT6', 'spender', 'profile/1770685946_698a85faed329.png', '2026-02-07 17:08:23'),
+(1, 'Lawrence Sumbi', 'guiansumbi@gmail.com', '$2y$10$cKIACjgglVTrRjDZaKSZjulwkdA0CIDUwOBkU12h2PPGKK03U0aT6', 'spender', 'profile/1771656471_699955178cecf.jpg', '2026-02-07 17:08:23'),
 (2, 'Patricia Ann Mae Obaob', 'patriciaannmaeobaob721@gmail.com', '$2y$10$gVokRQej23KaxSKKUZPiSOn/mL5IE0kvfoGyPRTZfN1in/ZpNAQku', 'sponsor', '', '2026-02-08 11:52:14'),
 (3, 'Dranreb Misa', 'draymisa@gmail.com', '$2y$10$Gw3YeLEMfsCIOPV3xFs5h.jClSQLC9rilddvuzZ063CceY9/IVgue', 'spender', '', '2026-02-09 00:03:22'),
 (4, 'Aljon Paragoso', 'aljon@gmail.com', '$2y$10$Wt8Xf9aFRGG6zRdmdsfP1.bzpQS9xPfN/20Rsf.l7gb5ivx7H.t8u', 'spender', '', '2026-02-10 02:32:42');
@@ -278,7 +286,7 @@ ALTER TABLE `due_status`
 -- AUTO_INCREMENT for table `expenses`
 --
 ALTER TABLE `expenses`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `payment_method`
@@ -296,7 +304,7 @@ ALTER TABLE `recurrence_type`
 -- AUTO_INCREMENT for table `scheduled_payments`
 --
 ALTER TABLE `scheduled_payments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- AUTO_INCREMENT for table `users`
