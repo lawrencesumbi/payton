@@ -151,6 +151,32 @@
   text-decoration: underline;
 }
 
+.form-forgot {
+  display: flex;
+  margin-bottom: 30px;
+}
+
+.form-forgot label{
+    width: 250px;
+    font-size: 13px;
+    color: #000000;
+}
+
+.form-forgot p {
+  font-size: 13px;
+  color: #777;
+}
+
+.form-forgot a {
+  color: #7f308f;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.form-forgot a:hover {
+  text-decoration: underline;
+}
+
 
     .login-btn {
   width: 100%;
@@ -307,6 +333,14 @@
       <div class="form-group">
         <label for="password">Password</label>
         <input type="password" name="password" id="password" required>
+      </div>
+
+      <div class="form-forgot">
+        <label>
+          <input type="checkbox" name="remember_me">
+          Remember me
+        </label>
+        <p><a href="forgotpassword.php">Forgot Password?</a></p>
       </div>
 
       <button type="submit" class="login-btn">Login</button>

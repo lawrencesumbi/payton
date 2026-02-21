@@ -438,7 +438,7 @@ $_SESSION['email'] = $user['email'];
 
     <a href="?page=manage_payments" class="<?= $page=='manage_payments'?'active':'' ?>">
       <i class="fa-solid fa-money-bill-transfer"></i>
-      <span>Payments</span>
+      <span>Payables</span>
     </a>
 
     <a href="?page=scheduler" class="<?= $page=='scheduler'?'active':'' ?>">
