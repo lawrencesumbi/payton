@@ -78,9 +78,9 @@ $_SESSION['email'] = $user['email'];
 
   /* ===== WHITE SIDEBAR: HOVER TO EXPAND ===== */
 .sidebar {
-  width: 85px; /* Collapsed width */
+  width: 90px; /* Collapsed width */
   background: #f4edf8; /* Original White Background */
-  padding: 20px 0;
+  padding: 10px 0;
   display: flex;
   flex-direction: column;
   height: 100vh;
@@ -94,16 +94,17 @@ $_SESSION['email'] = $user['email'];
 
 /* Expand on Hover */
 .sidebar:hover {
-  width: 260px;
+  width: 200px;
 }
 
 /* BRANDING (payton logo/name) */
 .left-nav {
+  
   display: flex;
   align-items: center;
-  padding: 0 20px;
-  margin-bottom: 40px;
-  gap: 15px;
+  padding: 5px 25px;
+  margin-bottom: 10px;
+  gap: 10px;
   white-space: nowrap;
 }
 
@@ -116,7 +117,7 @@ $_SESSION['email'] = $user['email'];
 }
 
 .left-nav h3 {
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 800;
   color: #222; /* Original dark text */
   opacity: 0;
@@ -293,7 +294,6 @@ $_SESSION['email'] = $user['email'];
   display: flex;
   align-items: center;
   gap: 10px;
-  background: white;
   padding: 8px 12px;
   border-radius: 18px;
   box-shadow: 0 6px 18px rgba(109, 40, 217, 0.08);
@@ -381,10 +381,7 @@ $_SESSION['email'] = $user['email'];
   color: #b91c1c;
 }
 
-    .navbar { width: 100%; background: white; display: flex;box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.08); position: fixed; top: 0;  left: 0;  z-index: 999;}
-    .left-nav{ display: flex; margin-bottom: 20px;}
-    .left-nav img{width: 50px; height: 50px; border-radius: 10px;}
-    .left-nav h3{padding-left: 10px; font-size: 25px; font-weight: bold; color: #111; padding-top: 10px;}
+
 
     .profile {
   display: flex;
@@ -452,7 +449,7 @@ $_SESSION['email'] = $user['email'];
 
     <header class="topbar">
   <div class="topbar-left">
-    <h1><?= ucfirst(str_replace('_',' ', $page)) ?></h1>
+    <h1><?= ucwords(str_replace('_',' ', $page)) ?></h1>
   </div>
 
   <div class="topbar-right">
@@ -464,7 +461,7 @@ $_SESSION['email'] = $user['email'];
     </form>
 
     <!-- Home -->
-    <a href="dashboard.php" class="icon-btn" title="Dashboard">
+    <a href="spender.php?page=dashboard" class="icon-btn" title="Dashboard">
       <i class="fa-solid fa-house"></i>
     </a>
 
@@ -481,7 +478,7 @@ $_SESSION['email'] = $user['email'];
 
     <div class="profile-info">
       <h4><?= htmlspecialchars($_SESSION['fullname']) ?></h4>
-      <span><?= htmlspecialchars($_SESSION['email']) ?></span>
+      <span><?= htmlspecialchars($_SESSION['role']) ?></span>
     </div>
 
     <i class="fa-solid fa-chevron-down"></i>

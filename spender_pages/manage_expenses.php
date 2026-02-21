@@ -110,23 +110,33 @@ if ($prevMonthTotal > 0) {
   <style>
     * { margin:0; padding:0; box-sizing:border-box; font-family: Arial, sans-serif; }
 
-    body { background: #f5f5f5; min-height:100vh; position: relative;}
+    body { background: #f5f5f5; height: 100%; margin: 0; }
 
     /* =========================
    ANALYTICS SECTION (CLEAN)
 ========================= */
 
+
+
 .dashboard-top-row {
-    display: flex;
+   
+display: flex;
     gap: 20px;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
     align-items: flex-start;
+    height: 300px;
 }
 
 /* LEFT SIDE: ANALYTICS */
 .analytics-container {
-    flex: 1; /* Takes about half the space */
-    min-width: 450px;
+    flex: 1;
+    min-width: 400px;
+    background: #ffffff;
+    padding: 22px;
+    border-radius: 18px;
+    border: 1px solid #eef1f6;
+    box-shadow: 0 10px 35px rgba(15, 23, 42, 0.06);
+    height: 300px; /* Ensure it matches the height of the left box */
 }
 
 .analytics-header {
@@ -313,14 +323,14 @@ if ($prevMonthTotal > 0) {
     border-radius: 18px;
     border: 1px solid #eef1f6;
     box-shadow: 0 10px 35px rgba(15, 23, 42, 0.06);
-    height: 100%; /* Ensure it matches the height of the left box */
+    height: 300px; /* Ensure it matches the height of the left box */
 }
 
 /* THE SINGLE LINE CATEGORY STYLE */
 .categories-list {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 5px;
     margin-top: 15px;
 }
 
@@ -457,49 +467,62 @@ h2 {
   color: #0f172a;
 }
 
+.main-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
 
 .table-container {
-    overflow-x: auto;
-    background: white;
-    border-radius: 12px;
-    padding: 20px;
-    margin-top: 10px;
-    box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+  flex: 1;
+  max-height: calc(100vh - 425px); /* viewport - topbar - margin/padding */
+  overflow-y: auto;
+  overflow-x: auto;
+  background: white;
+  border-radius: 12px;
+  padding: 0; /* important for sticky header alignment */
+  margin-top: 10px;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+  border: 1px solid #ddd;
 }
 
 /* MODIFIED */
 table {
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
 }
 
 /* SAME */
 th, td { 
-    padding: 12px 15px;
-    text-align: left;
-    border-bottom: 1px solid #eee;
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #eee;
 }
 
-/* MODIFIED */
-th {
-    background: #7210c8;
-    color: white;
-    font-weight: 700;
+/* MODIFIED (Sticky Header Added) */
+thead th {
+  position: sticky;
+  top: 0;
+  background: #7210c8; /* must have background */
+  color: white;
+  font-weight: 700;
+  z-index: 5; /* keeps header above rows */
 }
 
-/* ADDED (this is the key part) */
+/* Keep rounded corners */
 thead th:first-child {
-    border-top-left-radius: 12px;
+  border-top-left-radius: 12px;
 }
 
 thead th:last-child {
-    border-top-right-radius: 12px;
+  border-top-right-radius: 12px;
 }
 
 /* SAME */
 tr:hover {
-    background: #f3f0ff;
+  background: #f3f0ff;
 }
 
 
@@ -695,6 +718,8 @@ tr:hover {
 </head>
 <body>
 
+
+<div class="main-content">
 <!-- ANALYTICS SECTION -->
 <div class="dashboard-top-row">
 
@@ -708,18 +733,17 @@ tr:hover {
             <div class="stat-card stat-blue">
                 <div class="stat-icon"><i class="fa-solid fa-wallet"></i></div>
                 <div class="stat-card-content">
-                    <div class="stat-label">Total Expenses</div>
-                    <div class="stat-value">₱ <?= number_format($totalExpenses, 2) ?></div>
-                    <div class="stat-subtitle"><?= count($expenses) ?> transactions</div>
+                    <div class="stat-label">Total Budget Left</div>
+                    
                 </div>
             </div>
 
             <div class="stat-card stat-purple">
                 <div class="stat-icon"><i class="fa-solid fa-chart-line"></i></div>
                 <div class="stat-card-content">
-                    <div class="stat-label">Average</div>
-                    <div class="stat-value">₱ <?= count($expenses) > 0 ? number_format($totalExpenses / count($expenses), 2) : '0.00' ?></div>
-                    <div class="stat-subtitle">per transaction</div>
+                    <div class="stat-label">Total Expenses</div>
+                    <div class="stat-value">₱ <?= number_format($totalExpenses, 2) ?></div>
+                    <div class="stat-subtitle"><?= count($expenses) ?> transactions</div>
                 </div>
             </div>
 
@@ -727,7 +751,7 @@ tr:hover {
                 <div class="stat-icon"><i class="fa-solid fa-layer-group"></i></div>
                 <div class="stat-card-content">
                     <div class="stat-label">Tracked</div>
-                    <div class="stat-value"><?= count($categoryBreakdown) ?></div>
+                    <div class="stat-value"><?= count(array_filter($categoryBreakdown)) ?></div>
                     <div class="stat-subtitle">Categories</div>
                 </div>
             </div>
@@ -754,6 +778,7 @@ tr:hover {
         <div class="categories-list">
             <?php foreach ($allCategories as $cat):
                 $name = $cat['category_name'];
+                $amt = isset($categoryBreakdown[$name]) ? $categoryBreakdown[$name] : 0;
                 $pct = isset($categoryPercentages[$name]) ? $categoryPercentages[$name] : 0;
             ?>
                 <div class="category-row">
@@ -762,6 +787,7 @@ tr:hover {
                         <div class="cat-line-fill" style="width: <?= $pct ?>%;"></div>
                     </div>
                     <div class="cat-pct"><?= $pct ?>%</div>
+                    <div class="cat-pct">₱ <?= $amt ?></div>
                 </div>
             <?php endforeach; ?>
         </div>
@@ -778,8 +804,9 @@ tr:hover {
     <thead>
         <tr>
             <th>#</th>
-            <th>Category</th>
             <th>Description</th>
+            <th>Category</th>
+            
             <th>Amount</th>
             <th>Payment Method</th>
             <th>Date</th>
@@ -792,8 +819,9 @@ tr:hover {
         <?php foreach ($expenses as $index => $exp): ?>
             <tr>
                 <td><?= $index + 1 ?></td>
-                <td><?= htmlspecialchars($exp['category_name']) ?></td>
                 <td><?= htmlspecialchars($exp['description']) ?></td>
+                <td><?= htmlspecialchars($exp['category_name']) ?></td>
+                
                 <td>₱ <?= number_format($exp['amount'], 2) ?></td>
                 <td><?= htmlspecialchars($exp['payment_method_name']) ?></td>
                 <td><?= date("M d, Y", strtotime($exp['expense_date'])) ?></td>
@@ -827,6 +855,8 @@ tr:hover {
     </tbody>
 </table>
 
+
+</div>
 
 </div>
 
