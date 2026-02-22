@@ -109,33 +109,81 @@ body {
     font-weight: bold;
 }
 
-/* Modal */
+
+
+/* Modal Overlay */
 .modal {
-    display: none;
+    display: none; /* Keep hidden by default */
     position: fixed;
-    background: rgba(0,0,0,0.5);
+    z-index: 1000;
     top: 0; left: 0;
     width: 100%; height: 100%;
+    background: rgba(15, 23, 42, 0.6); /* Modern slate overlay */
+    backdrop-filter: blur(4px); /* Blurs the background content */
+    transition: opacity 0.3s ease;
 }
 
+.scheduled{
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.field{
+    margin-top: 10px;
+}
+
+/* Modal Box */
 .modal-content {
-    background: white;
-    width: 400px;
-    margin: 10% auto;
-    padding: 20px;
-    border-radius: 10px;
+    background: #ffffff;
+    width: 90%;
+    max-width: 420px;
+    margin: 10vh auto;
+    padding: 32px;
+    border-radius: 16px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    font-family: 'Inter', system-ui, sans-serif;
 }
 
-.modal-content input{
-    width: 100%;
-    padding: 10px;
-    margin-top: 10px;
+/* Typography & Inputs */
+.modal-content h2 {
+    margin-top: 0;
+    color: #1e293b;
+    font-size: 1.5rem;
 }
 
-.modal-content button{
+.modal-content input {
     width: 100%;
-    padding: 10px;
-    margin-top: 10px;
+    padding: 12px;
+    margin-top: 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    box-sizing: border-box; /* Prevents padding from breaking width */
+    font-size: 1rem;
+    transition: border-color 0.2s;
+}
+
+.modal-content input:focus {
+    outline: none;
+    border-color: #b23bf6;
+    ring: 2px solid #bfdbfe;
+}
+
+/* The Button */
+.modal-content button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 20px;
+    background: #992cff; /* Modern Blue */
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.modal-content button:hover {
+    background: #a967ff;
 }
 
 .today {
@@ -254,17 +302,23 @@ body {
 <!-- Modal -->
 <div class="modal" id="paymentModal">
     <div class="modal-content">
-        <h3>Add Scheduled Payment</h3>
+        <div class="scheduled">
+            <h3>Add Scheduled Payment</h3>
+        </div>
         <form method="POST" action="save_schedule.php">
             <input type="hidden" name="date" id="selectedDate">
 
+        <div class="field">
             <label>Payment Name</label>
+        </div>
             <input type="text" name="payment_name" required>
 
+        <div class="field">
             <label>Amount</label>
+        </div>
             <input type="number" step="0.01" name="amount" required>
 
-            
+        
 
             <button type="submit">Save Payment</button>
             <button type="button" onclick="closeModal()">Cancel</button>

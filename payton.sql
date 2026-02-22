@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Feb 21, 2026 at 04:15 PM
+-- Generation Time: Feb 22, 2026 at 10:57 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -130,27 +130,6 @@ INSERT INTO `payment_method` (`id`, `payment_method_name`) VALUES
 -- --------------------------------------------------------
 
 --
--- Table structure for table `recurrence_type`
---
-
-CREATE TABLE `recurrence_type` (
-  `id` int(11) NOT NULL,
-  `recurrence_type_name` varchar(50) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `recurrence_type`
---
-
-INSERT INTO `recurrence_type` (`id`, `recurrence_type_name`) VALUES
-(1, 'once'),
-(2, 'weekly'),
-(3, 'monthly'),
-(4, 'yearly');
-
--- --------------------------------------------------------
-
---
 -- Table structure for table `scheduled_payments`
 --
 
@@ -160,8 +139,6 @@ CREATE TABLE `scheduled_payments` (
   `payment_name` varchar(255) NOT NULL,
   `amount` decimal(10,2) NOT NULL,
   `due_date` date NOT NULL,
-  `is_recurring` tinyint(1) NOT NULL DEFAULT 0,
-  `recurrence_type_id` int(11) DEFAULT NULL,
   `paid_date` date DEFAULT NULL,
   `payment_method_id` int(11) DEFAULT NULL,
   `due_status_id` int(11) NOT NULL,
@@ -173,17 +150,20 @@ CREATE TABLE `scheduled_payments` (
 -- Dumping data for table `scheduled_payments`
 --
 
-INSERT INTO `scheduled_payments` (`id`, `user_id`, `payment_name`, `amount`, `due_date`, `is_recurring`, `recurrence_type_id`, `paid_date`, `payment_method_id`, `due_status_id`, `created_at`, `updated_at`) VALUES
-(3, 1, 'Water Bill', 143.00, '2026-02-19', 0, 1, NULL, 1, 1, '2026-02-18 09:29:20', '2026-02-18 09:29:20'),
-(4, 1, 'Electricity', 389.00, '2026-02-26', 0, 1, NULL, 1, 1, '2026-02-18 09:30:55', '2026-02-18 09:30:55'),
-(10, 1, 'Tuition', 2000.00, '2026-02-14', 0, NULL, NULL, NULL, 1, '2026-02-21 12:48:51', '2026-02-21 12:48:51'),
-(11, 1, 'Load', 100.00, '2026-02-21', 0, NULL, NULL, NULL, 1, '2026-02-21 12:49:21', '2026-02-21 12:49:21'),
-(13, 1, 'sample', 100.00, '2026-02-20', 0, NULL, NULL, NULL, 1, '2026-02-21 12:53:24', '2026-02-21 12:53:24'),
-(14, 1, '25', 100.00, '2026-02-27', 0, NULL, NULL, NULL, 1, '2026-02-21 12:54:53', '2026-02-21 12:54:53'),
-(15, 1, 'data', 40.00, '2026-02-21', 0, NULL, NULL, NULL, 1, '2026-02-21 12:55:05', '2026-02-21 12:55:05'),
-(16, 1, '28', 28.00, '2026-02-28', 0, NULL, NULL, NULL, 1, '2026-02-21 13:00:07', '2026-02-21 13:00:07'),
-(19, 1, 'Loklok', 149.00, '2026-02-22', 0, NULL, NULL, NULL, 1, '2026-02-21 14:45:12', '2026-02-21 14:45:12'),
-(20, 1, '280', 280.00, '2026-02-28', 0, NULL, NULL, NULL, 1, '2026-02-21 15:11:01', '2026-02-21 15:11:01');
+INSERT INTO `scheduled_payments` (`id`, `user_id`, `payment_name`, `amount`, `due_date`, `paid_date`, `payment_method_id`, `due_status_id`, `created_at`, `updated_at`) VALUES
+(10, 1, 'Tuition', 2000.00, '2026-02-14', '2026-02-19', 5, 2, '2026-02-21 12:48:51', '2026-02-21 12:48:51'),
+(11, 1, 'Load', 100.00, '2026-02-21', NULL, NULL, 3, '2026-02-21 12:49:21', '2026-02-21 12:49:21'),
+(13, 1, 'sample', 100.00, '2026-02-20', '2026-02-14', 1, 2, '2026-02-21 12:53:24', '2026-02-21 12:53:24'),
+(14, 1, '25', 100.00, '2026-02-27', NULL, NULL, 1, '2026-02-21 12:54:53', '2026-02-21 12:54:53'),
+(15, 1, 'data', 40.00, '2026-02-21', '2026-02-22', 1, 2, '2026-02-21 12:55:05', '2026-02-21 12:55:05'),
+(16, 1, '28', 28.00, '2026-02-28', '2026-02-21', 1, 2, '2026-02-21 13:00:07', '2026-02-21 13:00:07'),
+(19, 1, 'Loklok', 149.00, '2026-02-22', NULL, NULL, 1, '2026-02-21 14:45:12', '2026-02-21 14:45:12'),
+(20, 1, '280', 280.00, '2026-02-28', '2026-02-22', 2, 2, '2026-02-21 15:11:01', '2026-02-21 15:11:01'),
+(21, 1, '13', 13.00, '2026-02-13', NULL, NULL, 3, '2026-02-22 04:27:48', '2026-02-22 04:27:48'),
+(22, 1, '4', 4.00, '2026-02-04', NULL, NULL, 3, '2026-02-22 04:45:24', '2026-02-22 04:45:24'),
+(23, 1, '5', 5.00, '2026-02-05', NULL, NULL, 3, '2026-02-22 06:04:06', '2026-02-22 06:04:06'),
+(24, 1, 'sample', 100.00, '2026-03-01', '2026-02-22', 1, 2, '2026-02-22 08:09:48', '2026-02-22 08:09:48'),
+(25, 1, 'sample2', 200.00, '2026-03-02', NULL, NULL, 1, '2026-02-22 08:35:01', '2026-02-22 08:35:01');
 
 -- --------------------------------------------------------
 
@@ -244,20 +224,13 @@ ALTER TABLE `payment_method`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `recurrence_type`
---
-ALTER TABLE `recurrence_type`
-  ADD PRIMARY KEY (`id`);
-
---
 -- Indexes for table `scheduled_payments`
 --
 ALTER TABLE `scheduled_payments`
   ADD PRIMARY KEY (`id`),
   ADD KEY `user_id` (`user_id`),
   ADD KEY `due_status_id` (`due_status_id`),
-  ADD KEY `payment_method_id` (`payment_method_id`),
-  ADD KEY `recurrence_type_id` (`recurrence_type_id`);
+  ADD KEY `payment_method_id` (`payment_method_id`);
 
 --
 -- Indexes for table `users`
@@ -295,16 +268,10 @@ ALTER TABLE `payment_method`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
--- AUTO_INCREMENT for table `recurrence_type`
---
-ALTER TABLE `recurrence_type`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
-
---
 -- AUTO_INCREMENT for table `scheduled_payments`
 --
 ALTER TABLE `scheduled_payments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
 -- AUTO_INCREMENT for table `users`
@@ -330,8 +297,18 @@ ALTER TABLE `expenses`
 ALTER TABLE `scheduled_payments`
   ADD CONSTRAINT `scheduled_payments_due_status_id_fr` FOREIGN KEY (`due_status_id`) REFERENCES `due_status` (`id`),
   ADD CONSTRAINT `scheduled_payments_payment_method_id_fr` FOREIGN KEY (`payment_method_id`) REFERENCES `payment_method` (`id`),
-  ADD CONSTRAINT `scheduled_payments_recurrence_type_id_fr` FOREIGN KEY (`recurrence_type_id`) REFERENCES `recurrence_type` (`id`),
   ADD CONSTRAINT `scheduled_payments_user_id_fr` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
+
+DELIMITER $$
+--
+-- Events
+--
+CREATE DEFINER=`root`@`localhost` EVENT `auto_mark_overdue` ON SCHEDULE EVERY 1 DAY STARTS '2026-02-23 00:00:00' ON COMPLETION NOT PRESERVE ENABLE DO UPDATE scheduled_payments
+SET due_status_id = 3
+WHERE paid_date IS NULL
+AND due_date < CURDATE()$$
+
+DELIMITER ;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

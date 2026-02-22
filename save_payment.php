@@ -9,63 +9,61 @@ if (!isset($_SESSION['user_id'])) {
 $user_id = $_SESSION['user_id'];
 
 // Get POST values safely
-$id = $_POST['id'] ?? null;  // Hidden field for edit
+$id = $_POST['id'] ?? null;
 $name = $_POST['payment_name'] ?? null;
 $amount = $_POST['amount'] ?? null;
 $due_date = $_POST['due_date'] ?? null;
-$recurrence_type_id = $_POST['recurrence_type_id'] ?? null; // fixed
 
-// Hidden fields for paid/unpaid
-$payment_method_id = $_POST['payment_method_id'] ?? null; // or null if using "Mark as Paid"
-$due_status_id = $_POST['due_status_id'] ?? 1;          // Unpaid by default
+// Optional fields
+$payment_method_id = $_POST['payment_method_id'] ?? null;
 $paid_date = $_POST['paid_date'] ?? null;
-
-if (!$name || !$amount || !$due_date) {
-    exit("Missing required fields.");
-}
 
 // ================= ADD PAYMENT =================
 if (empty($id)) {
 
+    if (!$name || !$amount || !$due_date) {
+        exit("Missing required fields.");
+    }
+
+    // Default unpaid
+    $due_status_id = 1;
+
     $sql = "INSERT INTO scheduled_payments
-            (user_id, payment_name, amount, due_date, recurrence_type_id, payment_method_id, due_status_id, paid_date)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-    
+            (user_id, payment_name, amount, due_date, due_status_id)
+            VALUES (?, ?, ?, ?, ?)";
+
     $stmt = $conn->prepare($sql);
     $stmt->execute([
         $user_id,
         $name,
         $amount,
         $due_date,
-        $recurrence_type_id,
-        $payment_method_id,
-        $due_status_id,
-        $paid_date
+        $due_status_id
     ]);
+}
 
-} 
 // ================= EDIT PAYMENT =================
 else {
 
+    // If paid_date exists → mark as paid
+    if (!empty($paid_date)) {
+        $due_status_id = 2; // Paid
+    } else {
+        $due_status_id = 1; // Still unpaid
+    }
+
     $sql = "UPDATE scheduled_payments
-            SET payment_name = ?,
-                amount = ?,
-                due_date = ?,
-                recurrence_type_id = ?,
+            SET 
+                paid_date = ?,
                 payment_method_id = ?,
-                due_status_id = ?,
-                paid_date = ?
+                due_status_id = ?
             WHERE id = ? AND user_id = ?";
 
     $stmt = $conn->prepare($sql);
     $stmt->execute([
-        $name,
-        $amount,
-        $due_date,
-        $recurrence_type_id,
+        $paid_date,
         $payment_method_id,
         $due_status_id,
-        $paid_date,
         $id,
         $user_id
     ]);
