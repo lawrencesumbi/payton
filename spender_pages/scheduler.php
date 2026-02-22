@@ -1,4 +1,8 @@
 <?php
+// Start session for notifications
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 $pdo = new PDO("mysql:host=localhost;dbname=payton", "root", "");
 $user_id = $_SESSION['user_id'] ?? 1;
 
@@ -22,8 +26,6 @@ foreach ($payments as $payment) {
     ];
 }
 ?>
-
-
 
 <!DOCTYPE html>
 <html>
@@ -236,13 +238,61 @@ body {
         .info-box h4 { margin: 0 0 10px 0; font-size: 14px; color: var(--primary-purple); }
         .info-item { font-size: 13px; margin-bottom: 5px; display: flex; justify-content: space-between; }
 
-
-
-
+/* TOAST STYLES */
+.toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 10001;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.custom-toast {
+    display: flex;
+    align-items: center;
+    background: #fff;
+    width: 350px;
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    gap: 15px;
+    animation: slideIn 0.3s ease-out;
+}
+.toast-success { border-left: 5px solid #62C976; }
+.toast-error { border-left: 5px solid #EB786C; }
+@keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
 </style>
 </head>
 
 <body>
+
+<div class="toast-container" id="toastContainer">
+    <?php if (isset($_SESSION['success_msg'])): ?>
+        <div class="custom-toast toast-success">
+            <div style="flex: 1;">
+                <div style="font-weight: 800; color: #62C976;">SUCCESS</div>
+                <div style="color: #666; font-size: 13px;"><?= $_SESSION['success_msg'] ?></div>
+            </div>
+            <button onclick="this.parentElement.remove()" style="border:none; background:none; cursor:pointer; color: #999;">✕</button>
+        </div>
+        <?php unset($_SESSION['success_msg']); ?>
+    <?php endif; ?>
+
+    <?php if (isset($_SESSION['error_msg'])): ?>
+        <div class="custom-toast toast-error">
+            <div style="flex: 1;">
+                <div style="font-weight: 800; color: #EB786C; font-size: 11px;">ERROR</div>
+                <div style="color: #666; font-size: 13px;"><?= $_SESSION['error_msg'] ?></div>
+            </div>
+            <button onclick="this.parentElement.remove()" style="border:none; background:none; cursor:pointer; color: #999;">✕</button>
+        </div>
+        <?php unset($_SESSION['error_msg']); ?>
+    <?php endif; ?>
+</div>
 
 <div class="app-container">
 
@@ -253,7 +303,6 @@ body {
         <button onclick="changeMonth(1)">Next ▶</button>
     </div>
     <div class="grid" id="calendarGrid">
-        <!-- Weekday Headers -->
         <div class="weekday">Sun</div>
         <div class="weekday">Mon</div>
         <div class="weekday">Tue</div>
@@ -274,7 +323,9 @@ body {
 
         <div class="info-box">
             <h4>Overdue</h4>
-            
+            <div id="overdueList">
+                <p style="font-size:12px; color:#999;">No overdue payments</p>
+            </div>
         </div>
 
         <div class="info-box">
@@ -299,7 +350,6 @@ body {
 
 </div>
 
-<!-- Modal -->
 <div class="modal" id="paymentModal">
     <div class="modal-content">
         <div class="scheduled">
@@ -450,10 +500,12 @@ renderCalendar();
 
 /* ================= REMINDERS ================= */
 function renderReminders() {
+    const overdueListEl = document.getElementById("overdueList");
     const todayListEl = document.getElementById("todayList");
     const tomorrowListEl = document.getElementById("tomorrowList");
 
     // Clear previous content
+    overdueListEl.innerHTML = '';
     todayListEl.innerHTML = '';
     tomorrowListEl.innerHTML = '';
 
@@ -471,19 +523,55 @@ function renderReminders() {
     const t_yyyy = tomorrow.getFullYear();
     const tomorrowStr = `${t_yyyy}-${t_mm}-${t_dd}`;
 
-    // Populate Today's Due
+    /* ================= OVERDUE ================= */
+    let hasOverdue = false;
+
+    Object.keys(payments).forEach(dateKey => {
+        if (dateKey < todayStr) {
+
+            payments[dateKey].forEach(p => {
+
+                // If you store status, skip paid ones
+                if (p.status && p.status.toLowerCase() === "paid") return;
+
+                overdueListEl.innerHTML += `
+                    <div class="info-item">
+                        ${p.name} 
+                        <span>₱${Number(p.amount).toLocaleString()}</span>
+                    </div>
+                `;
+                hasOverdue = true;
+            });
+        }
+    });
+
+    if (!hasOverdue) {
+        overdueListEl.innerHTML = `<p style="font-size:12px; color:#999;">No overdue payments</p>`;
+    }
+
+    /* ================= TODAY ================= */
     if(payments[todayStr]) {
         payments[todayStr].forEach(p => {
-            todayListEl.innerHTML += `<div class="info-item">${p.name} <span>₱${Number(p.amount).toLocaleString()}</span></div>`;
+            todayListEl.innerHTML += `
+                <div class="info-item">
+                    ${p.name} 
+                    <span>₱${Number(p.amount).toLocaleString()}</span>
+                </div>
+            `;
         });
     } else {
         todayListEl.innerHTML = `<p style="font-size:12px; color:#999;">No payments today</p>`;
     }
 
-    // Populate Tomorrow's Due
+    /* ================= TOMORROW ================= */
     if(payments[tomorrowStr]) {
         payments[tomorrowStr].forEach(p => {
-            tomorrowListEl.innerHTML += `<div class="info-item">${p.name} <span>₱${Number(p.amount).toLocaleString()}</span></div>`;
+            tomorrowListEl.innerHTML += `
+                <div class="info-item">
+                    ${p.name} 
+                    <span>₱${Number(p.amount).toLocaleString()}</span>
+                </div>
+            `;
         });
     } else {
         tomorrowListEl.innerHTML = `<p style="font-size:12px; color:#999;">No payments tomorrow</p>`;
@@ -493,10 +581,13 @@ function renderReminders() {
 // Call after rendering calendar
 renderReminders();
 
-
-
-
-
+// AUTO-DISMISS TOASTS
+document.addEventListener("DOMContentLoaded", () => {
+    setTimeout(() => {
+        const toasts = document.querySelectorAll('.custom-toast');
+        toasts.forEach(t => t.remove());
+    }, 5000);
+});
 </script>
 
 

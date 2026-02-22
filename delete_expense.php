@@ -1,8 +1,7 @@
 <?php
 session_start();
-require 'db.php'; // Adjust path to your db.php
+require 'db.php';
 
-// Make sure user is logged in
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit;
@@ -10,35 +9,36 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = $_SESSION['user_id'];
 
-// Validate expense ID
 if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
-    header("Location: spender.php");
+    $_SESSION['error_msg'] = "Invalid expense ID.";
+    header("Location: spender.php?page=manage_expenses");
     exit;
 }
 
-$expense_id = intval($_GET['id']);
+try {
+    $expense_id = intval($_GET['id']);
 
-// Make sure the expense belongs to this user
-$stmt = $conn->prepare("SELECT id FROM expenses WHERE id = ? AND user_id = ?");
-$stmt->execute([$expense_id, $user_id]);
-$expense = $stmt->fetch(PDO::FETCH_ASSOC);
+    // Check ownership
+    $stmt = $conn->prepare("SELECT receipt_upload FROM expenses WHERE id = ? AND user_id = ?");
+    $stmt->execute([$expense_id, $user_id]);
+    $expense = $stmt->fetch(PDO::FETCH_ASSOC);
 
-if (!$expense) {
-    // Expense not found or doesn't belong to user
-    header("Location: spender.php");
-    exit;
+    if ($expense) {
+        // Delete file if exists
+        if ($expense['receipt_upload'] && file_exists($expense['receipt_upload'])) {
+            unlink($expense['receipt_upload']);
+        }
+
+        $del = $conn->prepare("DELETE FROM expenses WHERE id = ?");
+        $del->execute([$expense_id]);
+        
+        $_SESSION['success_msg'] = "Expense deleted successfully.";
+    } else {
+        $_SESSION['error_msg'] = "Expense not found or unauthorized.";
+    }
+} catch (Exception $e) {
+    $_SESSION['error_msg'] = "An error occurred while deleting.";
 }
 
-// Delete the expense
-$stmt = $conn->prepare("DELETE FROM expenses WHERE id = ? AND user_id = ?");
-$stmt->execute([$expense_id, $user_id]);
-
-// Optionally: delete receipt file
-$receipt_path = "../uploads/" . $_GET['receipt'] ?? '';
-if ($receipt_path && file_exists($receipt_path)) {
-    unlink($receipt_path);
-}
-
-// Redirect back with success message
-header("Location: http://localhost/payton/spender.php?page=manage_expenses&deleted=1");
+header("Location: spender.php?page=manage_expenses");
 exit;

@@ -2,6 +2,9 @@
 
 require 'db.php';
 
+// If session isn't started in db.php, uncomment the line below
+// session_start();
+
 // Make sure user is logged in
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
@@ -104,7 +107,6 @@ if ($prevMonthTotal > 0) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Add Expense</title>
 
-  <!-- FONT AWESOME CSS -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
 
   <style>
@@ -116,11 +118,8 @@ if ($prevMonthTotal > 0) {
    ANALYTICS SECTION (CLEAN)
 ========================= */
 
-
-
 .dashboard-top-row {
-   
-display: flex;
+   display: flex;
     gap: 10px;
     margin-bottom: 10px;
     align-items: flex-start;
@@ -281,13 +280,6 @@ display: flex;
 /* =========================
    COLOR VARIANTS (INSPO)
 ========================= */
-/* You can add these classes in HTML:
-   class="stat-card stat-blue"
-   class="stat-card stat-purple"
-   class="stat-card stat-green"
-   class="stat-card stat-orange"
-*/
-
 .stat-blue {
   background: #f3f8ff;
   border: 1px solid #dbe7ff;
@@ -525,7 +517,6 @@ tr:hover {
   background: #f3f0ff;
 }
 
-
 .receipt-img {
     width: 60px;
     height: 60px;
@@ -548,7 +539,6 @@ tr:hover {
   font-weight: 700;
   text-decoration: none;
   cursor: pointer;
-
 
   display: inline-flex;
   align-items: center;
@@ -579,7 +569,6 @@ tr:hover {
   background: #f5efff;
   color: #7210c8;
 
-
   border: 1px solid #e7d6ff;
   transition: 0.2s ease;
   display: inline-flex;
@@ -609,7 +598,6 @@ tr:hover {
   box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.18);
 }
 
-
 .btn-delete {
   background: #ffecec;
   color: #a30000;
@@ -619,13 +607,6 @@ tr:hover {
   background: #a30000;
   color: white;
 }
-
-
-
-
-
-
-
 
     /* FAB */
     .fab {
@@ -714,14 +695,120 @@ tr:hover {
     .btn-save { width:100%; padding:14px; background:#6300d4; color:white; border:none; border-radius:14px; font-weight:800; cursor:pointer; }
     .btn-save:hover { opacity:0.9; }
 
+    /* =========================
+       CUSTOM TOAST NOTIFICATIONS
+    ========================= */
+    .toast-container {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 10000;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .custom-toast {
+        display: flex;
+        align-items: center;
+        background: #ffffff;
+        width: 380px;
+        padding: 15px 20px;
+        border-radius: 12px;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+        gap: 18px;
+        animation: slideInRight 0.4s ease forwards;
+        position: relative;
+    }
+
+    .custom-toast.fade-out {
+        animation: fadeOut 0.4s ease forwards;
+    }
+
+    @keyframes slideInRight {
+        from { transform: translateX(120%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+    @keyframes fadeOut {
+        from { transform: translateX(0); opacity: 1; }
+        to { transform: translateX(120%); opacity: 0; }
+    }
+
+    /* Success Theme */
+    .toast-success { border: 3px solid #62C976; }
+    .toast-success .toast-icon i { color: #62C976; font-size: 32px; }
+    .toast-success .toast-title { color: #62C976; }
+    .toast-success .toast-close { background: #62C976; color: white; }
+
+    /* Error Theme */
+    .toast-error { border: 3px solid #EB786C; }
+    .toast-error .toast-icon i { color: #EB786C; font-size: 36px; }
+    .toast-error .toast-title { color: #EB786C; }
+    .toast-error .toast-close { background: #EB786C; color: white; }
+
+    /* Content Styles */
+    .toast-content { flex: 1; }
+    .toast-title {
+        font-size: 16px;
+        font-weight: 800;
+        margin-bottom: 4px;
+        text-transform: uppercase;
+    }
+    .toast-message {
+        color: #888;
+        font-size: 14px;
+        font-weight: 500;
+    }
+
+    /* Close Button */
+    .toast-close {
+        border: none;
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 12px;
+        align-self: flex-start;
+        margin-top: -5px;
+        margin-right: -5px;
+        transition: 0.2s;
+    }
+    .toast-close:hover { opacity: 0.8; transform: scale(1.1); }
 
   </style>
 </head>
 <body>
 
+<div class="toast-container" id="toastContainer">
+    <?php if (isset($_SESSION['success_msg'])): ?>
+        <div class="custom-toast toast-success">
+            <div class="toast-icon"><i class="fa-solid fa-check"></i></div>
+            <div class="toast-content">
+                <div class="toast-title">SUCCESS!</div>
+                <div class="toast-message"><?= htmlspecialchars($_SESSION['success_msg']) ?></div>
+            </div>
+            <button class="toast-close" onclick="closeToast(this)"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <?php unset($_SESSION['success_msg']); ?>
+    <?php endif; ?>
+
+    <?php if (isset($_SESSION['error_msg'])): ?>
+        <div class="custom-toast toast-error">
+            <div class="toast-icon"><i class="fa-solid fa-xmark"></i></div>
+            <div class="toast-content">
+                <div class="toast-title">ERROR!</div>
+                <div class="toast-message"><?= htmlspecialchars($_SESSION['error_msg']) ?></div>
+            </div>
+            <button class="toast-close" onclick="closeToast(this)"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <?php unset($_SESSION['error_msg']); ?>
+    <?php endif; ?>
+</div>
 
 <div class="main-content">
-<!-- ANALYTICS SECTION -->
 <div class="dashboard-top-row">
 
     <div class="analytics-container">
@@ -796,10 +883,6 @@ tr:hover {
 
 </div>
 
-
-
-
-
 <div class="table-container">
 <table>
     <thead>
@@ -833,7 +916,6 @@ tr:hover {
                         -
                     <?php endif; ?>
                 </td>
-                <!-- ACTIONS -->
                 <td class="actions"> 
                     <a href="#"
                         class="btn-edit"
@@ -856,34 +938,17 @@ tr:hover {
     </tbody>
 </table>
 
-
+</div>
 </div>
 
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-  <!-- FAB BUTTON -->
   <button class="fab" title="Add Expense">
       <i class="fa-solid fa-plus"></i>
   </button>
 
-  <!-- MODAL -->
   <div class="modal-overlay" id="modalOverlay">
     <div class="expense-area">
       <button class="close-btn">&times;</button>
       
-
       <form class="expense-form" 
       action="add_expense_process.php" 
       method="POST" 
@@ -942,10 +1007,6 @@ tr:hover {
     </div>
   </div>
 
-
-
-
-<!-- RECEIPT VIEW MODAL -->
 <div class="modal-overlay" id="receiptModal">
   <div class="receipt-area">
     <button class="close-receipt-btn">&times;</button>
@@ -986,9 +1047,25 @@ tr:hover {
   }
 </style>
 
-
 <script>
+// Function to manually close the toast
+function closeToast(button) {
+    const toast = button.closest('.custom-toast');
+    toast.classList.add('fade-out');
+    setTimeout(() => toast.remove(), 400); // Wait for animation
+}
+
 document.addEventListener("DOMContentLoaded", () => {
+
+  // Auto-remove toasts after 5 seconds
+  document.querySelectorAll('.custom-toast').forEach(toast => {
+      setTimeout(() => {
+          if (toast.parentElement) {
+              toast.classList.add('fade-out');
+              setTimeout(() => toast.remove(), 400);
+          }
+      }, 5000);
+  });
 
   const fab = document.querySelector('.fab');
   const modalOverlay = document.getElementById('modalOverlay');
@@ -1076,39 +1153,39 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // ================= AI AUTO CATEGORIZE =================
   let typingTimer;
-const delay = 300; // faster for offline
+  const delay = 300; // faster for offline
 
-descInput.addEventListener("input", () => {
-  clearTimeout(typingTimer);
+  descInput.addEventListener("input", () => {
+    clearTimeout(typingTimer);
 
-  typingTimer = setTimeout(() => {
-    classifyOffline(descInput.value);
-  }, delay);
-});
+    typingTimer = setTimeout(() => {
+      classifyOffline(descInput.value);
+    }, delay);
+  });
 
-function classifyOffline(text) {
-  if (!text.trim()) return;
+  function classifyOffline(text) {
+    if (!text.trim()) return;
 
-  fetch("local_categorize.php", {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: "description=" + encodeURIComponent(text)
-  })
-  .then(res => res.json())
-  .then(data => {
-    const detectedCategory = data.category_id || 10;
+    fetch("local_categorize.php", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: "description=" + encodeURIComponent(text)
+    })
+    .then(res => res.json())
+    .then(data => {
+      const detectedCategory = data.category_id || 10;
 
-    // Update UI
-    catCards.forEach(card => card.classList.remove("active"));
+      // Update UI
+      catCards.forEach(card => card.classList.remove("active"));
 
-    const selectedCard = document.querySelector(`[data-category-id="${detectedCategory}"]`);
-    if (selectedCard) {
-      selectedCard.classList.add("active");
-      categoryInput.value = detectedCategory;
-    }
-  })
-  .catch(err => console.error("Offline AI error:", err));
-}
+      const selectedCard = document.querySelector(`[data-category-id="${detectedCategory}"]`);
+      if (selectedCard) {
+        selectedCard.classList.add("active");
+        categoryInput.value = detectedCategory;
+      }
+    })
+    .catch(err => console.error("Offline AI error:", err));
+  }
 
 });
 </script>

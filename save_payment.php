@@ -22,7 +22,9 @@ $paid_date = $_POST['paid_date'] ?? null;
 if (empty($id)) {
 
     if (!$name || !$amount || !$due_date) {
-        exit("Missing required fields.");
+        $_SESSION['error_msg'] = "Please fill in all required fields.";
+        header("Location: http://localhost/payton/spender.php?page=manage_payments");
+        exit();
     }
 
     // Default unpaid
@@ -40,6 +42,8 @@ if (empty($id)) {
         $due_date,
         $due_status_id
     ]);
+
+    $_SESSION['success_msg'] = "Payment for '$name' scheduled successfully!";
 }
 
 // ================= EDIT PAYMENT =================
@@ -67,6 +71,8 @@ else {
         $id,
         $user_id
     ]);
+
+    $_SESSION['success_msg'] = "Payment details updated successfully!";
 }
 
 header("Location: http://localhost/payton/spender.php?page=manage_payments");

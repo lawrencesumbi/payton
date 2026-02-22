@@ -60,7 +60,7 @@ if (isset($_POST['save_profile'])) {
     // Optional success message
     echo "<script>
       alert('Personal information updated successfully');
-      window.location.href = 'login.php';
+      window.location.href = 'my_account.php';
     </script>";
   }
 }
@@ -153,7 +153,7 @@ if (isset($_POST['update_photo']) && !empty($_FILES['profile_pic']['name'])) {
 
         echo "<script>
             alert('Profile photo updated successfully');
-            window.location.href = 'login.php';
+            window.location.href = 'my_account.php';
         </script>";
 
     } else {

@@ -304,6 +304,12 @@ $_SESSION['email'] = $user['email'];
   height: 38px;
   border-radius: 50%;
   object-fit: cover;
+}.profile-info {
+  display: flex;
+  flex-direction: column; /* Stacks name and role vertically */
+  align-items: flex-start; /* Forces alignment to the left */
+  justify-content: center;
+  text-align: left;
 }
 
 .profile-info h4 {
@@ -315,8 +321,10 @@ $_SESSION['email'] = $user['email'];
 }
 
 .profile-info span {
-  font-size: 12px;
+  font-size: 11px; /* Slightly smaller for better hierarchy */
   color: #777;
+  display: block; /* Ensures it stays on its own line */
+  margin-top: 2px;
 }
 
 .profile-btn i {
