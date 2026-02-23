@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Feb 22, 2026 at 10:57 AM
+-- Generation Time: Feb 23, 2026 at 09:28 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -20,6 +20,32 @@ SET time_zone = "+00:00";
 --
 -- Database: `payton`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `budget`
+--
+
+CREATE TABLE `budget` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `budget_name` varchar(255) NOT NULL,
+  `budget_amount` decimal(10,2) NOT NULL,
+  `start_date` date NOT NULL,
+  `end_date` date NOT NULL,
+  `status` varchar(255) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+
+--
+-- Dumping data for table `budget`
+--
+
+INSERT INTO `budget` (`id`, `user_id`, `budget_name`, `budget_amount`, `start_date`, `end_date`, `status`, `created_at`, `updated_at`) VALUES
+(3, 1, 'JAN BUDGET', 1000.00, '0000-00-00', '0000-00-00', 'Active', '2026-02-23 08:24:34', '2026-02-23 08:24:34'),
+(4, 1, 'JAN BUDGET', 1000.00, '0000-00-00', '0000-00-00', 'Active', '2026-02-23 08:24:34', '2026-02-23 08:24:34');
 
 -- --------------------------------------------------------
 
@@ -98,9 +124,7 @@ INSERT INTO `expenses` (`id`, `user_id`, `category_id`, `description`, `amount`,
 (5, 1, 8, 'CCTV', 899.00, 1, NULL, '2026-02-09', '2026-02-09 03:33:46', '2026-02-09 03:33:46'),
 (6, 1, 6, 'Paper', 30.00, 1, NULL, '2026-02-18', '2026-02-18 04:01:04', '2026-02-18 04:01:18'),
 (7, 1, 4, 'Water Bill', 143.00, 1, NULL, '2026-02-21', '2026-02-21 07:37:51', '2026-02-21 07:37:51'),
-(8, 1, 6, 'Tuition', 1555.00, 1, NULL, '2026-02-21', '2026-02-21 07:44:37', '2026-02-21 07:44:37'),
-(9, 1, 1, 'lumpia', 5.00, 1, NULL, '2026-02-21', '2026-02-21 08:10:04', '2026-02-21 08:10:04'),
-(10, 1, 7, 'Subscription', 299.00, 2, NULL, '2026-02-21', '2026-02-21 08:29:46', '2026-02-21 12:29:31');
+(8, 1, 6, 'Tuition', 1565.00, 1, NULL, '2026-02-21', '2026-02-21 07:44:37', '2026-02-22 10:51:40');
 
 -- --------------------------------------------------------
 
@@ -159,11 +183,8 @@ INSERT INTO `scheduled_payments` (`id`, `user_id`, `payment_name`, `amount`, `du
 (16, 1, '28', 28.00, '2026-02-28', '2026-02-21', 1, 2, '2026-02-21 13:00:07', '2026-02-21 13:00:07'),
 (19, 1, 'Loklok', 149.00, '2026-02-22', NULL, NULL, 1, '2026-02-21 14:45:12', '2026-02-21 14:45:12'),
 (20, 1, '280', 280.00, '2026-02-28', '2026-02-22', 2, 2, '2026-02-21 15:11:01', '2026-02-21 15:11:01'),
-(21, 1, '13', 13.00, '2026-02-13', NULL, NULL, 3, '2026-02-22 04:27:48', '2026-02-22 04:27:48'),
 (22, 1, '4', 4.00, '2026-02-04', NULL, NULL, 3, '2026-02-22 04:45:24', '2026-02-22 04:45:24'),
-(23, 1, '5', 5.00, '2026-02-05', NULL, NULL, 3, '2026-02-22 06:04:06', '2026-02-22 06:04:06'),
-(24, 1, 'sample', 100.00, '2026-03-01', '2026-02-22', 1, 2, '2026-02-22 08:09:48', '2026-02-22 08:09:48'),
-(25, 1, 'sample2', 200.00, '2026-03-02', NULL, NULL, 1, '2026-02-22 08:35:01', '2026-02-22 08:35:01');
+(24, 1, 'sample', 100.00, '2026-03-01', '2026-02-22', 1, 2, '2026-02-22 08:09:48', '2026-02-22 08:09:48');
 
 -- --------------------------------------------------------
 
@@ -186,14 +207,22 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `fullname`, `email`, `password`, `role`, `profile_pic`, `created_at`) VALUES
-(1, 'Lawrence Sumbi', 'guiansumbi@gmail.com', '$2y$10$cKIACjgglVTrRjDZaKSZjulwkdA0CIDUwOBkU12h2PPGKK03U0aT6', 'spender', 'profile/1771656471_699955178cecf.jpg', '2026-02-07 17:08:23'),
+(1, 'Lawrence Sumbi', 'guiansumbi@gmail.com', '$2y$10$cKIACjgglVTrRjDZaKSZjulwkdA0CIDUwOBkU12h2PPGKK03U0aT6', 'spender', 'profile/1771773625_699b1eb98867d.jpg', '2026-02-07 17:08:23'),
 (2, 'Patricia Ann Mae Obaob', 'patriciaannmaeobaob721@gmail.com', '$2y$10$gVokRQej23KaxSKKUZPiSOn/mL5IE0kvfoGyPRTZfN1in/ZpNAQku', 'sponsor', '', '2026-02-08 11:52:14'),
 (3, 'Dranreb Misa', 'draymisa@gmail.com', '$2y$10$Gw3YeLEMfsCIOPV3xFs5h.jClSQLC9rilddvuzZ063CceY9/IVgue', 'spender', '', '2026-02-09 00:03:22'),
-(4, 'Aljon Paragoso', 'aljon@gmail.com', '$2y$10$Wt8Xf9aFRGG6zRdmdsfP1.bzpQS9xPfN/20Rsf.l7gb5ivx7H.t8u', 'spender', '', '2026-02-10 02:32:42');
+(4, 'Aljon Paragoso', 'aljon@gmail.com', '$2y$10$Wt8Xf9aFRGG6zRdmdsfP1.bzpQS9xPfN/20Rsf.l7gb5ivx7H.t8u', 'spender', '', '2026-02-10 02:32:42'),
+(5, 'King James', 'king@gmail.com', '$2y$10$gEXzRZe1Yx1W/lVHDmk8ju/S//8ksu6iLCjJaJyxXhy3lWOLBBTw6', 'spender', '', '2026-02-23 08:07:35');
 
 --
 -- Indexes for dumped tables
 --
+
+--
+-- Indexes for table `budget`
+--
+ALTER TABLE `budget`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `user_id` (`user_id`);
 
 --
 -- Indexes for table `category`
@@ -244,6 +273,12 @@ ALTER TABLE `users`
 --
 
 --
+-- AUTO_INCREMENT for table `budget`
+--
+ALTER TABLE `budget`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
 -- AUTO_INCREMENT for table `category`
 --
 ALTER TABLE `category`
@@ -271,17 +306,23 @@ ALTER TABLE `payment_method`
 -- AUTO_INCREMENT for table `scheduled_payments`
 --
 ALTER TABLE `scheduled_payments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- Constraints for dumped tables
 --
+
+--
+-- Constraints for table `budget`
+--
+ALTER TABLE `budget`
+  ADD CONSTRAINT `budget_user_id_fr` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
 
 --
 -- Constraints for table `expenses`
