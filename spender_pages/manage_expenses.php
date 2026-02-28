@@ -2,9 +2,6 @@
 
 require 'db.php';
 
-// If session isn't started in db.php, uncomment the line below
-// session_start();
-
 // Make sure user is logged in
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
@@ -13,7 +10,22 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = $_SESSION['user_id'];
 
-/* ================= GET USER BUDGET ================= */
+/* =====================================================
+   SAFE INITIALIZATION (PREVENT WARNINGS)
+===================================================== */
+$expenses = [];
+$totalExpenses = 0;
+$categoryBreakdown = [];
+$categoryPercentages = [];
+$thisMonthTotal = 0;
+$prevMonthTotal = 0;
+$budgetLeft = 0;
+$budgetExpired = false;
+
+
+/* =====================================================
+   GET USER LATEST BUDGET
+===================================================== */
 $budgetStmt = $conn->prepare("
     SELECT budget_amount, start_date, end_date
     FROM budget
@@ -28,128 +40,129 @@ $budgetAmount = $budget['budget_amount'] ?? 0;
 $budgetStart  = $budget['start_date'] ?? null;
 $budgetEnd    = $budget['end_date'] ?? null;
 
-// -------------------- BUDGET EXPIRED CHECK --------------------
-$budgetExpired = false;
 
+/* =====================================================
+   CHECK IF BUDGET EXPIRED (DISPLAY PURPOSE ONLY)
+===================================================== */
 $today = new DateTime();
+
 if ($budgetEnd) {
     $budgetEndDate = new DateTime($budgetEnd);
 
     if ($today > $budgetEndDate) {
         $budgetExpired = true;
-
-        // Reset everything if budget expired
-        $budgetAmount = 0;
-        $totalExpenses = 0;
-        $budgetLeft = 0;
-        $thisMonthTotal = 0;
-        $expenses = [];          // no expenses
-        $categoryBreakdown = []; // reset categories
-
+        $budgetAmount = 0; // visually reset only
     }
 }
 
-// -------------------- FETCH EXPENSES ONLY IF NOT EXPIRED --------------------
-if (!$budgetExpired && $budgetStart && $budgetEnd) {
-    $stmt = $conn->prepare("
-        SELECT 
-            e.id,
-            e.description,
-            e.amount,
-            e.expense_date,
-            e.receipt_upload,
-            e.category_id,
-            e.payment_method_id,
-            c.category_name,
-            pm.payment_method_name
-        FROM expenses e
-        JOIN category c ON e.category_id = c.id
-        JOIN payment_method pm ON e.payment_method_id = pm.id
-        WHERE e.user_id = ?
-        AND e.expense_date BETWEEN ? AND ?
-        ORDER BY e.id DESC
-    ");
-    $stmt->execute([$user_id, $budgetStart, $budgetEnd]);
-    $expenses = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    // ----------------- SUM TOTAL EXPENSES -----------------
-    $totalExpenses = 0;
-    foreach ($expenses as $exp) {
-        $totalExpenses += floatval($exp['amount']);
-    }
+/* =====================================================
+   FETCH ALL USER EXPENSES
+   (EXPENSE PAGE MUST SHOW EVERYTHING)
+===================================================== */
+$stmt = $conn->prepare("
+    SELECT 
+        e.id,
+        e.description,
+        e.amount,
+        e.expense_date,
+        e.receipt_upload,
+        e.category_id,
+        e.payment_method_id,
+        c.category_name,
+        pm.payment_method_name
+    FROM expenses e
+    JOIN category c ON e.category_id = c.id
+    JOIN payment_method pm ON e.payment_method_id = pm.id
+    WHERE e.user_id = ?
+    ORDER BY e.expense_date DESC
+");
+$stmt->execute([$user_id]);
+$expenses = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    // ----------------- CALCULATE BUDGET LEFT -----------------
-    $budgetLeft = $budgetAmount - $totalExpenses;
+
+/* =====================================================
+   TOTAL EXPENSES
+===================================================== */
+foreach ($expenses as $exp) {
+    $totalExpenses += floatval($exp['amount']);
 }
 
+$budgetLeft = max(0, $budgetAmount - $totalExpenses);
 
-// Fetch all categories
+
+/* =====================================================
+   CATEGORY BREAKDOWN
+===================================================== */
 $catStmt = $conn->prepare("SELECT id, category_name FROM category");
 $catStmt->execute();
 $allCategories = $catStmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Calculate category-wise breakdown
-$categoryBreakdown = [];
-$totalExpenses = 0;
-
-// Initialize all categories with 0
+/* initialize categories */
 foreach ($allCategories as $cat) {
     $categoryBreakdown[$cat['category_name']] = 0;
 }
 
-// Add expenses to categories
+/* accumulate expenses */
 foreach ($expenses as $exp) {
     $category = $exp['category_name'];
     $amount = floatval($exp['amount']);
-    
+
     $categoryBreakdown[$category] += $amount;
-    $totalExpenses += $amount;
 }
 
-// Calculate percentages
-$categoryPercentages = [];
+/* percentages */
 if ($totalExpenses > 0) {
     foreach ($categoryBreakdown as $category => $amount) {
-        $categoryPercentages[$category] = round(($amount / $totalExpenses) * 100, 1);
+        $categoryPercentages[$category] =
+            round(($amount / $totalExpenses) * 100, 1);
     }
 } else {
-    // If no expenses, all percentages are 0
     foreach ($categoryBreakdown as $category => $amount) {
         $categoryPercentages[$category] = 0;
     }
 }
-arsort($categoryBreakdown); // Sort by amount descending
 
-// Calculate current month and previous month totals for trend
-$thisMonthTotal = 0;
-$prevMonthTotal = 0;
+arsort($categoryBreakdown);
 
+
+/* =====================================================
+   MONTHLY ANALYTICS (CONTINUES DAILY)
+===================================================== */
 $now = new DateTime();
-$startOfThisMonth = (clone $now)->modify('first day of this month')->setTime(0,0,0);
+
+$startOfThisMonth = (clone $now)
+    ->modify('first day of this month')
+    ->setTime(0,0,0);
+
 $startOfNextMonth = (clone $startOfThisMonth)->modify('+1 month');
 $startOfPrevMonth = (clone $startOfThisMonth)->modify('-1 month');
 
 foreach ($expenses as $exp) {
-  $d = new DateTime($exp['expense_date']);
-  if ($d >= $startOfThisMonth && $d < $startOfNextMonth) {
-    $thisMonthTotal += floatval($exp['amount']);
-  }
-  if ($d >= $startOfPrevMonth && $d < $startOfThisMonth) {
-    $prevMonthTotal += floatval($exp['amount']);
-  }
+
+    $d = new DateTime($exp['expense_date']);
+
+    if ($d >= $startOfThisMonth && $d < $startOfNextMonth) {
+        $thisMonthTotal += floatval($exp['amount']);
+    }
+
+    if ($d >= $startOfPrevMonth && $d < $startOfThisMonth) {
+        $prevMonthTotal += floatval($exp['amount']);
+    }
 }
 
-$monthChangePct = null;
+
+/* =====================================================
+   MONTH CHANGE %
+===================================================== */
 if ($prevMonthTotal > 0) {
-  $monthChangePct = round((($thisMonthTotal - $prevMonthTotal) / $prevMonthTotal) * 100, 1);
+    $monthChangePct =
+        round((($thisMonthTotal - $prevMonthTotal) / $prevMonthTotal) * 100, 1);
 } elseif ($thisMonthTotal > 0) {
-  $monthChangePct = 100.0; // from 0 to some value
+    $monthChangePct = 100.0;
 } else {
-  $monthChangePct = 0.0;
+    $monthChangePct = 0.0;
 }
-
-
-
 
 ?>
 
@@ -859,7 +872,7 @@ tr:hover {
         </div>
         <?php unset($_SESSION['error_msg']); ?>
     <?php endif; ?>
-</div>
+  </div>
 
 <div class="main-content">
 
