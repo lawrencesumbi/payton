@@ -10,11 +10,13 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = $_SESSION['user_id'];
 
+
 /* =====================================================
    SAFE INITIALIZATION (PREVENT WARNINGS)
 ===================================================== */
 $expenses = [];
-$totalExpenses = 0;
+$totalExpenses = 0;      // analytics total (ALL)
+$budgetExpenses = 0;     // budget-only expenses
 $categoryBreakdown = [];
 $categoryPercentages = [];
 $thisMonthTotal = 0;
@@ -27,7 +29,7 @@ $budgetExpired = false;
    GET USER LATEST BUDGET
 ===================================================== */
 $budgetStmt = $conn->prepare("
-    SELECT budget_amount, start_date, end_date
+    SELECT id, budget_amount, start_date, end_date
     FROM budget
     WHERE user_id = ?
     ORDER BY id DESC
@@ -36,6 +38,7 @@ $budgetStmt = $conn->prepare("
 $budgetStmt->execute([$user_id]);
 $budget = $budgetStmt->fetch(PDO::FETCH_ASSOC);
 
+$budgetId     = $budget['id'] ?? null;
 $budgetAmount = $budget['budget_amount'] ?? 0;
 $budgetStart  = $budget['start_date'] ?? null;
 $budgetEnd    = $budget['end_date'] ?? null;
@@ -51,14 +54,13 @@ if ($budgetEnd) {
 
     if ($today > $budgetEndDate) {
         $budgetExpired = true;
-        $budgetAmount = 0; // visually reset only
+        $budgetAmount = 0;
     }
 }
 
 
 /* =====================================================
-   FETCH ALL USER EXPENSES
-   (EXPENSE PAGE MUST SHOW EVERYTHING)
+   FETCH ALL USER EXPENSES (FOR ANALYTICS PAGE)
 ===================================================== */
 $stmt = $conn->prepare("
     SELECT 
@@ -77,41 +79,66 @@ $stmt = $conn->prepare("
     WHERE e.user_id = ?
     ORDER BY e.expense_date DESC
 ");
+
 $stmt->execute([$user_id]);
 $expenses = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 
 /* =====================================================
-   TOTAL EXPENSES
+   TOTAL EXPENSES (ANALYTICS ONLY)
 ===================================================== */
 foreach ($expenses as $exp) {
     $totalExpenses += floatval($exp['amount']);
 }
 
-$budgetLeft = max(0, $budgetAmount - $totalExpenses);
+
+/* =====================================================
+   ✅ CALCULATE EXPENSES INSIDE CURRENT BUDGET ONLY
+===================================================== */
+if (!$budgetExpired && $budgetStart && $budgetEnd) {
+
+    $budgetExpStmt = $conn->prepare("
+        SELECT SUM(amount) AS total
+        FROM expenses
+        WHERE user_id = ?
+        AND expense_date BETWEEN ? AND ?
+    ");
+
+    $budgetExpStmt->execute([
+        $user_id,
+        $budgetStart,
+        $budgetEnd
+    ]);
+
+    $budgetExpenses =
+        $budgetExpStmt->fetch(PDO::FETCH_ASSOC)['total'] ?? 0;
+}
 
 
 /* =====================================================
-   CATEGORY BREAKDOWN
+   ✅ CORRECT BUDGET LEFT CALCULATION
+   (NO MORE OLD EXPENSE DEDUCTION)
+===================================================== */
+$budgetLeft = max(0, $budgetAmount - $budgetExpenses);
+
+
+/* =====================================================
+   CATEGORY BREAKDOWN (ALL EXPENSES)
 ===================================================== */
 $catStmt = $conn->prepare("SELECT id, category_name FROM category");
 $catStmt->execute();
 $allCategories = $catStmt->fetchAll(PDO::FETCH_ASSOC);
 
-/* initialize categories */
 foreach ($allCategories as $cat) {
     $categoryBreakdown[$cat['category_name']] = 0;
 }
 
-/* accumulate expenses */
 foreach ($expenses as $exp) {
     $category = $exp['category_name'];
     $amount = floatval($exp['amount']);
-
     $categoryBreakdown[$category] += $amount;
 }
 
-/* percentages */
 if ($totalExpenses > 0) {
     foreach ($categoryBreakdown as $category => $amount) {
         $categoryPercentages[$category] =
@@ -127,7 +154,7 @@ arsort($categoryBreakdown);
 
 
 /* =====================================================
-   MONTHLY ANALYTICS (CONTINUES DAILY)
+   MONTHLY ANALYTICS (ALWAYS RUNS)
 ===================================================== */
 $now = new DateTime();
 
