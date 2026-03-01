@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 01, 2026 at 10:41 AM
+-- Generation Time: Mar 01, 2026 at 06:00 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -44,7 +44,10 @@ CREATE TABLE `budget` (
 --
 
 INSERT INTO `budget` (`id`, `user_id`, `budget_name`, `budget_amount`, `start_date`, `end_date`, `status`, `created_at`, `updated_at`) VALUES
-(5, 1, 'February Budget', 1000.00, '2026-02-01', '2026-02-28', 'Active', '2026-02-27 08:59:18', '2026-02-27 08:59:18');
+(15, 1, 'February 1-7', 1000.00, '2026-02-01', '2026-02-07', 'Inactive', '2026-02-06 13:33:19', '2026-02-06 13:33:19'),
+(16, 1, 'February 8 - 14', 2000.00, '2026-02-08', '2026-02-14', 'Inactive', '2026-02-08 13:38:22', '2026-02-08 13:38:22'),
+(22, 1, 'February 15 - 20', 500.00, '2026-02-15', '2026-02-20', 'Inactive', '2026-02-20 00:47:40', '2026-02-20 00:47:40'),
+(23, 1, 'March 2 - 10', 1000.00, '2026-03-02', '2026-03-10', 'Active', '2026-03-01 16:52:40', '2026-03-01 16:52:40');
 
 -- --------------------------------------------------------
 
@@ -118,8 +121,13 @@ CREATE TABLE `expenses` (
 --
 
 INSERT INTO `expenses` (`id`, `user_id`, `budget_id`, `category_id`, `description`, `amount`, `payment_method_id`, `receipt_upload`, `expense_date`, `created_at`, `updated_at`) VALUES
-(14, 1, 5, 1, 'Jollibee', 156.00, 1, NULL, '2026-02-27', '2026-02-27 08:59:57', '2026-02-27 08:59:57'),
-(15, 1, 5, 2, 'Taxi', 200.00, 1, NULL, '2026-02-27', '2026-02-27 09:00:44', '2026-02-27 09:00:44');
+(27, 1, 15, 1, 'Jollibee', 156.00, 1, NULL, '2026-02-06', '2026-02-06 13:33:47', '2026-02-06 13:33:47'),
+(28, 1, 15, 1, 'Burger', 44.00, 1, NULL, '2026-02-06', '2026-02-06 13:34:24', '2026-02-06 13:34:24'),
+(29, 1, 15, 2, 'Gasoline', 800.00, 1, NULL, '2026-02-06', '2026-02-06 13:34:57', '2026-02-06 13:34:57'),
+(30, 1, 16, 1, 'Manok', 100.00, 1, NULL, '2026-02-08', '2026-02-08 13:39:24', '2026-02-08 13:39:24'),
+(31, 1, 16, 10, 'Subscription', 199.00, 1, NULL, '2026-02-08', '2026-02-08 13:50:55', '2026-02-08 13:50:55'),
+(32, 1, 16, 9, 'Savings', 500.00, 1, NULL, '2026-02-08', '2026-02-08 13:53:49', '2026-02-08 13:53:49'),
+(33, 1, 16, 2, 'Motor Parts', 201.00, 1, NULL, '2026-02-08', '2026-02-08 14:57:06', '2026-02-08 14:57:06');
 
 -- --------------------------------------------------------
 
@@ -272,7 +280,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `budget`
 --
 ALTER TABLE `budget`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
 
 --
 -- AUTO_INCREMENT for table `category`
@@ -290,7 +298,7 @@ ALTER TABLE `due_status`
 -- AUTO_INCREMENT for table `expenses`
 --
 ALTER TABLE `expenses`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
 
 --
 -- AUTO_INCREMENT for table `payment_method`
@@ -345,6 +353,11 @@ CREATE DEFINER=`root`@`localhost` EVENT `auto_mark_overdue` ON SCHEDULE EVERY 1 
 SET due_status_id = 3
 WHERE paid_date IS NULL
 AND due_date < CURDATE()$$
+
+CREATE DEFINER=`root`@`localhost` EVENT `update_budget_status` ON SCHEDULE EVERY 1 DAY STARTS '2026-02-08 22:29:03' ON COMPLETION NOT PRESERVE ENABLE DO UPDATE budget
+    SET status = 'Inactive'
+    WHERE end_date < CURDATE()
+      AND status != 'Inactive'$$
 
 DELIMITER ;
 COMMIT;

@@ -1,10 +1,5 @@
 <?php
-/* =====================================================
-    DATABASE CONNECTION
-===================================================== */
-$pdo = new PDO("mysql:host=localhost;dbname=payton", "root", "", [
-    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
-]);
+require 'db.php';
 
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
@@ -14,16 +9,31 @@ if (!isset($_SESSION['user_id'])) {
 $user_id = $_SESSION['user_id'];
 
 /* =====================================================
-    FETCH ALL USER BUDGETS
+    FETCH ACTIVE BUDGETS (RECENT TAB)
 ===================================================== */
-$stmt = $pdo->prepare("
+$stmtActive = $conn->prepare("
     SELECT *
     FROM budget
     WHERE user_id = ?
+    AND status = 'Active'
     ORDER BY created_at DESC
 ");
-$stmt->execute([$user_id]);
-$all_budgets = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$stmtActive->execute([$user_id]);
+$recentBudgets = $stmtActive->fetchAll(PDO::FETCH_ASSOC);
+
+
+/* =====================================================
+    FETCH INACTIVE BUDGETS (HISTORY TAB)
+===================================================== */
+$stmtHistory = $conn->prepare("
+    SELECT *
+    FROM budget
+    WHERE user_id = ?
+    AND status = 'Inactive'
+    ORDER BY created_at DESC
+");
+$stmtHistory->execute([$user_id]);
+$historyBudgets = $stmtHistory->fetchAll(PDO::FETCH_ASSOC);
 
 /* =====================================================
     HELPER: PROGRESS CALCULATION
@@ -43,35 +53,18 @@ function getBudgetProgress($start, $end) {
 }
 
 /* =====================================================
-    SEPARATE RECENT + HISTORY & CALCULATE DASHBOARD
+    CALCULATE DASHBOARD TOTALS FOR ACTIVE BUDGET
 ===================================================== */
-$recentBudgets = [];
-$historyBudgets = [];
 $total_budgeted = 0;
-
-foreach ($all_budgets as $budget) {
-    $progress = getBudgetProgress($budget['start_date'], $budget['end_date']);
-    if ($progress >= 100) {
-        $historyBudgets[] = $budget;
-    } else {
-        $recentBudgets[] = $budget;
-        $total_budgeted += $budget['budget_amount']; // Sum for active dashboard
-    }
-}
-
-/* =====================================================
-    GET ACTIVE BUDGET (LATEST RUNNING TIMELINE)
-===================================================== */
-$activeBudget = !empty($recentBudgets) ? $recentBudgets[0] : null;
-
-/* =====================================================
-    FETCH TIMELINE DEDUCTIONS & DASHBOARD TOTALS
-===================================================== */
-$timelineExpenses = [];
 $total_spent = 0;
+$timelineExpenses = [];
 
-if ($activeBudget) {
-    $timelineStmt = $pdo->prepare("
+if (!empty($recentBudgets)) {
+    $activeBudget = $recentBudgets[0]; // Latest Active Budget
+    $total_budgeted = $activeBudget['budget_amount'];
+
+    // Fetch expenses within this budget period
+    $timelineStmt = $conn->prepare("
         SELECT description, amount, expense_date
         FROM expenses
         WHERE user_id = ?
@@ -89,21 +82,18 @@ if ($activeBudget) {
         $total_spent += $exp['amount'];
     }
 }
+
 $remaining_balance = $total_budgeted - $total_spent;
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Budget | Professional</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/material_purple.css">
-    
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manage Budget | Professional</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <style>
     :root {
         --brand-purple: #6f42c1;
@@ -116,19 +106,21 @@ $remaining_balance = $total_budgeted - $total_spent;
     body { background-color: var(--bg-body); font-family: 'Inter', sans-serif; color: #2d3748; }
 
     .dashboard-container {
-        max-width: 1300px;
-        margin: 40px auto;
+        
+        width: 100%;
+        
         display: grid;
         grid-template-columns: 1fr 500px; 
-        gap: 30px;
-        padding: 0 20px;
+        gap: 20px;
+        
         align-items: start;
     }
 
-    .panel { display: flex; flex-direction: column; gap: 24px; min-width: 0; }
+    .panel { display: flex; flex-direction: column; gap: 15px; min-width: 0; }
 
     /* IMAGE-BASED CALENDAR DESIGN */
 .card-custom {
+    background: white;
     border-radius: 16px;
     border: none;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
@@ -136,97 +128,78 @@ $remaining_balance = $total_budgeted - $total_spent;
 }
 
 /* Container stretch */
-#calendar-inline { width: 100% !important; }
-
-/* ALIGNMENT FIX: WEEKDAYS & DATES */
-.flatpickr-calendar {
-  
-    width: 100% !important;
-    background: transparent !important;
-    box-shadow: none !important;
-    border: none !important;
+/* CALENDAR WRAPPER */
+#calendar {
+    background: #fff;
+    padding: 15px;
+    border-radius: 14px;
 }
 
-/* 1. Header & Weekday Row Alignment */
-.flatpickr-weekdays {
-    width: 100% !important;
-    background: transparent !important;
+/* HEADER */
+.calendar-header {
+    text-align: center;
+    font-weight: 600;
     margin-bottom: 10px;
 }
 
-.flatpickr-weekday {
-    flex: 1 !important; /* Forces 7 equal columns */
-    text-align: center !important;
-    color: #94a3b8 !important;
-    font-weight: 500 !important;
-    font-size: 0.8rem !important;
+/* WEEKDAYS */
+.weekdays, .days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    text-align: center;
 }
 
-/* 2. Day Container Alignment */
-.dayContainer {
-    width: 100% !important;
-    min-width: 100% !important;
-    max-width: 100% !important;
-    display: flex !important;
-    flex-wrap: wrap !important;
-    justify-content: start !important; /* Standardize starting point */
+.weekdays div {
+    font-size: 12px;
+    color: #94a3b8;
+    padding: 5px 0;
 }
 
-.flatpickr-day {
-    flex: 1 0 14.28% !important; /* 100% divided by 7 days */
-    max-width: 14.28% !important;
-    height: 48px !important;
-    line-height: 48px !important;
-    margin: 4px 0 !important;
-    display: inline-flex !important;
-    align-items: center;
-    justify-content: center;
-    border: none !important;
-    font-weight: 500;
-    border-radius: 50% !important; /* Circle style from image */
-}
-
-/* 3. Image Theme Selection Colors */
-.flatpickr-day.selected, 
-.flatpickr-day.startRange, 
-.flatpickr-day.endRange {
-    background: #5d45d7 !important; /* Vibrant Purple */
-    color: #fff !important;
-}
-
-.flatpickr-day.inRange {
-    background: #eeebff !important; /* Light wash */
-    color: #5d45d7 !important;
-    border-radius: 0 !important; /* Connects the bar */
-}
-
-/* Remove default focus outlines for a cleaner look */
-.flatpickr-day:focus {
-    background: #f1f5f9;
-}
-
-/* Selection Box Footer */
-.selection-box {
-    margin-top: 20px;
-    padding-top: 15px;
-    border-top: 1px solid #f1f5f9;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.btn-clear-date {
-    background: #fee2e2;
-    color: #ef4444;
-    border: none;
-    padding: 4px 12px;
-    border-radius: 8px;
-    font-size: 0.75rem;
-    font-weight: 700;
+/* DAYS */
+.day {
+    height: 42px;
+    line-height: 42px;
+    margin: 4px;
+    border-radius: 50%;
+    cursor: pointer;
     transition: 0.2s;
 }
 
-.btn-clear-date:hover { background: #fecaca; }
+.day:hover {
+    background: #f1f5f9;
+}
+
+/* SELECTED */
+.day.selected {
+    background: #5d45d7;
+    color: #fff;
+}
+
+.day.in-range {
+    background: #eae6ff;
+    border-radius: 0;
+}
+
+/* FOOTER */
+.selection-box {
+    margin-top: 15px;
+    text-align: center;
+}
+
+#range-preview {
+    font-weight: 600;
+    color: #5d45d7;
+}
+
+#clear-date-btn {
+    margin-top: 8px;
+    padding: 4px 10px;
+    border: none;
+    background: #fee2e2;
+    color: #ef4444;
+    border-radius: 6px;
+    cursor: pointer;
+}
 
     
 
@@ -323,6 +296,7 @@ $remaining_balance = $total_budgeted - $total_spent;
             </div>
             
             <div class="budget-scroll-area">
+                <!-- RECENT -->
                 <div id="view-recent">
                     <?php if(!empty($recentBudgets)): foreach ($recentBudgets as $budget): 
                         $progress = getBudgetProgress($budget['start_date'], $budget['end_date']); ?>
@@ -341,6 +315,7 @@ $remaining_balance = $total_budgeted - $total_spent;
                     <?php endif; ?>
                 </div>
 
+                <!-- HISTORY -->
                 <div id="view-history" class="d-none">
                     <?php if(!empty($historyBudgets)): foreach ($historyBudgets as $budget): ?>
                         <div class="budget-item opacity-75">
@@ -356,21 +331,23 @@ $remaining_balance = $total_budgeted - $total_spent;
             </div>
         </div>
 
-            <div class="kpi-grid">
-                <div class="kpi-card-mini kpi-budget">
-                    <span class="kpi-label">Active Budget</span>
-                    <span class="kpi-value">₱<?= number_format($total_budgeted, 2) ?></span>
-                </div>
-                <div class="kpi-card-mini kpi-spent">
-                    <span class="kpi-label">Current Spent</span>
-                    <span class="kpi-value text-danger">-₱<?= number_format($total_spent, 2) ?></span>
-                </div>
-                <div class="kpi-card-mini kpi-remaining">
-                    <span class="kpi-label">Available</span>
-                    <span class="kpi-value text-success">₱<?= number_format($remaining_balance, 2) ?></span>
-                </div>
+        <!-- KPI CARDS -->
+        <div class="kpi-grid">
+            <div class="kpi-card-mini kpi-budget">
+                <span class="kpi-label">Active Budget</span>
+                <span class="kpi-value">₱<?= number_format($total_budgeted, 2) ?></span>
             </div>
+            <div class="kpi-card-mini kpi-spent">
+                <span class="kpi-label">Current Spent</span>
+                <span class="kpi-value text-danger">-₱<?= number_format($total_spent, 2) ?></span>
+            </div>
+            <div class="kpi-card-mini kpi-remaining">
+                <span class="kpi-label">Available</span>
+                <span class="kpi-value text-success">₱<?= number_format($remaining_balance, 2) ?></span>
+            </div>
+        </div>
 
+        <!-- TIMELINE DEDUCTIONS -->
         <div class="card-custom">
             <div class="section-title"><i class="bi bi-list-check text-primary"></i> Timeline Deductions</div>
             <div class="table-responsive">
@@ -404,7 +381,7 @@ $remaining_balance = $total_budgeted - $total_spent;
             <form action="add_budget.php" method="POST" id="budgetForm">
                 <div class="mb-3">
                     <label class="form-label fw-semibold small text-muted">BUDGET NAME</label>
-                    <input type="text" name="budget_name" class="form-control form-control-custom" placeholder="e.g. Monthly Savings" required>
+                    <input type="text" name="budget_name" class="form-control form-control-custom" placeholder="e.g. March 1-7 Budget" required>
                 </div>
                 <div class="mb-4">
                     <label class="form-label fw-semibold small text-muted">TOTAL AMOUNT</label>
@@ -421,12 +398,18 @@ $remaining_balance = $total_budgeted - $total_spent;
         </div>
 
         <div class="card-custom">
-            <div class="section-title"><i class="bi bi-calendar-range text-primary"></i> Timeline Range</div>
-            <div id="calendar-inline"></div>
+            <div class="section-title">Timeline Range</div>
+
+            <div id="calendar"></div>
+
             <div class="selection-box">
-                <span id="range-preview" class="fw-bold" style="color:var(--brand-purple)">No dates selected</span>
-                <button type="button" id="clear-date-btn" class="btn-clear-date"><i class="bi bi-x"></i> Clear</button>
+                <span id="range-preview">No dates selected</span>
+                <button type="button" id="clear-date-btn">Clear</button>
             </div>
+
+            <!-- Hidden inputs for PHP -->
+            <input type="hidden" name="start_date" id="start_date">
+            <input type="hidden" name="end_date" id="end_date">
         </div>
     </div>
 </div>
@@ -440,53 +423,183 @@ $remaining_balance = $total_budgeted - $total_spent;
         document.getElementById('view-history').classList.toggle('d-none', view !== 'history');
     }
 
-const fp = flatpickr("#calendar-inline", {
-    inline: true,
-    mode: "range",
-    dateFormat: "Y-m-d",
-    onReady: function(s, d, instance) {
-        instance.redraw();
-    },
-    onMonthChange: function(s, d, instance) {
-        instance.redraw();
-    },
-    onChange: function(selectedDates, dateStr, instance) {
-        const preview = document.getElementById('range-preview');
-        const clearBtn = document.getElementById('clear-date-btn');
-        
-        if (selectedDates.length === 2) {
-            // Update hidden inputs for your PHP form
-            document.getElementById('start_date').value = instance.formatDate(selectedDates[0], "Y-m-d");
-            document.getElementById('end_date').value = instance.formatDate(selectedDates[1], "Y-m-d");
-            
-            // Format preview like the image: "July 14 - 20"
-            const month = instance.formatDate(selectedDates[0], "F");
-            const startDay = instance.formatDate(selectedDates[0], "j");
-            const endDay = instance.formatDate(selectedDates[1], "j");
-            
-            preview.innerText = `Range: ${month} ${startDay} - ${endDay}`;
-            clearBtn.style.display = "inline-block";
-        } else {
-            clearBtn.style.display = "none";
-            preview.innerText = "No dates selected";
+const calendar = document.getElementById("calendar");
+const preview = document.getElementById("range-preview");
+const startInput = document.getElementById("start_date");
+const endInput = document.getElementById("end_date");
+
+let startDate = null;
+let endDate = null;
+
+// dynamic month
+let current = new Date();
+let year = current.getFullYear();
+let month = current.getMonth();
+
+function renderCalendar() {
+    calendar.innerHTML = "";
+
+    /* ================= HEADER WITH NAV ================= */
+    const header = document.createElement("div");
+    header.className = "calendar-header";
+    header.style.display = "flex";
+    header.style.justifyContent = "space-between";
+    header.style.alignItems = "center";
+
+    const prevBtn = document.createElement("button");
+    prevBtn.textContent = "←";
+    prevBtn.style.border = "none";
+    prevBtn.style.background = "transparent";
+    prevBtn.style.cursor = "pointer";
+
+    const nextBtn = document.createElement("button");
+    nextBtn.textContent = "→";
+    nextBtn.style.border = "none";
+    nextBtn.style.background = "transparent";
+    nextBtn.style.cursor = "pointer";
+
+    const title = document.createElement("div");
+    title.textContent = new Date(year, month).toLocaleString("default", {
+        month: "long",
+        year: "numeric"
+    });
+
+    prevBtn.onclick = () => {
+        month--;
+        if (month < 0) {
+            month = 11;
+            year--;
         }
+        renderCalendar();
+    };
+
+    nextBtn.onclick = () => {
+        month++;
+        if (month > 11) {
+            month = 0;
+            year++;
+        }
+        renderCalendar();
+    };
+
+    header.appendChild(prevBtn);
+    header.appendChild(title);
+    header.appendChild(nextBtn);
+    calendar.appendChild(header);
+
+    /* ================= WEEKDAYS ================= */
+    const weekdays = document.createElement("div");
+    weekdays.className = "weekdays";
+    ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].forEach(d=>{
+        const el = document.createElement("div");
+        el.textContent = d;
+        weekdays.appendChild(el);
+    });
+    calendar.appendChild(weekdays);
+
+    /* ================= DAYS ================= */
+    const daysGrid = document.createElement("div");
+    daysGrid.className = "days";
+
+    const firstDay = new Date(year, month, 1).getDay();
+    const totalDays = new Date(year, month + 1, 0).getDate();
+
+    // blanks
+    for(let i=0;i<firstDay;i++){
+        daysGrid.appendChild(document.createElement("div"));
     }
-});
 
-    document.getElementById('clear-date-btn').addEventListener('click', function() {
-        fp.clear();
-        document.getElementById('start_date').value = "";
-        document.getElementById('end_date').value = "";
-        document.getElementById('range-preview').innerText = "No dates selected";
-        this.style.display = "none";
-    });
+    for(let d=1; d<=totalDays; d++){
+        const day = document.createElement("div");
+        day.className = "day";
+        day.textContent = d;
 
-    document.getElementById('budgetForm').addEventListener('submit', function(e) {
-        if (!document.getElementById('start_date').value || !document.getElementById('end_date').value) {
-            e.preventDefault();
-            document.getElementById('date-error-msg').style.display = "block";
+        const date = new Date(year, month, d);
+
+        day.addEventListener("click", ()=>{
+            if(!startDate || (startDate && endDate)){
+                startDate = date;
+                endDate = null;
+            } else {
+                endDate = date;
+                if(endDate < startDate){
+                    [startDate, endDate] = [endDate, startDate];
+                }
+            }
+            updateRange();
+        });
+
+        daysGrid.appendChild(day);
+    }
+
+    calendar.appendChild(daysGrid);
+    highlightSelected();
+}
+
+/* ================= RANGE HIGHLIGHT ================= */
+function highlightSelected(){
+    const days = document.querySelectorAll(".day");
+
+    days.forEach(d=>{
+        d.classList.remove("selected","in-range");
+
+        const dayNum = parseInt(d.textContent);
+        if(!dayNum) return;
+
+        const date = new Date(year, month, dayNum);
+
+        if(startDate && sameDay(date, startDate)){
+            d.classList.add("selected");
+        }
+
+        if(endDate && sameDay(date, endDate)){
+            d.classList.add("selected");
+        }
+
+        if(startDate && endDate && date > startDate && date < endDate){
+            d.classList.add("in-range");
         }
     });
+}
+
+function sameDay(a,b){
+    return a.getFullYear() === b.getFullYear() &&
+           a.getMonth() === b.getMonth() &&
+           a.getDate() === b.getDate();
+}
+
+/* ================= UPDATE INPUTS ================= */
+
+function formatLocalDate(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+}
+
+function updateRange(){
+    highlightSelected();
+
+    if(startDate && endDate){
+        startInput.value = formatLocalDate(startDate);
+        endInput.value = formatLocalDate(endDate);
+
+        preview.textContent =
+            startDate.toDateString() + " → " + endDate.toDateString();
+    }
+}
+
+/* ================= CLEAR BUTTON ================= */
+document.getElementById("clear-date-btn").onclick = ()=>{
+    startDate = null;
+    endDate = null;
+    startInput.value = "";
+    endInput.value = "";
+    preview.textContent = "No dates selected";
+    renderCalendar();
+};
+
+renderCalendar();
 </script>
 </body>
 </html>

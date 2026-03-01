@@ -50,9 +50,12 @@ $budgetEnd    = $budget['end_date'] ?? null;
 $today = new DateTime();
 
 if ($budgetEnd) {
+    // Compare only dates, not times
     $budgetEndDate = new DateTime($budgetEnd);
+    $todayDate = new DateTime(); 
+    $todayDate->setTime(0,0,0);  // ignore the time
 
-    if ($today > $budgetEndDate) {
+    if ($todayDate > $budgetEndDate) {
         $budgetExpired = true;
         $budgetAmount = 0;
     }
@@ -77,19 +80,14 @@ $stmt = $conn->prepare("
     JOIN category c ON e.category_id = c.id
     JOIN payment_method pm ON e.payment_method_id = pm.id
     WHERE e.user_id = ?
-    ORDER BY e.expense_date DESC
+    ORDER BY id DESC
 ");
 
 $stmt->execute([$user_id]);
 $expenses = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 
-/* =====================================================
-   TOTAL EXPENSES (ANALYTICS ONLY)
-===================================================== */
-foreach ($expenses as $exp) {
-    $totalExpenses += floatval($exp['amount']);
-}
+
 
 
 /* =====================================================
@@ -120,6 +118,13 @@ if (!$budgetExpired && $budgetStart && $budgetEnd) {
    (NO MORE OLD EXPENSE DEDUCTION)
 ===================================================== */
 $budgetLeft = max(0, $budgetAmount - $budgetExpenses);
+
+/* =====================================================
+   TOTAL EXPENSES (ANALYTICS ONLY)
+===================================================== */
+
+$totalExpenses = ($budgetAmount - $budgetLeft);
+
 
 
 /* =====================================================
@@ -190,6 +195,83 @@ if ($prevMonthTotal > 0) {
 } else {
     $monthChangePct = 0.0;
 }
+
+
+
+$stmt = $conn->prepare("
+    SELECT e.*, 
+           b.status AS budget_status, 
+           b.budget_name,
+           c.category_name,
+           p.payment_method_name
+    FROM expenses e
+    JOIN budget b ON e.budget_id = b.id
+    LEFT JOIN category c ON e.category_id = c.id
+    LEFT JOIN payment_method p ON e.payment_method_id = p.id
+    WHERE e.user_id = ? 
+      AND b.status = 'Active'
+    ORDER BY e.expense_date DESC
+");
+
+$stmt->execute([$user_id]);
+$expenses = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+
+
+// 1️⃣ Fetch all categories
+$allCategoriesStmt = $conn->query("SELECT id, category_name FROM category");
+$allCategories = $allCategoriesStmt->fetchAll(PDO::FETCH_ASSOC);
+
+// 2️⃣ Get active budgets
+$activeBudgetsStmt = $conn->prepare("
+    SELECT id 
+    FROM budget 
+    WHERE user_id = ? AND status = 'Active'
+");
+$activeBudgetsStmt->execute([$user_id]);
+$activeBudgetIds = $activeBudgetsStmt->fetchAll(PDO::FETCH_COLUMN);
+
+// 3️⃣ Prepare arrays
+$categoryBreakdown = [];
+$categoryPercentages = [];
+$totalAmount = 0; // ✅ Initialize totalAmount to 0
+
+if (!empty($activeBudgetIds)) {
+    $placeholders = implode(',', array_fill(0, count($activeBudgetIds), '?'));
+
+    // 4️⃣ Fetch expenses JOIN categories for active budgets
+    $expensesStmt = $conn->prepare("
+        SELECT c.id AS category_id, c.category_name, SUM(e.amount) AS total_amount
+        FROM expenses e
+        JOIN category c ON e.category_id = c.id
+        WHERE e.budget_id IN ($placeholders)
+        GROUP BY c.id, c.category_name
+    ");
+    $expensesStmt->execute($activeBudgetIds);
+    $activeExpenses = $expensesStmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Map totals by category name
+    foreach ($activeExpenses as $exp) {
+        $categoryBreakdown[$exp['category_name']] = floatval($exp['total_amount']);
+        $totalAmount += floatval($exp['total_amount']);
+    }
+}
+
+// 5️⃣ Fill in missing categories with 0
+foreach ($allCategories as $cat) {
+    $name = $cat['category_name'];
+    if (!isset($categoryBreakdown[$name])) {
+        $categoryBreakdown[$name] = 0;
+    }
+}
+
+// 6️⃣ Calculate percentages (safe even if $totalAmount = 0)
+foreach ($allCategories as $cat) {
+    $name = $cat['category_name'];
+    $amt = $categoryBreakdown[$name];
+    $categoryPercentages[$name] = $totalAmount > 0 ? round(($amt / $totalAmount) * 100, 2) : 0;
+}
+
 
 ?>
 
@@ -970,10 +1052,8 @@ tr:hover {
     <div class="categories-breakdown">
         <div class="breakdown-title">Category Breakdown</div>
         <div class="categories-list">
-            <?php foreach ($allCategories as $cat):
-                $name = $cat['category_name'];
-                $amt = isset($categoryBreakdown[$name]) ? $categoryBreakdown[$name] : 0;
-                $pct = isset($categoryPercentages[$name]) ? $categoryPercentages[$name] : 0;
+            <?php foreach ($categoryBreakdown as $name => $amt):
+                $pct = $categoryPercentages[$name];
             ?>
                 <div class="category-row">
                     <div class="cat-label"><?= htmlspecialchars($name) ?></div>
@@ -981,7 +1061,7 @@ tr:hover {
                         <div class="cat-line-fill" style="width: <?= $pct ?>%;"></div>
                     </div>
                     <div class="cat-pct"><?= $pct ?>%</div>
-                    <div class="cat-pct">₱ <?= $amt ?></div>
+                    <div class="cat-pct">₱ <?= number_format($amt, 2) ?></div>
                 </div>
             <?php endforeach; ?>
         </div>
@@ -1005,13 +1085,19 @@ tr:hover {
         </tr>
     </thead>
     <tbody>
-    <?php if ($expenses): ?>
-        <?php foreach ($expenses as $index => $exp): ?>
+    <?php 
+    // Filter expenses for only those whose budget status is Active
+    $activeExpenses = array_filter($expenses, function($exp) {
+        return isset($exp['budget_status']) && $exp['budget_status'] === "Active";
+    });
+    ?>
+
+    <?php if ($activeExpenses): ?>
+        <?php foreach ($activeExpenses as $index => $exp): ?>
             <tr>
                 <td><?= $index + 1 ?></td>
                 <td><?= htmlspecialchars($exp['description']) ?></td>
                 <td><?= htmlspecialchars($exp['category_name']) ?></td>
-                
                 <td>₱ <?= number_format($exp['amount'], 2) ?></td>
                 <td><?= htmlspecialchars($exp['payment_method_name']) ?></td>
                 <td><?= date("M d, Y", strtotime($exp['expense_date'])) ?></td>
@@ -1039,9 +1125,9 @@ tr:hover {
             </tr>
         <?php endforeach; ?>
     <?php else: ?>
-        <tr><td colspan="7" style="text-align:center;">No expenses recorded yet.</td></tr>
+        <tr><td colspan="8" style="text-align:center;">No expenses recorded yet.</td></tr>
     <?php endif; ?>
-    </tbody>
+</tbody>
 </table>
 
 </div>
