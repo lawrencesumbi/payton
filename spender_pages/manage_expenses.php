@@ -13,26 +13,75 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = $_SESSION['user_id'];
 
-// Fetch expenses for the current user
-$stmt = $conn->prepare("
-    SELECT 
-        e.id,
-        e.description,
-        e.amount,
-        e.expense_date,
-        e.receipt_upload,
-        e.category_id,
-        e.payment_method_id,
-        c.category_name,
-        pm.payment_method_name
-    FROM expenses e
-    JOIN category c ON e.category_id = c.id
-    JOIN payment_method pm ON e.payment_method_id = pm.id
-    WHERE e.user_id = ?
+/* ================= GET USER BUDGET ================= */
+$budgetStmt = $conn->prepare("
+    SELECT budget_amount, start_date, end_date
+    FROM budget
+    WHERE user_id = ?
     ORDER BY id DESC
+    LIMIT 1
 ");
-$stmt->execute([$user_id]);
-$expenses = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$budgetStmt->execute([$user_id]);
+$budget = $budgetStmt->fetch(PDO::FETCH_ASSOC);
+
+$budgetAmount = $budget['budget_amount'] ?? 0;
+$budgetStart  = $budget['start_date'] ?? null;
+$budgetEnd    = $budget['end_date'] ?? null;
+
+// -------------------- BUDGET EXPIRED CHECK --------------------
+$budgetExpired = false;
+
+$today = new DateTime();
+if ($budgetEnd) {
+    $budgetEndDate = new DateTime($budgetEnd);
+
+    if ($today > $budgetEndDate) {
+        $budgetExpired = true;
+
+        // Reset everything if budget expired
+        $budgetAmount = 0;
+        $totalExpenses = 0;
+        $budgetLeft = 0;
+        $thisMonthTotal = 0;
+        $expenses = [];          // no expenses
+        $categoryBreakdown = []; // reset categories
+
+    }
+}
+
+// -------------------- FETCH EXPENSES ONLY IF NOT EXPIRED --------------------
+if (!$budgetExpired && $budgetStart && $budgetEnd) {
+    $stmt = $conn->prepare("
+        SELECT 
+            e.id,
+            e.description,
+            e.amount,
+            e.expense_date,
+            e.receipt_upload,
+            e.category_id,
+            e.payment_method_id,
+            c.category_name,
+            pm.payment_method_name
+        FROM expenses e
+        JOIN category c ON e.category_id = c.id
+        JOIN payment_method pm ON e.payment_method_id = pm.id
+        WHERE e.user_id = ?
+        AND e.expense_date BETWEEN ? AND ?
+        ORDER BY e.id DESC
+    ");
+    $stmt->execute([$user_id, $budgetStart, $budgetEnd]);
+    $expenses = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // ----------------- SUM TOTAL EXPENSES -----------------
+    $totalExpenses = 0;
+    foreach ($expenses as $exp) {
+        $totalExpenses += floatval($exp['amount']);
+    }
+
+    // ----------------- CALCULATE BUDGET LEFT -----------------
+    $budgetLeft = $budgetAmount - $totalExpenses;
+}
+
 
 // Fetch all categories
 $catStmt = $conn->prepare("SELECT id, category_name FROM category");
@@ -98,6 +147,10 @@ if ($prevMonthTotal > 0) {
 } else {
   $monthChangePct = 0.0;
 }
+
+
+
+
 ?>
 
 <!DOCTYPE html>
@@ -809,6 +862,14 @@ tr:hover {
 </div>
 
 <div class="main-content">
+
+<!-- BUDGET EXPIRED WARNING -->
+    <?php if ($budgetExpired): ?>
+        <div style="padding:10px; background:#ffecec; border:1px solid #a30000; border-radius:6px; margin-bottom:12px;">
+            ⚠ Your current budget has ended. Please set a new budget to continue adding expenses.
+        </div>
+    <?php endif; ?>
+
 <div class="dashboard-top-row">
 
     <div class="analytics-container">
@@ -822,7 +883,12 @@ tr:hover {
                 <div class="stat-icon"><i class="fa-solid fa-wallet"></i></div>
                 <div class="stat-card-content">
                     <div class="stat-label">Total Budget Left</div>
-                    
+                      <div class="stat-value">
+                           ₱ <?= number_format($budgetLeft, 2) ?>
+                      </div>
+                    <div class="stat-subtitle">
+                        Budget: ₱ <?= number_format($budgetAmount, 2) ?>
+                    </div>
                 </div>
             </div>
 
@@ -940,6 +1006,8 @@ tr:hover {
 
 </div>
 </div>
+
+
 
   <button class="fab" title="Add Expense">
       <i class="fa-solid fa-plus"></i>

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Feb 23, 2026 at 09:28 AM
+-- Generation Time: Mar 01, 2026 at 10:41 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -44,8 +44,7 @@ CREATE TABLE `budget` (
 --
 
 INSERT INTO `budget` (`id`, `user_id`, `budget_name`, `budget_amount`, `start_date`, `end_date`, `status`, `created_at`, `updated_at`) VALUES
-(3, 1, 'JAN BUDGET', 1000.00, '0000-00-00', '0000-00-00', 'Active', '2026-02-23 08:24:34', '2026-02-23 08:24:34'),
-(4, 1, 'JAN BUDGET', 1000.00, '0000-00-00', '0000-00-00', 'Active', '2026-02-23 08:24:34', '2026-02-23 08:24:34');
+(5, 1, 'February Budget', 1000.00, '2026-02-01', '2026-02-28', 'Active', '2026-02-27 08:59:18', '2026-02-27 08:59:18');
 
 -- --------------------------------------------------------
 
@@ -103,6 +102,7 @@ INSERT INTO `due_status` (`id`, `due_status_name`) VALUES
 CREATE TABLE `expenses` (
   `id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
+  `budget_id` int(11) DEFAULT NULL,
   `category_id` int(11) NOT NULL,
   `description` varchar(255) NOT NULL,
   `amount` decimal(10,2) NOT NULL,
@@ -117,14 +117,9 @@ CREATE TABLE `expenses` (
 -- Dumping data for table `expenses`
 --
 
-INSERT INTO `expenses` (`id`, `user_id`, `category_id`, `description`, `amount`, `payment_method_id`, `receipt_upload`, `expense_date`, `created_at`, `updated_at`) VALUES
-(2, 1, 1, 'Jolibee', 230.00, 4, 'uploads/69899a990334e-47599096_TUYsQ8e0eKU1dtXcuxCEs44flSOjBrapqgbDXB-JuyI.jpg', '2026-02-09', '2026-02-08 16:27:13', '2026-02-09 08:29:07'),
-(3, 1, 1, 'Angels Burger', 40.00, 1, NULL, '2026-02-09', '2026-02-09 02:06:22', '2026-02-09 03:30:59'),
-(4, 1, 2, 'Gasoline', 1000.00, 1, 'uploads/698955dc227ca-gas receipt- May 2010a.jpg', '2026-02-09', '2026-02-09 02:13:32', '2026-02-09 03:34:52'),
-(5, 1, 8, 'CCTV', 899.00, 1, NULL, '2026-02-09', '2026-02-09 03:33:46', '2026-02-09 03:33:46'),
-(6, 1, 6, 'Paper', 30.00, 1, NULL, '2026-02-18', '2026-02-18 04:01:04', '2026-02-18 04:01:18'),
-(7, 1, 4, 'Water Bill', 143.00, 1, NULL, '2026-02-21', '2026-02-21 07:37:51', '2026-02-21 07:37:51'),
-(8, 1, 6, 'Tuition', 1565.00, 1, NULL, '2026-02-21', '2026-02-21 07:44:37', '2026-02-22 10:51:40');
+INSERT INTO `expenses` (`id`, `user_id`, `budget_id`, `category_id`, `description`, `amount`, `payment_method_id`, `receipt_upload`, `expense_date`, `created_at`, `updated_at`) VALUES
+(14, 1, 5, 1, 'Jollibee', 156.00, 1, NULL, '2026-02-27', '2026-02-27 08:59:57', '2026-02-27 08:59:57'),
+(15, 1, 5, 2, 'Taxi', 200.00, 1, NULL, '2026-02-27', '2026-02-27 09:00:44', '2026-02-27 09:00:44');
 
 -- --------------------------------------------------------
 
@@ -244,7 +239,8 @@ ALTER TABLE `expenses`
   ADD KEY `user_id` (`user_id`),
   ADD KEY `description` (`description`),
   ADD KEY `category_id` (`category_id`),
-  ADD KEY `payment_method_id` (`payment_method_id`);
+  ADD KEY `payment_method_id` (`payment_method_id`),
+  ADD KEY `budget_id` (`budget_id`);
 
 --
 -- Indexes for table `payment_method`
@@ -276,7 +272,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `budget`
 --
 ALTER TABLE `budget`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `category`
@@ -294,7 +290,7 @@ ALTER TABLE `due_status`
 -- AUTO_INCREMENT for table `expenses`
 --
 ALTER TABLE `expenses`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- AUTO_INCREMENT for table `payment_method`
@@ -328,6 +324,7 @@ ALTER TABLE `budget`
 -- Constraints for table `expenses`
 --
 ALTER TABLE `expenses`
+  ADD CONSTRAINT `expenses_budget_id_fr` FOREIGN KEY (`budget_id`) REFERENCES `budget` (`id`) ON DELETE SET NULL ON UPDATE SET NULL,
   ADD CONSTRAINT `expenses_category_id_fr` FOREIGN KEY (`category_id`) REFERENCES `category` (`id`),
   ADD CONSTRAINT `expenses_payment_method_id_fr` FOREIGN KEY (`payment_method_id`) REFERENCES `payment_method` (`id`),
   ADD CONSTRAINT `expenses_user_id_fr` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
