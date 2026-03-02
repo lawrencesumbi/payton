@@ -347,7 +347,13 @@ $remaining_balance = $total_budgeted - $total_spent;
                                     
                                     <!-- Edit Button -->
                                     <button class="btn btn-sm btn-outline-primary"
-                                            onclick="editBudget(<?= $budget['id'] ?>)">
+                                        onclick="editBudget(
+                                            <?= $budget['id'] ?>,
+                                            '<?= htmlspecialchars($budget['budget_name'], ENT_QUOTES) ?>',
+                                            <?= $budget['budget_amount'] ?>,
+                                            '<?= $budget['start_date'] ?>',
+                                            '<?= $budget['end_date'] ?>'
+                                        )">
                                         <i class="bi bi-pencil"></i>
                                     </button>
 
@@ -480,9 +486,10 @@ $remaining_balance = $total_budgeted - $total_spent;
 
         <!-- FORM -->
         <form action="add_budget.php" method="POST" id="budgetForm">
+            <input type="hidden" name="budget_id" id="budget_id">
           <div class="mb-3">
             <label class="form-label fw-semibold small text-muted">BUDGET NAME</label>
-            <input type="text" name="budget_name" class="form-control form-control-custom"
+            <input type="text" name="budget_name" id="budget_name" class="form-control form-control-custom"
                    placeholder="e.g. March 1-7 Budget" required>
           </div>
 
@@ -490,7 +497,7 @@ $remaining_balance = $total_budgeted - $total_spent;
             <label class="form-label fw-semibold small text-muted">TOTAL AMOUNT</label>
             <div class="input-group">
               <span class="input-group-text bg-white border-end-0">₱</span>
-              <input type="number" step="0.01" name="budget_amount"
+              <input type="number" step="0.01" name="budget_amount" id="budget_amount"
                      class="form-control form-control-custom border-start-0"
                      placeholder="0.00" required>
             </div>
@@ -522,8 +529,10 @@ $remaining_balance = $total_budgeted - $total_spent;
 
           <!-- FOOTER BUTTON -->
           <div class="mt-4">
-            <button type="submit" name="add_budget" class="btn btn-purple w-100">
-              Add Budget Record
+            <button type="submit" id="budgetSubmitBtn"
+                    name="add_budget"
+                    class="btn btn-purple w-100">
+                Add Budget Record
             </button>
           </div>
         </form>
@@ -752,6 +761,39 @@ budgetModal.addEventListener('shown.bs.modal', () => {
 
 
 
+function editBudget(id, name, amount, start, end) {
+
+    // Open modal
+    let modal = new bootstrap.Modal(document.getElementById('createBudgetModal'));
+    modal.show();
+
+    // Change modal title
+    document.querySelector('#createBudgetModal .modal-title').innerHTML =
+        '<i class="bi bi-pencil text-primary me-2"></i>Edit Budget';
+
+    // Change form action
+    document.getElementById('budgetForm').action = 'update_budget.php';
+
+    // Fill fields
+    document.getElementById('budget_id').value = id;
+    document.getElementById('budget_name').value = name;
+    document.getElementById('budget_amount').value = amount;
+
+    // Set dates
+    startDate = new Date(start);
+    endDate   = new Date(end);
+
+    updateRange();
+    renderCalendar();
+
+    // Change button text
+    const btn = document.getElementById('budgetSubmitBtn');
+    btn.textContent = "Update Budget";
+    btn.name = "update_budget";
+}
+
+
+
 function viewBudgetExpenses(budgetId) {
 
     let modal = new bootstrap.Modal(document.getElementById('viewExpensesModal'));
@@ -767,6 +809,27 @@ function viewBudgetExpenses(budgetId) {
                 "<p class='text-danger text-center'>Error loading expenses.</p>";
         });
 }
+
+budgetModal.addEventListener('hidden.bs.modal', () => {
+
+    document.getElementById('budgetForm').reset();
+    document.getElementById('budgetForm').action = 'add_budget.php';
+
+    document.querySelector('#createBudgetModal .modal-title').innerHTML =
+        '<i class="bi bi-plus-circle text-primary me-2"></i>Create Budget';
+
+    const btn = document.getElementById('budgetSubmitBtn');
+    btn.textContent = "Add Budget Record";
+    btn.name = "add_budget";
+
+    document.getElementById('budget_id').value = "";
+
+    startDate = null;
+    endDate = null;
+    preview.textContent = "No dates selected";
+    renderCalendar();
+});
+
 </script>
 </body>
 </html>
