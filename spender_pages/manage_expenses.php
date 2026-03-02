@@ -210,7 +210,7 @@ $stmt = $conn->prepare("
     LEFT JOIN payment_method p ON e.payment_method_id = p.id
     WHERE e.user_id = ? 
       AND b.status = 'Active'
-    ORDER BY e.expense_date DESC
+    ORDER BY id DESC
 ");
 
 $stmt->execute([$user_id]);
@@ -271,6 +271,9 @@ foreach ($allCategories as $cat) {
     $amt = $categoryBreakdown[$name];
     $categoryPercentages[$name] = $totalAmount > 0 ? round(($amt / $totalAmount) * 100, 2) : 0;
 }
+
+
+
 
 
 ?>
@@ -1025,10 +1028,29 @@ tr:hover {
 
             <div class="stat-card stat-green">
                 <div class="stat-icon"><i class="fa-solid fa-layer-group"></i></div>
+
                 <div class="stat-card-content">
-                    <div class="stat-label">Tracked</div>
-                    <div class="stat-value"><?= count(array_filter($categoryBreakdown)) ?></div>
-                    <div class="stat-subtitle">Categories</div>
+                    <div class="stat-label">Budget Period</div>
+
+                    <?php
+                    $stmt = $conn->prepare("
+                        SELECT budget_name 
+                        FROM budget 
+                        WHERE user_id = ? AND status = 'Active'
+                        ORDER BY created_at DESC 
+                        LIMIT 1
+                    ");
+                    $stmt->execute([$user_id]);
+                    $active = $stmt->fetch(PDO::FETCH_ASSOC);
+                    ?>
+
+                    <?php if ($active): ?>
+                        <div class="stat-value">
+                            <?= htmlspecialchars($active['budget_name']) ?>
+                        </div>
+                    <?php else: ?>
+                        <div class="stat-value">No active budget</div>
+                    <?php endif; ?>
                 </div>
             </div>
 

@@ -8,10 +8,12 @@ $user_id = $_SESSION['user_id'] ?? 1;
 
 /* ================= FETCH PAYMENTS ================= */
 $stmt = $pdo->prepare("
-    SELECT payment_name, amount, due_date
-    FROM scheduled_payments
-    WHERE user_id = ?
-    ORDER BY due_date ASC
+    SELECT sp.payment_name, sp.amount, sp.due_date
+    FROM scheduled_payments sp
+    JOIN due_status ds ON sp.due_status_id = ds.id
+    WHERE sp.user_id = ?
+    AND LOWER(ds.due_status_name) != 'paid'
+    ORDER BY sp.due_date ASC
 ");
 $stmt->execute([$user_id]);
 $payments = $stmt->fetchAll(PDO::FETCH_ASSOC);

@@ -20,7 +20,7 @@ if (isset($_POST['add_budget'])) {
 
     $stmt->execute([$user_id, $name, $amount, $start, $end, $status]);
 
-    header("Location: manage_budget.php?success=1");
+    header("Location: http://localhost/payton/spender.php?page=manage_budget");
     exit();
 }
 ?>
