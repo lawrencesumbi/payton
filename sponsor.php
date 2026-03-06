@@ -19,10 +19,9 @@ $page = $_GET['page'] ?? 'dashboard';
 
 $allowed_pages = [
     'dashboard',
-    'manage_budgets',
-    'overspending_alerts',
-    'reminder_timing',
-    'manage_loans',
+    'groups',
+    'manage_budget',
+    'monitoring_page',
     'my_account'
 ];
 
@@ -49,94 +48,141 @@ $_SESSION['email'] = $user['email'];
   <title>Sponsor Dashboard</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
   <style>
-    /* ===== BASIC RESET ===== */
+   /* ===== BASIC RESET ===== */
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
       font-family: Arial, sans-serif;
     }
+    
 
     body {
       background: #f5f7fb;
       min-height: 100vh;
     }
 
-    .app { display: flex; min-height: 100vh; }
-
-    /* SIDEBAR */
-    .sidebar {
-      width: 200px;
-      background: #ffffff;
-      padding: 25px 18px;
-      border-right: 1px solid #eee;
-    }
-
-    .brand {
+    .app {
       display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 30px;
+      min-height: 100vh;
     }
 
-    .logo {
-      width: 42px;
-      height: 42px;
-      border-radius: 12px;
-      background: #7f308f;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-size: 18px;
-    }
+   /* ===== WHITE SIDEBAR: HOVER TO EXPAND ===== */
+.sidebar {
+  width: 90px; /* Collapsed width */
+  background: #f4edf8; /* Original White Background */
+  padding: 10px 0;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden; 
+  border-right: 1px solid #eee; /* Original border */
+  z-index: 1000;
+}
 
-    .brand h2 {
-      font-size: 20px;
-      font-weight: 800;
-      color: #222;
-    }
+/* Expand on Hover */
+.sidebar:hover {
+  width: 200px;
+}
 
-    .menu {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
+/* BRANDING (payton logo/name) */
+.left-nav {
+  
+  display: flex;
+  align-items: center;
+  padding: 5px 25px;
+  margin-bottom: 10px;
+  gap: 10px;
+  white-space: nowrap;
+}
 
-    }
+.left-nav img {
+  width: 45px;
+  min-width: 45px;
+  height: 45px;
+  border-radius: 12px;
+  object-fit: cover;
+}
 
-    .menu a {
-      text-decoration: none;
-      padding: 12px 14px;
-      border-radius: 14px;
-      color: #444;
-      font-weight: 600;
-      font-size: 14px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      transition: 0.25s;
-    }
+.left-nav h3 {
+  font-size: 20px;
+  font-weight: 800;
+  color: #222; /* Original dark text */
+  opacity: 0;
+  transition: opacity 0.2s;
+}
 
-    .menu a:hover {
-      background: #f3eaff;
-      color: #7f308f;
-    }
+.sidebar:hover .left-nav h3 {
+  opacity: 1;
+}
 
-    .menu a.active {
-      background: #7f308f;
-      color: white;
-    }
+/* MENU LAYOUT */
+.menu {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-left: 15px;
+}
 
-    .menu a.logout {
-      margin-top: 15px;
-      background: #f6f6f6;
-    }
+.menu a {
+  text-decoration: none;
+  padding: 14px 20px;
+  color: #444; /* Original dark gray text */
+  font-weight: 600;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  transition: all 0.2s ease;
+  border-radius: 30px 0 0 30px; /* Capsule shape */
+  white-space: nowrap;
+}
 
+.menu a i {
+  font-size: 18px;
+  min-width: 25px;
+  text-align: center;
+  color: #7f308f; /* Original Purple for icons */
+}
+
+/* Hide labels when collapsed */
+.menu a span {
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.sidebar:hover .menu a span {
+  opacity: 1;
+}
+
+/* ACTIVE STATE (Light Purple Capsule) */
+.menu a.active {
+  background: #ebe0f7; /* Light Purple / Lavender background */
+  color: #7f308f !important; /* Original Purple text */
+}
+
+.menu a.active i {
+  color: #7f308f;
+}
+
+.menu a:hover:not(.active) {
+  background: #f9f9f9;
+  color: #7f308f;
+}
     /* MAIN */
-    .main { flex: 1; padding: 10px; }
+    .main {
+      flex: 1;
+      padding: 10px;
+    }
 
     /* TOPBAR */
+   /* TOPBAR */
 .topbar {
+  
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -226,6 +272,7 @@ $_SESSION['email'] = $user['email'];
   border-radius: 50px;
   font-weight: 700;
 }
+
 /* PROFILE DROPDOWN */
 .profile-dropdown {
   position: relative;
@@ -238,14 +285,9 @@ $_SESSION['email'] = $user['email'];
   display: flex;
   align-items: center;
   gap: 10px;
-  background: white;
   padding: 8px 12px;
   border-radius: 18px;
   box-shadow: 0 6px 18px rgba(109, 40, 217, 0.08);
-
-  width: 250px;       /* fixed width */
-  min-width: 250px;
-  max-width: 250px; 
 }
 
 .profile-btn img {
@@ -253,51 +295,35 @@ $_SESSION['email'] = $user['email'];
   height: 38px;
   border-radius: 50%;
   object-fit: cover;
-}
-
-
-/* Profile text container */
-.profile-info {
+}.profile-info {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start; /* always left */
+  flex-direction: column; /* Stacks name and role vertically */
+  align-items: flex-start; /* Forces alignment to the left */
   justify-content: center;
   text-align: left;
-  flex: 1;              /* take remaining space */
-  min-width: 0;         /* allow text truncation */
 }
 
-/* Name */
 .profile-info h4 {
   font-size: 13px;
   font-weight: 800;
   color: #222;
   margin: 0;
   line-height: 1.2;
-  width: 100%;
-  text-align: left;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
-/* Email */
 .profile-info span {
-  font-size: 12px;
+  font-size: 11px; /* Slightly smaller for better hierarchy */
   color: #777;
-  width: 100%;
-  text-align: left;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  display: block; /* Ensures it stays on its own line */
+  margin-top: 2px;
 }
 
-/* Optional: icon inside button */
 .profile-btn i {
   font-size: 12px;
   color: #666;
   margin-left: 6px;
 }
+
 /* DROPDOWN MENU */
 .profile-menu {
   position: absolute;
@@ -353,12 +379,10 @@ $_SESSION['email'] = $user['email'];
 .profile-menu a.danger i {
   color: #b91c1c;
 }
-    .navbar { width: 100%; background: white; display: flex;box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.08); position: fixed; top: 0;  left: 0;  z-index: 999;}
-    .left-nav{ display: flex; margin-bottom: 20px;}
-    .left-nav img{width: 50px; height: 50px; border-radius: 10px;}
-    .left-nav h3{padding-left: 10px; font-size: 25px; font-weight: bold; color: #111; padding-top: 10px;}
-    
-     .profile {
+
+
+
+    .profile {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -368,10 +392,15 @@ $_SESSION['email'] = $user['email'];
   box-shadow: 0 6px 18px rgba(253, 76, 224, 0.06);
 }
 
+
     /* RESPONSIVE */
     @media (max-width: 800px) {
-      .sidebar { display: none; }
-      .main { padding: 18px; }
+      .sidebar {
+        display: none;
+      }
+      .main {
+        padding: 18px;
+      }
     }
   </style>
 </head>
@@ -390,21 +419,17 @@ $_SESSION['email'] = $user['email'];
       <a href="?page=dashboard" class="<?= $page=='dashboard'?'active':'' ?>">
         <i class="fa-solid fa-house"></i> Dashboard
       </a>
+      
+      <a href="?page=group" class="<?= $page=='group'?'active':'' ?>">
+        <i class="fa-solid fa-triangle-exclamation"></i> Groups
+      </a>
 
-      <a href="?page=manage_budgets" class="<?= $page=='manage_budgets'?'active':'' ?>">
+      <a href="?page=manage_budget" class="<?= $page=='manage_budget'?'active':'' ?>">
         <i class="fa-solid fa-wallet"></i> Budgets
       </a>
 
-      <a href="?page=overspending_alerts" class="<?= $page=='overspending_alerts'?'active':'' ?>">
-        <i class="fa-solid fa-triangle-exclamation"></i> Alerts
-      </a>
-
-      <a href="?page=reminder_timing" class="<?= $page=='reminder_timing'?'active':'' ?>">
-        <i class="fa-solid fa-bell"></i> Reminders
-      </a>
-
-      <a href="?page=manage_loans" class="<?= $page=='manage_loans'?'active':'' ?>">
-        <i class="fa-solid fa-hand-holding-dollar"></i> Loans
+      <a href="?page=monitoring_page" class="<?= $page=='monitoring_page'?'active':'' ?>">
+        <i class="fa-solid fa-bell"></i> Monitoring
       </a>
     </nav>
   </aside>

@@ -19,7 +19,6 @@ $page = $_GET['page'] ?? 'dashboard';
 
 $allowed_pages = [
     'dashboard',
-    'manage_budget',
     'manage_expenses',
     'manage_payments',
     'scheduler',
@@ -429,11 +428,6 @@ $_SESSION['email'] = $user['email'];
     <a href="?page=dashboard" class="<?= $page=='dashboard'?'active':'' ?>">
       <i class="fa-solid fa-house"></i>
       <span>Dashboard</span>
-    </a>
-
-    <a href="?page=manage_budget" class="<?= $page=='manage_budget'?'active':'' ?>">
-      <i class="fa-solid fa-wallet"></i>
-      <span>Budget</span>
     </a>
     
     <a href="?page=manage_expenses" class="<?= $page=='manage_expenses'?'active':'' ?>">
