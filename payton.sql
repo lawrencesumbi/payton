@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 02, 2026 at 06:49 AM
+-- Generation Time: Mar 08, 2026 at 12:57 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -142,6 +142,48 @@ INSERT INTO `expenses` (`id`, `user_id`, `budget_id`, `category_id`, `descriptio
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `groups`
+--
+
+CREATE TABLE `groups` (
+  `id` int(11) NOT NULL,
+  `group_name` varchar(255) NOT NULL,
+  `group_code` varchar(255) NOT NULL,
+  `sponsor_id` int(11) NOT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+
+--
+-- Dumping data for table `groups`
+--
+
+INSERT INTO `groups` (`id`, `group_name`, `group_code`, `sponsor_id`, `created_at`) VALUES
+(1, 'Family Member', '3KAG1P', 2, '2026-03-08 18:54:13'),
+(2, 'Siblings', '44YF0I', 2, '2026-03-08 19:27:08');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `group_member`
+--
+
+CREATE TABLE `group_member` (
+  `id` int(11) NOT NULL,
+  `group_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `joined_at` datetime NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+
+--
+-- Dumping data for table `group_member`
+--
+
+INSERT INTO `group_member` (`id`, `group_id`, `user_id`, `joined_at`) VALUES
+(1, 1, 1, '0000-00-00 00:00:00');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `payment_method`
 --
 
@@ -261,6 +303,21 @@ ALTER TABLE `expenses`
   ADD KEY `budget_id` (`budget_id`);
 
 --
+-- Indexes for table `groups`
+--
+ALTER TABLE `groups`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `sponsor_id` (`sponsor_id`);
+
+--
+-- Indexes for table `group_member`
+--
+ALTER TABLE `group_member`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `group_id` (`group_id`),
+  ADD KEY `user_id` (`user_id`);
+
+--
 -- Indexes for table `payment_method`
 --
 ALTER TABLE `payment_method`
@@ -311,6 +368,18 @@ ALTER TABLE `expenses`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=45;
 
 --
+-- AUTO_INCREMENT for table `groups`
+--
+ALTER TABLE `groups`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `group_member`
+--
+ALTER TABLE `group_member`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
 -- AUTO_INCREMENT for table `payment_method`
 --
 ALTER TABLE `payment_method`
@@ -346,6 +415,19 @@ ALTER TABLE `expenses`
   ADD CONSTRAINT `expenses_category_id_fr` FOREIGN KEY (`category_id`) REFERENCES `category` (`id`),
   ADD CONSTRAINT `expenses_payment_method_id_fr` FOREIGN KEY (`payment_method_id`) REFERENCES `payment_method` (`id`),
   ADD CONSTRAINT `expenses_user_id_fr` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
+
+--
+-- Constraints for table `groups`
+--
+ALTER TABLE `groups`
+  ADD CONSTRAINT `groups_id_user_fr` FOREIGN KEY (`sponsor_id`) REFERENCES `users` (`id`);
+
+--
+-- Constraints for table `group_member`
+--
+ALTER TABLE `group_member`
+  ADD CONSTRAINT `group_member_id_groups_fr` FOREIGN KEY (`group_id`) REFERENCES `groups` (`id`),
+  ADD CONSTRAINT `group_member_id_user_fr` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
 
 --
 -- Constraints for table `scheduled_payments`

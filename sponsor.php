@@ -19,7 +19,7 @@ $page = $_GET['page'] ?? 'dashboard';
 
 $allowed_pages = [
     'dashboard',
-    'groups',
+    'manage_groups',
     'manage_budget',
     'monitoring_page',
     'my_account'
@@ -40,6 +40,16 @@ $profilePath = $user['profile_pic']; // this goes into our check above
 $_SESSION['fullname'] = $user['fullname'];
 $_SESSION['email'] = $user['email'];
 
+// Fetch groups for the sidebar
+$user_groups = [];
+try {
+    $group_stmt = $conn->prepare("SELECT id, group_name FROM groups WHERE sponsor_id = ?");
+    $group_stmt->execute([$id]);
+    $user_groups = $group_stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    // Silently fail to keep the sidebar rendering
+    $user_groups = [];
+}
 
 ?>
 <!DOCTYPE html>
@@ -158,7 +168,52 @@ $_SESSION['email'] = $user['email'];
 .sidebar:hover .menu a span {
   opacity: 1;
 }
+/* Sidebar Group List Styling */
+/* Sidebar Sub-menu Logic */
+.sidebar-sub-menu {
+    margin-left: 28px; /* Indent to show hierarchy */
+    display: none;
+    flex-direction: column;
+    gap: 2px;
+}
 
+.sidebar:hover .sidebar-sub-menu {
+    display: flex;
+}
+
+.group-sub-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 10px;
+    transition: 0.2s;
+}
+
+/* THE ICON ARROW STYLE */
+.sub-icon-arrow {
+    font-size: 12px;
+    color: #cbd5e1; /* Default soft gray */
+    transform: rotate(90deg); /* Curves it to point right */
+    transition: all 0.2s ease;
+}
+
+.group-item-name {
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    color: #666;
+    white-space: nowrap;
+}
+
+/* HOVER EFFECTS: Changes to Payton Purple */
+.group-sub-wrapper:hover .sub-icon-arrow {
+    color: #7f308f; /* Your specific Payton Purple theme */
+    transform: rotate(90deg) scale(1.2);
+}
+
+.group-sub-wrapper:hover .group-item-name {
+    color: #7f308f;
+}
 /* ACTIVE STATE (Light Purple Capsule) */
 .menu a.active {
   background: #ebe0f7; /* Light Purple / Lavender background */
@@ -415,23 +470,36 @@ $_SESSION['email'] = $user['email'];
       <h3>payton</h3>
     </div>
 
-    <nav class="menu">
-      <a href="?page=dashboard" class="<?= $page=='dashboard'?'active':'' ?>">
-        <i class="fa-solid fa-house"></i> Dashboard
-      </a>
-      
-      <a href="?page=group" class="<?= $page=='group'?'active':'' ?>">
-        <i class="fa-solid fa-triangle-exclamation"></i> Groups
-      </a>
+   <nav class="menu">
+    <a href="?page=dashboard" class="<?= $page=='dashboard'?'active':'' ?>">
+        <i class="fa-solid fa-house"></i> <span>Dashboard</span>
+    </a>
+    
+    <a href="?page=manage_groups" class="<?= $page=='manage_groups'?'active':'' ?>">
+        <i class="fa-solid fa-users"></i> <span>Groups</span>
+    </a>
 
-      <a href="?page=manage_budget" class="<?= $page=='manage_budget'?'active':'' ?>">
-        <i class="fa-solid fa-wallet"></i> Budgets
-      </a>
+  <div class="sidebar-sub-menu">
+        <?php if (!empty($user_groups)): ?>
+            <?php foreach($user_groups as $group): ?>
+                <div class="group-sub-wrapper">
+                    <i class="fa-solid fa-arrow-turn-up sub-icon-arrow"></i>
+                    <a href="?page=manage_groups&group_id=<?= $group['id'] ?>" class="group-item-name">
+                        <?= htmlspecialchars($group['group_name']) ?>
+                    </a>
+                </div>
+            <?php endforeach; ?>
+        <?php endif; ?>
+    </div>
 
-      <a href="?page=monitoring_page" class="<?= $page=='monitoring_page'?'active':'' ?>">
-        <i class="fa-solid fa-bell"></i> Monitoring
-      </a>
-    </nav>
+    <a href="?page=manage_budget" class="<?= $page=='manage_budget'?'active':'' ?>">
+        <i class="fa-solid fa-wallet"></i> <span>Budgets</span>
+    </a>
+
+    <a href="?page=monitoring_page" class="<?= $page=='monitoring_page'?'active':'' ?>">
+        <i class="fa-solid fa-bell"></i> <span>Monitoring</span>
+    </a>
+</nav>
   </aside>
 
   <!-- MAIN -->
