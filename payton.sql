@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 08, 2026 at 12:57 PM
+-- Generation Time: Mar 08, 2026 at 03:43 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -142,44 +142,25 @@ INSERT INTO `expenses` (`id`, `user_id`, `budget_id`, `category_id`, `descriptio
 -- --------------------------------------------------------
 
 --
--- Table structure for table `groups`
+-- Table structure for table `notifications`
 --
 
-CREATE TABLE `groups` (
+CREATE TABLE `notifications` (
   `id` int(11) NOT NULL,
-  `group_name` varchar(255) NOT NULL,
-  `group_code` varchar(255) NOT NULL,
-  `sponsor_id` int(11) NOT NULL,
-  `created_at` datetime NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
-
---
--- Dumping data for table `groups`
---
-
-INSERT INTO `groups` (`id`, `group_name`, `group_code`, `sponsor_id`, `created_at`) VALUES
-(1, 'Family Member', '3KAG1P', 2, '2026-03-08 18:54:13'),
-(2, 'Siblings', '44YF0I', 2, '2026-03-08 19:27:08');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `group_member`
---
-
-CREATE TABLE `group_member` (
-  `id` int(11) NOT NULL,
-  `group_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
-  `joined_at` datetime NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+  `parent_id` int(11) NOT NULL,
+  `type` enum('invite','info') NOT NULL,
+  `message` text NOT NULL,
+  `status` enum('unread','read') NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `group_member`
+-- Dumping data for table `notifications`
 --
 
-INSERT INTO `group_member` (`id`, `group_id`, `user_id`, `joined_at`) VALUES
-(1, 1, 1, '0000-00-00 00:00:00');
+INSERT INTO `notifications` (`id`, `user_id`, `parent_id`, `type`, `message`, `status`, `created_at`) VALUES
+(5, 1, 2, 'invite', 'You have been invited by Patricia Ann Mae Obaob. Click accept to join.', 'read', '2026-03-08 14:40:39');
 
 -- --------------------------------------------------------
 
@@ -244,6 +225,26 @@ INSERT INTO `scheduled_payments` (`id`, `user_id`, `payment_name`, `amount`, `du
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `sponsor_spender`
+--
+
+CREATE TABLE `sponsor_spender` (
+  `id` int(11) NOT NULL,
+  `sponsor_id` int(11) NOT NULL,
+  `spender_id` int(11) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `sponsor_spender`
+--
+
+INSERT INTO `sponsor_spender` (`id`, `sponsor_id`, `spender_id`, `created_at`) VALUES
+(4, 2, 1, '2026-03-08 14:40:51');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `users`
 --
 
@@ -303,19 +304,12 @@ ALTER TABLE `expenses`
   ADD KEY `budget_id` (`budget_id`);
 
 --
--- Indexes for table `groups`
+-- Indexes for table `notifications`
 --
-ALTER TABLE `groups`
+ALTER TABLE `notifications`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `sponsor_id` (`sponsor_id`);
-
---
--- Indexes for table `group_member`
---
-ALTER TABLE `group_member`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `group_id` (`group_id`),
-  ADD KEY `user_id` (`user_id`);
+  ADD KEY `user_id` (`user_id`),
+  ADD KEY `parent_id` (`parent_id`);
 
 --
 -- Indexes for table `payment_method`
@@ -331,6 +325,14 @@ ALTER TABLE `scheduled_payments`
   ADD KEY `user_id` (`user_id`),
   ADD KEY `due_status_id` (`due_status_id`),
   ADD KEY `payment_method_id` (`payment_method_id`);
+
+--
+-- Indexes for table `sponsor_spender`
+--
+ALTER TABLE `sponsor_spender`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `sponsor_id` (`sponsor_id`),
+  ADD KEY `spender_id` (`spender_id`);
 
 --
 -- Indexes for table `users`
@@ -368,16 +370,10 @@ ALTER TABLE `expenses`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=45;
 
 --
--- AUTO_INCREMENT for table `groups`
+-- AUTO_INCREMENT for table `notifications`
 --
-ALTER TABLE `groups`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
-
---
--- AUTO_INCREMENT for table `group_member`
---
-ALTER TABLE `group_member`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+ALTER TABLE `notifications`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `payment_method`
@@ -390,6 +386,12 @@ ALTER TABLE `payment_method`
 --
 ALTER TABLE `scheduled_payments`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
+
+--
+-- AUTO_INCREMENT for table `sponsor_spender`
+--
+ALTER TABLE `sponsor_spender`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `users`
@@ -417,17 +419,11 @@ ALTER TABLE `expenses`
   ADD CONSTRAINT `expenses_user_id_fr` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
 
 --
--- Constraints for table `groups`
+-- Constraints for table `notifications`
 --
-ALTER TABLE `groups`
-  ADD CONSTRAINT `groups_id_user_fr` FOREIGN KEY (`sponsor_id`) REFERENCES `users` (`id`);
-
---
--- Constraints for table `group_member`
---
-ALTER TABLE `group_member`
-  ADD CONSTRAINT `group_member_id_groups_fr` FOREIGN KEY (`group_id`) REFERENCES `groups` (`id`),
-  ADD CONSTRAINT `group_member_id_user_fr` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
+ALTER TABLE `notifications`
+  ADD CONSTRAINT `notifications_parent_id_fr` FOREIGN KEY (`parent_id`) REFERENCES `users` (`id`),
+  ADD CONSTRAINT `notifications_user_id_fr` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
 
 --
 -- Constraints for table `scheduled_payments`
@@ -436,6 +432,13 @@ ALTER TABLE `scheduled_payments`
   ADD CONSTRAINT `scheduled_payments_due_status_id_fr` FOREIGN KEY (`due_status_id`) REFERENCES `due_status` (`id`),
   ADD CONSTRAINT `scheduled_payments_payment_method_id_fr` FOREIGN KEY (`payment_method_id`) REFERENCES `payment_method` (`id`),
   ADD CONSTRAINT `scheduled_payments_user_id_fr` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
+
+--
+-- Constraints for table `sponsor_spender`
+--
+ALTER TABLE `sponsor_spender`
+  ADD CONSTRAINT `sponsor_spender_spender_id_fr` FOREIGN KEY (`spender_id`) REFERENCES `users` (`id`),
+  ADD CONSTRAINT `sponsor_spender_sponsor_id_fr` FOREIGN KEY (`sponsor_id`) REFERENCES `users` (`id`);
 
 DELIMITER $$
 --

@@ -19,7 +19,7 @@ $page = $_GET['page'] ?? 'dashboard';
 
 $allowed_pages = [
     'dashboard',
-    'manage_groups',
+    'manage_members',
     'manage_budget',
     'monitoring_page',
     'my_account'
@@ -475,22 +475,9 @@ try {
         <i class="fa-solid fa-house"></i> <span>Dashboard</span>
     </a>
     
-    <a href="?page=manage_groups" class="<?= $page=='manage_groups'?'active':'' ?>">
-        <i class="fa-solid fa-users"></i> <span>Groups</span>
+    <a href="?page=manage_members" class="<?= $page=='manage_members'?'active':'' ?>">
+        <i class="fa-solid fa-users"></i> <span>Members</span>
     </a>
-
-  <div class="sidebar-sub-menu">
-        <?php if (!empty($user_groups)): ?>
-            <?php foreach($user_groups as $group): ?>
-                <div class="group-sub-wrapper">
-                    <i class="fa-solid fa-arrow-turn-up sub-icon-arrow"></i>
-                    <a href="?page=manage_groups&group_id=<?= $group['id'] ?>" class="group-item-name">
-                        <?= htmlspecialchars($group['group_name']) ?>
-                    </a>
-                </div>
-            <?php endforeach; ?>
-        <?php endif; ?>
-    </div>
 
     <a href="?page=manage_budget" class="<?= $page=='manage_budget'?'active':'' ?>">
         <i class="fa-solid fa-wallet"></i> <span>Budgets</span>

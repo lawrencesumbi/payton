@@ -24,6 +24,7 @@ $allowed_pages = [
     'manage_payments',
     'scheduler',
     'manage_reminders',
+    'notifications',
     'my_account'
 ];
 
@@ -431,11 +432,6 @@ $_SESSION['email'] = $user['email'];
       <span>Dashboard</span>
     </a>
     
-    <a href="?page=manage_groups" class="<?= $page=='manage_groups'?'active':'' ?>">
-      <i class="fa-solid fa-users"></i>
-      <span>Groups</span>
-    </a>
-    
     <a href="?page=manage_expenses" class="<?= $page=='manage_expenses'?'active':'' ?>">
       <i class="fa-solid fa-file-invoice-dollar"></i>
       <span>Expenses</span>
@@ -449,6 +445,11 @@ $_SESSION['email'] = $user['email'];
     <a href="?page=scheduler" class="<?= $page=='scheduler'?'active':'' ?>">
       <i class="fa-solid fa-calendar-days"></i>
       <span>Scheduler</span>
+    </a>
+
+    <a href="?page=notifications" class="<?= $page=='notifications'?'active':'' ?>">
+      <i class="fa-solid fa-calendar-days"></i>
+      <span>Notifications</span>
     </a>
   </nav>
 </aside>
