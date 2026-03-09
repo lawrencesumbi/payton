@@ -16,27 +16,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $payment_method_id = $_POST['payment_method_id'];
 
         /* ===============================
-           GET ACTIVE BUDGET
+           GET MOST RECENT ACTIVE BUDGET
         =============================== */
         $stmtBudget = $conn->prepare("
             SELECT id
             FROM budget
             WHERE user_id = ?
-            AND CURDATE() BETWEEN start_date AND end_date
             AND status = 'Active'
+            AND start_date <= CURDATE()
+            AND end_date >= CURDATE()
+            ORDER BY start_date DESC
             LIMIT 1
         ");
         $stmtBudget->execute([$user_id]);
         $budget = $stmtBudget->fetch(PDO::FETCH_ASSOC);
 
-        // if no active budget → NULL allowed
-        $budget_id = $budget['id'] ?? NULL;
+        // if no active budget → fallback to latest budget ever
+        if ($budget) {
+            $budget_id = $budget['id'];
+        } else {
+            $stmtFallback = $conn->prepare("
+                SELECT id
+                FROM budget
+                WHERE user_id = ?
+                ORDER BY end_date DESC
+                LIMIT 1
+            ");
+            $stmtFallback->execute([$user_id]);
+            $lastBudget = $stmtFallback->fetch(PDO::FETCH_ASSOC);
+            $budget_id = $lastBudget['id'] ?? NULL;
+        }
 
         /* ===============================
            RECEIPT UPLOAD
         =============================== */
         $receiptPath = null;
-
         if (!empty($_FILES['receipt_upload']['name']) 
             && $_FILES['receipt_upload']['error'] === UPLOAD_ERR_OK) {
 
@@ -54,7 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         /* ===============================
-           INSERT EXPENSE (NOW WITH BUDGET)
+           INSERT EXPENSE
         =============================== */
         $stmt = $conn->prepare("
             INSERT INTO expenses
@@ -66,7 +80,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $stmt->execute([
             $user_id,
-            $budget_id,   // ✅ NEW
+            $budget_id,
             $category_id,
             $description,
             $amount,
@@ -78,6 +92,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             "Transaction for '$description' has been recorded!";
 
     } catch (Exception $e) {
+        error_log("Add expense error: " . $e->getMessage()); // log real error
         $_SESSION['error_msg'] =
             "Failed to add expense. Please try again.";
     }

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 08, 2026 at 03:43 PM
+-- Generation Time: Mar 09, 2026 at 05:08 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -29,11 +29,12 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `budget` (
   `id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
   `budget_name` varchar(255) NOT NULL,
   `budget_amount` decimal(10,2) NOT NULL,
   `start_date` date NOT NULL,
   `end_date` date NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `sponsor_id` int(11) NOT NULL,
   `status` varchar(255) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
@@ -43,11 +44,8 @@ CREATE TABLE `budget` (
 -- Dumping data for table `budget`
 --
 
-INSERT INTO `budget` (`id`, `user_id`, `budget_name`, `budget_amount`, `start_date`, `end_date`, `status`, `created_at`, `updated_at`) VALUES
-(15, 1, 'February 1-7', 1000.00, '2026-02-01', '2026-02-07', 'Inactive', '2026-02-06 13:33:19', '2026-02-06 13:33:19'),
-(16, 1, 'February 8 - 14', 2000.00, '2026-02-08', '2026-02-14', 'Inactive', '2026-02-08 13:38:22', '2026-02-08 13:38:22'),
-(22, 1, 'February 15 - 20', 500.00, '2026-02-15', '2026-02-20', 'Inactive', '2026-02-20 00:47:40', '2026-02-20 00:47:40'),
-(23, 1, 'March 2 - 10', 1000.00, '2026-03-02', '2026-03-10', 'Active', '2026-03-01 16:52:40', '2026-03-01 16:52:40');
+INSERT INTO `budget` (`id`, `budget_name`, `budget_amount`, `start_date`, `end_date`, `user_id`, `sponsor_id`, `status`, `created_at`, `updated_at`) VALUES
+(34, 'March 21 - 30', 1000.00, '2026-03-21', '2026-03-30', 1, 2, 'Active', '2026-03-08 15:28:03', '2026-03-08 15:28:03');
 
 -- --------------------------------------------------------
 
@@ -69,11 +67,11 @@ INSERT INTO `category` (`id`, `category_name`) VALUES
 (2, 'Transportation'),
 (3, 'Housing / Rent'),
 (4, 'Bills & Utilities'),
-(5, 'Health & Personal Care'),
+(5, 'Personal Care'),
 (6, 'Education'),
-(7, 'Entertainment & Leisure'),
+(7, 'Entertainment'),
 (8, 'Shopping'),
-(9, 'Savings & Investments'),
+(9, 'Savings'),
 (10, 'Miscellaneous');
 
 -- --------------------------------------------------------
@@ -121,23 +119,9 @@ CREATE TABLE `expenses` (
 --
 
 INSERT INTO `expenses` (`id`, `user_id`, `budget_id`, `category_id`, `description`, `amount`, `payment_method_id`, `receipt_upload`, `expense_date`, `created_at`, `updated_at`) VALUES
-(27, 1, 15, 1, 'Jollibee', 156.00, 1, NULL, '2026-02-06', '2026-02-06 13:33:47', '2026-02-06 13:33:47'),
-(28, 1, 15, 1, 'Burger', 44.00, 1, NULL, '2026-02-06', '2026-02-06 13:34:24', '2026-02-06 13:34:24'),
-(29, 1, 15, 2, 'Gasoline', 800.00, 1, NULL, '2026-02-06', '2026-02-06 13:34:57', '2026-02-06 13:34:57'),
-(30, 1, 16, 1, 'Manok', 100.00, 1, NULL, '2026-02-08', '2026-02-08 13:39:24', '2026-02-08 13:39:24'),
-(31, 1, 16, 10, 'Subscription', 199.00, 1, NULL, '2026-02-08', '2026-02-08 13:50:55', '2026-02-08 13:50:55'),
-(32, 1, 16, 9, 'Savings', 500.00, 1, NULL, '2026-02-08', '2026-02-08 13:53:49', '2026-02-08 13:53:49'),
-(33, 1, 16, 2, 'Motor Parts', 201.00, 1, NULL, '2026-02-08', '2026-02-08 14:57:06', '2026-02-08 14:57:06'),
-(34, 1, 23, 10, 'Mang Inasal', 300.00, 1, NULL, '2026-03-02', '2026-03-02 01:17:47', '2026-03-02 01:17:47'),
-(36, 1, 23, 2, 'Gas', 100.00, 1, NULL, '2026-03-02', '2026-03-02 01:56:26', '2026-03-02 01:56:26'),
-(37, 1, 23, 1, 'Jollibee', 10.00, 1, NULL, '2026-03-02', '2026-03-02 03:30:18', '2026-03-02 03:30:18'),
-(38, 1, 23, 1, 'Mcdo', 10.00, 1, NULL, '2026-03-02', '2026-03-02 03:30:25', '2026-03-02 03:30:25'),
-(39, 1, 23, 10, 'Chowking', 10.00, 1, 'uploads/69a504e21d7a8-receipt-768x992.jpg', '2026-03-02', '2026-03-02 03:30:34', '2026-03-02 03:32:50'),
-(40, 1, 23, 1, 'Ngohiong', 10.00, 1, NULL, '2026-03-02', '2026-03-02 03:30:45', '2026-03-02 03:30:45'),
-(41, 1, 23, 10, 'Lumpia', 10.00, 1, NULL, '2026-03-02', '2026-03-02 03:30:54', '2026-03-02 03:30:54'),
-(42, 1, 23, 1, 'Angels Burger', 10.00, 1, NULL, '2026-03-02', '2026-03-02 03:34:42', '2026-03-02 03:34:42'),
-(43, 1, 23, 1, 'Hotdog', 10.00, 1, NULL, '2026-03-02', '2026-03-02 03:46:32', '2026-03-02 03:46:32'),
-(44, 1, 23, 7, 'Roblox', 30.00, 4, NULL, '2026-03-02', '2026-03-02 04:46:26', '2026-03-02 04:46:26');
+(53, 1, 34, 1, 'Jollibee', 100.00, 1, NULL, '2026-03-08', '2026-03-08 15:53:05', '2026-03-08 15:53:05'),
+(54, 1, 34, 2, 'Gas', 100.00, 1, NULL, '2026-03-09', '2026-03-08 16:06:44', '2026-03-08 16:06:44'),
+(55, 1, 34, 2, 'Gasoline', 100.00, 1, NULL, '2026-03-09', '2026-03-08 16:07:48', '2026-03-08 16:07:48');
 
 -- --------------------------------------------------------
 
@@ -278,7 +262,8 @@ INSERT INTO `users` (`id`, `fullname`, `email`, `password`, `role`, `profile_pic
 --
 ALTER TABLE `budget`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `user_id` (`user_id`);
+  ADD KEY `user_id` (`user_id`),
+  ADD KEY `sponsor_id` (`sponsor_id`);
 
 --
 -- Indexes for table `category`
@@ -349,7 +334,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `budget`
 --
 ALTER TABLE `budget`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
 
 --
 -- AUTO_INCREMENT for table `category`
@@ -367,7 +352,7 @@ ALTER TABLE `due_status`
 -- AUTO_INCREMENT for table `expenses`
 --
 ALTER TABLE `expenses`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=45;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=56;
 
 --
 -- AUTO_INCREMENT for table `notifications`
@@ -407,6 +392,7 @@ ALTER TABLE `users`
 -- Constraints for table `budget`
 --
 ALTER TABLE `budget`
+  ADD CONSTRAINT `budget_sponsor_id` FOREIGN KEY (`sponsor_id`) REFERENCES `users` (`id`),
   ADD CONSTRAINT `budget_user_id_fr` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
 
 --

@@ -1007,12 +1007,12 @@ tr:hover {
             <div class="stat-card stat-blue">
                 <div class="stat-icon"><i class="fa-solid fa-wallet"></i></div>
                 <div class="stat-card-content">
-                    <div class="stat-label">Total Budget Left</div>
+                    <div class="stat-label">Total Allowance Left</div>
                       <div class="stat-value">
                            ₱ <?= number_format($budgetLeft, 2) ?>
                       </div>
                     <div class="stat-subtitle">
-                        Budget: ₱ <?= number_format($budgetAmount, 2) ?>
+                        Allowance: ₱ <?= number_format($budgetAmount, 2) ?>
                     </div>
                 </div>
             </div>
@@ -1030,7 +1030,7 @@ tr:hover {
                 <div class="stat-icon"><i class="fa-solid fa-layer-group"></i></div>
 
                 <div class="stat-card-content">
-                    <div class="stat-label">Budget Period</div>
+                    <div class="stat-label">Allowance Period</div>
 
                     <?php
                     $stmt = $conn->prepare("
@@ -1049,7 +1049,7 @@ tr:hover {
                             <?= htmlspecialchars($active['budget_name']) ?>
                         </div>
                     <?php else: ?>
-                        <div class="stat-value">No active budget</div>
+                        <div class="stat-value">No active Allowance</div>
                     <?php endif; ?>
                 </div>
             </div>
@@ -1184,11 +1184,11 @@ tr:hover {
         <div class="cat-card" data-category-id="2"><div class="cat-icon">🚗</div><p class="cat-name">Transportation</p></div>
         <div class="cat-card" data-category-id="3"><div class="cat-icon">🏡</div><p class="cat-name">Housing / Rent</p></div>
         <div class="cat-card" data-category-id="4"><div class="cat-icon">💡</div><p class="cat-name">Bills & Utilities</p></div>
-        <div class="cat-card" data-category-id="5"><div class="cat-icon">🏥</div><p class="cat-name">Health & Personal Care</p></div>
+        <div class="cat-card" data-category-id="5"><div class="cat-icon">🏥</div><p class="cat-name">Personal Care</p></div>
         <div class="cat-card" data-category-id="6"><div class="cat-icon">📚</div><p class="cat-name">Education</p></div>
-        <div class="cat-card" data-category-id="7"><div class="cat-icon">🎮</div><p class="cat-name">Entertainment & Leisure</p></div>
+        <div class="cat-card" data-category-id="7"><div class="cat-icon">🎮</div><p class="cat-name">Entertainment</p></div>
         <div class="cat-card" data-category-id="8"><div class="cat-icon">🛍</div><p class="cat-name">Shopping</p></div>
-        <div class="cat-card" data-category-id="9"><div class="cat-icon">💰</div><p class="cat-name">Savings & Investments</p></div>
+        <div class="cat-card" data-category-id="9"><div class="cat-icon">💰</div><p class="cat-name">Savings</p></div>
         <div class="cat-card" data-category-id="10"><div class="cat-icon">📝</div><p class="cat-name">Miscellaneous</p></div>
       </div>
 

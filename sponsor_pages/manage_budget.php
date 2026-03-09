@@ -14,11 +14,11 @@ $user_id = $_SESSION['user_id'];
 $stmtActive = $conn->prepare("
     SELECT *
     FROM budget
-    WHERE user_id = ?
-    AND status = 'Active'
+    WHERE status = 'Active'
+    AND (user_id = ? OR sponsor_id = ?)
     ORDER BY created_at DESC
 ");
-$stmtActive->execute([$user_id]);
+$stmtActive->execute([$user_id, $user_id]);
 $recentBudgets = $stmtActive->fetchAll(PDO::FETCH_ASSOC);
 
 
@@ -476,7 +476,7 @@ $remaining_balance = $total_budgeted - $total_spent;
       <!-- HEADER -->
       <div class="modal-header">
         <h5 class="modal-title fw-bold">
-          <i class="bi bi-plus-circle text-primary me-2"></i>Create Budget
+          <i class="bi bi-plus-circle text-primary me-2"></i>Set Allowance for Spender
         </h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
@@ -484,9 +484,34 @@ $remaining_balance = $total_budgeted - $total_spent;
       <!-- BODY -->
       <div class="modal-body">
 
+
         <!-- FORM -->
         <form action="add_budget.php" method="POST" id="budgetForm">
             <input type="hidden" name="budget_id" id="budget_id">
+
+        <div class="mb-3">
+    <label class="form-label fw-semibold small text-muted">Select Spender</label>
+    <select name="spender_id" id="spender_id" class="form-select form-control-custom" required>
+        <option value="">-- Select Spender--</option>
+        <?php
+        // Fetch all students linked to this parent
+        $stmt = $conn->prepare("
+            SELECT u.id, u.fullname
+            FROM users u
+            INNER JOIN sponsor_spender ss ON u.id = ss.spender_id
+            WHERE ss.sponsor_id = ?
+        ");
+        $stmt->execute([$user_id]); // $user_id is parent
+        $students = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        foreach ($students as $s) {
+            echo "<option value=\"{$s['id']}\">" . htmlspecialchars($s['fullname']) . "</option>";
+        }
+        ?>
+    </select>
+</div>
+
+
           <div class="mb-3">
             <label class="form-label fw-semibold small text-muted">BUDGET NAME</label>
             <input type="text" name="budget_name" id="budget_name" class="form-control form-control-custom"

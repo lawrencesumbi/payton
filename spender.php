@@ -477,7 +477,7 @@ $_SESSION['email'] = $user['email'];
     <!-- Notifications -->
     <a href="notifications.php" class="icon-btn notif" title="Notifications">
       <i class="fa-regular fa-bell"></i>
-      <span class="notif-badge">3</span>
+      <span class="notif-badge">1</span>
     </a>
 
     <!-- Profile -->
