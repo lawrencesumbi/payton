@@ -75,7 +75,7 @@ body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f6f9; margin: 
 }
 
 .table-wrapper {
-    max-height: 600px; /* Adjust this height as needed */
+    max-height: 560px; /* Adjust this height as needed */
     overflow-y: auto;
     width: 100%;
 }

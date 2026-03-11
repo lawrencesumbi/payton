@@ -448,7 +448,7 @@ $_SESSION['email'] = $user['email'];
     </a>
 
     <a href="?page=notifications" class="<?= $page=='notifications'?'active':'' ?>">
-      <i class="fa-solid fa-calendar-days"></i>
+      <i class="fa-solid fa-bell"></i>
       <span>Notifications</span>
     </a>
   </nav>

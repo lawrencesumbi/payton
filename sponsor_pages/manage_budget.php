@@ -9,460 +9,219 @@ if (!isset($_SESSION['user_id'])) {
 $user_id = $_SESSION['user_id'];
 
 /* =====================================================
-    FETCH ACTIVE BUDGETS (RECENT TAB)
+    FETCH ALL BUDGETS (Unified Table Query)
 ===================================================== */
-$stmtActive = $conn->prepare("
-    SELECT *
-    FROM budget
-    WHERE status = 'Active'
-    AND (user_id = ? OR sponsor_id = ?)
-    ORDER BY created_at DESC
+$stmt = $conn->prepare("
+    SELECT b.*, u.fullname as spender_name 
+    FROM budget b
+    LEFT JOIN users u ON b.user_id = u.id
+    WHERE b.user_id = ? OR b.sponsor_id = ?
+    ORDER BY b.created_at DESC
 ");
-$stmtActive->execute([$user_id, $user_id]);
-$recentBudgets = $stmtActive->fetchAll(PDO::FETCH_ASSOC);
+$stmt->execute([$user_id, $user_id]);
+$allBudgets = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-
-/* =====================================================
-    FETCH INACTIVE BUDGETS (HISTORY TAB)
-===================================================== */
-$stmtHistory = $conn->prepare("
-    SELECT *
-    FROM budget
-    WHERE user_id = ?
-    AND status = 'Inactive'
-    ORDER BY created_at DESC
-");
-$stmtHistory->execute([$user_id]);
-$historyBudgets = $stmtHistory->fetchAll(PDO::FETCH_ASSOC);
-
-/* =====================================================
-    HELPER: PROGRESS CALCULATION
-===================================================== */
-function getBudgetProgress($start, $end) {
-    $startDate = new DateTime($start);
-    $endDate   = new DateTime($end);
-    $today     = new DateTime();
-
-    if ($today < $startDate) return 0;
-    if ($today > $endDate) return 100;
-
-    $totalDays  = $startDate->diff($endDate)->days ?: 1;
-    $passedDays = $startDate->diff($today)->days;
-
-    return min(100, max(0, round(($passedDays / $totalDays) * 100)));
+function getStatusBadge($status) {
+    $class = ($status == 'Active') ? 'bg-success-subtle text-success' : 'bg-secondary-subtle text-secondary';
+    return "<span class='badge $class' style='font-weight:600; padding: 6px 12px; border-radius: 6px;'>$status</span>";
 }
-
-/* =====================================================
-    CALCULATE DASHBOARD TOTALS FOR ACTIVE BUDGET
-===================================================== */
-$total_budgeted = 0;
-$total_spent = 0;
-$timelineExpenses = [];
-
-if (!empty($recentBudgets)) {
-    $activeBudget = $recentBudgets[0]; // Latest Active Budget
-    $total_budgeted = $activeBudget['budget_amount'];
-
-    // Fetch expenses within this budget period
-    $timelineStmt = $conn->prepare("
-        SELECT e.*, description, amount, expense_date, pm.payment_method_name
-        FROM expenses e
-        LEFT JOIN payment_method pm ON e.payment_method_id = pm.id
-        WHERE e.user_id = ?
-        AND expense_date BETWEEN ? AND ?
-        ORDER BY id DESC
-    ");
-    $timelineStmt->execute([
-        $user_id,
-        $activeBudget['start_date'],
-        $activeBudget['end_date']
-    ]);
-    $timelineExpenses = $timelineStmt->fetchAll(PDO::FETCH_ASSOC);
-
-    foreach ($timelineExpenses as $exp) {
-        $total_spent += $exp['amount'];
-    }
-}
-
-$remaining_balance = $total_budgeted - $total_spent;
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Manage Budget | Professional</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-<style>
-    :root {
-        --brand-purple: #6f42c1;
-        --brand-purple-light: #f3f0ff;
-        --brand-purple-dark: #59359a;
-        --bg-body: #f4f7fe;
-        --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Budget Management | Payton</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --brand-purple: #6f42c1;
+            --brand-purple-light: #f3f0ff;
+            --brand-purple-dark: #59359a;
+            --bg-body: #f8f9fa;
+        }
 
+        body { 
+            background-color: var(--bg-body); 
+            font-family: 'Inter', sans-serif; 
+            color: #1a202c; 
+        }
 
-    .topbar-left h1 {
-    font-weight: 700; /* or 800 for extra bold */
-}
+        .main-content {
+            padding: 40px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
 
-    body { background-color: var(--bg-body); font-family: 'Inter', sans-serif; color: #2d3748; }
+        .header-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
 
-    .dashboard-container {
-        gap: 20px;
-        width: 100%;
-        
-    }
+        .header-section h1 {
+            font-weight: 800;
+            font-size: 1.75rem;
+            letter-spacing: -0.5px;
+            margin: 0;
+        }
 
-    .panel { width: 100%; display: flex;  gap: 10px; margin-bottom: 10px; }
-    .panel-bottom { width: 100%; display: flex;  gap: 10px;}
+        /* --- TABLE STYLING --- */
+        .table-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+            padding: 25px;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
 
-    /* IMAGE-BASED CALENDAR DESIGN */
-.card-custom {
-    width: 75%;
-    background: white;
-    border-radius: 16px;
-    border: none;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
-    padding: 24px;
-}
+        .table thead th {
+            background: #f8fafc;
+            color: #64748b;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 15px 20px;
+            border: none;
+        }
 
-.card-custom2 {
-    height: 475px;
-    overflow-y: auto;
-    width: 100%;
-    background: white;
-    border-radius: 16px;
-    border: none;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
-    padding: 24px;
-}
+        .table tbody td {
+            padding: 18px 20px;
+            vertical-align: middle;
+            border-bottom: 1px solid #f1f5f9;
+        }
 
+        .budget-name { font-weight: 700; color: #2d3748; display: block; }
+        .date-range { font-size: 0.8rem; color: #94a3b8; }
+        .amount-text { font-weight: 700; color: var(--brand-purple); }
 
-/* Container stretch */
-/* CALENDAR WRAPPER */
-#calendar {
-    background: #fff;
-    padding: 15px;
-    border-radius: 14px;
-}
+        /* --- BUTTONS & FAB --- */
+        .btn-action {
+            width: 36px;
+            height: 36px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            border: 1px solid #edf2f7;
+            background: white;
+            transition: 0.2s;
+        }
 
-/* HEADER */
-.calendar-header {
-    text-align: center;
-    font-weight: 600;
-    margin-bottom: 10px;
-}
+        .btn-action:hover {
+            background: var(--brand-purple-light);
+            color: var(--brand-purple);
+            border-color: var(--brand-purple);
+        }
 
-/* WEEKDAYS */
-.weekdays, .days {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    text-align: center;
-}
+        .fab {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--brand-purple);
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 10px 20px rgba(111, 66, 193, 0.3);
+            border: none;
+            transition: 0.3s;
+            z-index: 1050;
+        }
 
-.weekdays div {
-    font-size: 12px;
-    color: #94a3b8;
-    padding: 5px 0;
-}
+        .fab:hover { transform: translateY(-5px); color: white; }
 
-/* DAYS */
-.day {
-    height: 42px;
-    line-height: 42px;
-    margin: 4px;
-    border-radius: 50%;
-    cursor: pointer;
-    transition: 0.2s;
-}
+        /* --- MODAL & FORM --- */
+        .custom-input {
+            background: #f8fafc;
+            border: 2px solid #edf2f7;
+            border-radius: 12px;
+            padding: 12px 15px;
+            font-weight: 500;
+        }
 
-.day:hover {
-    background: #f1f5f9;
-}
+        .custom-input:focus {
+            border-color: var(--brand-purple);
+            box-shadow: 0 0 0 4px rgba(111, 66, 193, 0.1);
+            outline: none;
+        }
 
-/* SELECTED */
-.day.selected {
-    background: #5d45d7;
-    color: #fff;
-}
-
-.day.in-range {
-    background: #eae6ff;
-    border-radius: 0;
-}
-
-/* FOOTER */
-.selection-box {
-    margin-top: 15px;
-    text-align: center;
-}
-
-#range-preview {
-    font-weight: 600;
-    color: #5d45d7;
-}
-
-#clear-date-btn {
-    margin-top: 8px;
-    padding: 4px 10px;
-    border: none;
-    background: #fee2e2;
-    color: #ef4444;
-    border-radius: 6px;
-    cursor: pointer;
-}
-
-    
-
-    /* REDUCED HEIGHT BUDGET AREA */
-    .budget-scroll-area {
-        height: 90px; 
-        overflow-y: auto;
-        padding-right: 8px;
-    }
-    .budget-scroll-area::-webkit-scrollbar { width: 4px; }
-    .budget-scroll-area::-webkit-scrollbar-thumb { background: #cbd5e0; border-radius: 10px; }
-
-    .budget-item {
-        padding: 14px;
-        border-radius: 12px;
-        margin-bottom: 10px;
-        background: #f8fafc;
-        border: 1px solid #edf2f7;
-    }
-
-    /* PROFESSIONAL KPI DASHBOARD */
-    /* PROFESSIONAL KPI DASHBOARD - REFINED */
-.kpi-grid { 
-    width: 25%;
-    display: grid; 
-    gap: 5px; 
-}
-
-.kpi-card-mini {
-    background: #ffffff;
-    padding: 0 16px; /* Balanced padding */
-    border-radius: 12px;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.02); /* Softer, modern shadow */
-    border: 1px solid #f1f5f9; /* Subtle border instead of heavy left-bar */
-    transition: transform 0.2s ease;
-}
-
-.kpi-label { 
-    font-size: 0.62rem; 
-    font-weight: 600; /* Medium weight instead of Ultra-Bold */
-    color: #64748b; 
-    text-transform: uppercase; 
-    letter-spacing: 0.8px; /* Increased tracking for readability */
-    
-    display: block;
-}
-
-.kpi-value { 
-    font-size: 1rem; /* Slightly smaller for a cleaner look */
-    font-weight: 500; /* Clean semi-bold */
-    color: #0f172a; 
-    display: block;
-    letter-spacing: -0.3px;
-}
-
-/* Color accents using tiny subtle indicators */
-.kpi-card-mini::before {
-    content: "";
-    display: block;
-    width: 12px;
-    height: 2px;
-    border-radius: 10px;
-    margin-bottom: 8px;
-}
-
-.kpi-budget::before { background: var(--brand-purple); }
-.kpi-spent::before { background: #ef4444; }
-.kpi-remaining::before { background: #22c55e; }
-
-    .tab-header { display: flex; gap: 20px; border-bottom: 2px solid #edf2f7; margin-bottom: 20px; }
-    .tab-btn { padding-bottom: 10px; cursor: pointer; font-weight: 700; color: #94a3b8; border-bottom: 3px solid transparent; transition: 0.3s; }
-    .tab-btn.active { color: var(--brand-purple); border-bottom-color: var(--brand-purple); }
-
-    .section-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
-    .progress { height: 6px; background-color: #e9ecef; border-radius: 10px; margin-top: 10px; }
-    .progress-bar { background-color: var(--brand-purple); }
-    .amount-badge { background: var(--brand-purple-light); color: var(--brand-purple); font-weight: 700; padding: 4px 10px; border-radius: 8px; font-size: 0.9rem; }
-
-    .form-control-custom { background: #f8fafc; border: 2px solid #edf2f7; border-radius: 10px; padding: 12px; }
-    .btn-purple { background: var(--brand-purple); color: white; border: none; border-radius: 10px; padding: 14px; font-weight: 600; }
-    .selection-box { background: #f8fafc; border-top: 1px dashed #dee2e6; padding: 20px; text-align: center; margin: 24px -30px -30px -30px; border-bottom-left-radius: 16px; border-bottom-right-radius: 16px; }
-
-    .btn-clear-date { background: #fee2e2; color: #ef4444; border: none; padding: 2px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; cursor: pointer; display: none; }
-
-   /* FAB */
-    .fab {
-    position: fixed;
-    bottom: 30px;
-    right: 30px;
-    background: #7f00d4;
-    color: white;
-    font-size: 26px;
-    border: none;
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    cursor: pointer;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-}
-
-    .fab:hover { background: #af35e8; transform: translateY(-3px); }
-
-
-
-</style>
+        /* CALENDAR CUSTOMIZATION */
+        #calendar { padding: 10px; background: #fff; }
+        .calendar-header { font-weight: 700; margin-bottom: 10px; }
+        .weekdays, .days { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; }
+        .weekdays div { font-size: 11px; color: #94a3b8; padding: 5px 0; }
+        .day { height: 38px; line-height: 38px; margin: 2px; border-radius: 50%; cursor: pointer; font-size: 13px; }
+        .day:hover { background: #f1f5f9; }
+        .day.selected { background: var(--brand-purple); color: #fff; }
+        .day.in-range { background: var(--brand-purple-light); border-radius: 0; }
+    </style>
 </head>
 <body>
 
-<div class="dashboard-container">
-    <div class="panel">
-        <div class="card-custom">
-            <div class="tab-header">
-                <div class="tab-btn active" onclick="switchBudgetView('recent', this)">Active Budget</div>
-                <div class="tab-btn" onclick="switchBudgetView('history', this)">Budget History</div>
-            </div>
-            
-            <div class="budget-scroll-area">
-                <!-- RECENT -->
-                <div id="view-recent">
-                    <?php if(!empty($recentBudgets)): foreach ($recentBudgets as $budget): 
-                        $progress = getBudgetProgress($budget['start_date'], $budget['end_date']); ?>
-                        <div class="budget-item">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <div class="fw-bold small"><?= htmlspecialchars($budget['budget_name']) ?></div>
-                                    <div class="text-muted" style="font-size: 0.7rem;"><?= $progress ?>% Time Passed</div>
-                                </div>
-                                <div class="d-flex align-items-center gap-2">
-                                    <div class="amount-badge">₱<?= number_format($budget['budget_amount'], 2) ?></div>
-                                    
-                                    <!-- Edit Button -->
-                                    <button class="btn btn-sm btn-outline-primary"
-                                        onclick="editBudget(
-                                            <?= $budget['id'] ?>,
-                                            '<?= htmlspecialchars($budget['budget_name'], ENT_QUOTES) ?>',
-                                            <?= $budget['budget_amount'] ?>,
-                                            '<?= $budget['start_date'] ?>',
-                                            '<?= $budget['end_date'] ?>'
-                                        )">
-                                        <i class="bi bi-pencil"></i>
-                                    </button>
+<div class="main-content">
+    <div class="header-section">
+        <div>
+            <h1>Budget Overview</h1>
+            <p class="text-muted small m-0">Tracking all active and historical budgets.</p>
+        </div>
+        <button class="btn btn-dark px-4 py-2" style="border-radius: 10px;" data-bs-toggle="modal" data-bs-target="#createBudgetModal">
+            <i class="bi bi-plus-lg me-2"></i> New Budget
+        </button>
+    </div>
 
-                                    <!-- Delete Button -->
-                                    <form method="POST" action="delete_budget.php" style="display:inline;">
-                                        <input type="hidden" name="budget_id" value="<?= $budget['id'] ?>">
-                                        <button type="submit" class="btn btn-sm btn-outline-danger"
-                                                onclick="return confirm('Are you sure you want to delete this budget?');">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
-                                    </form>
+    <div class="table-container">
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Reference</th>
+                        <th>Spender</th>
+                        <th>Status</th>
+                        <th>Amount</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if(!empty($allBudgets)): foreach($allBudgets as $budget): ?>
+                    <tr>
+                        <td>
+                            <span class="budget-name"><?= htmlspecialchars($budget['budget_name']) ?></span>
+                            <span class="date-range"><?= date("M d", strtotime($budget['start_date'])) ?> — <?= date("M d, Y", strtotime($budget['end_date'])) ?></span>
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div class="bg-light rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px; font-size: 0.7rem; font-weight: 800; color: var(--brand-purple);">
+                                    <?= strtoupper(substr($budget['spender_name'], 0, 2)) ?>
                                 </div>
+                                <span class="fw-medium"><?= htmlspecialchars($budget['spender_name'] ?? 'N/A') ?></span>
                             </div>
-                            <div class="progress"><div class="progress-bar" style="width: <?= $progress ?>%"></div></div>
-                        </div>
+                        </td>
+                        <td><?= getStatusBadge($budget['status']) ?></td>
+                        <td><span class="amount-text">₱<?= number_format($budget['budget_amount'], 2) ?></span></td>
+                        <td class="text-end">
+                            <button class="btn-action" onclick="viewBudgetExpenses(<?= $budget['id'] ?>)"><i class="bi bi-eye"></i></button>
+                            <button class="btn-action" onclick="editBudget(<?= $budget['id'] ?>, '<?= addslashes($budget['budget_name']) ?>', <?= $budget['budget_amount'] ?>, '<?= $budget['start_date'] ?>', '<?= $budget['end_date'] ?>')"><i class="bi bi-pencil"></i></button>
+                            <form method="POST" action="delete_budget.php" style="display:inline;">
+                                <input type="hidden" name="budget_id" value="<?= $budget['id'] ?>">
+                                <button type="submit" class="btn-action" onclick="return confirm('Delete this budget?');"><i class="bi bi-trash text-danger"></i></button>
+                            </form>
+                        </td>
+                    </tr>
                     <?php endforeach; else: ?>
-                        <p class="text-center text-muted py-4">No active budgets.</p>
+                    <tr><td colspan="5" class="text-center py-5 text-muted">No budgets found.</td></tr>
                     <?php endif; ?>
-                </div>
-
-                <!-- HISTORY -->
-                <div id="view-history" class="d-none">
-                    <?php if(!empty($historyBudgets)): foreach ($historyBudgets as $budget): ?>
-                        <div class="budget-item opacity-75">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <div class="fw-bold text-muted small">
-                            <?= htmlspecialchars($budget['budget_name']) ?>
-                        </div>
-                        <div class="small text-muted">
-                            <?= date("M d, Y", strtotime($budget['start_date'])) ?>
-                            -
-                            <?= date("M d, Y", strtotime($budget['end_date'])) ?>
-                        </div>
-                    </div>
-
-                    <div class="d-flex align-items-center gap-2">
-                        <div class="fw-bold small">
-                            ₱<?= number_format($budget['budget_amount'], 2) ?>
-                        </div>
-
-                        <!-- VIEW BUTTON -->
-                        <button class="btn btn-sm btn-outline-primary"
-                                onclick="viewBudgetExpenses(<?= $budget['id'] ?>)">
-                            <i class="bi bi-eye"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-                    <?php endforeach; else: ?>
-                        <p class="text-center text-muted py-4">No history found.</p>
-                    <?php endif; ?>
-                </div>
-            </div>
-        </div>
-
-        <!-- KPI CARDS -->
-        <div class="kpi-grid">
-            <div class="kpi-card-mini">
-                <span class="kpi-label">Active Budget</span>
-                <span class="kpi-value">₱<?= number_format($total_budgeted, 2) ?></span>
-            </div>
-            <div class="kpi-card-mini">
-                <span class="kpi-label">Current Spent</span>
-                <span class="kpi-value text-danger">-₱<?= number_format($total_spent, 2) ?></span>
-            </div>
-            <div class="kpi-card-mini">
-                <span class="kpi-label">Available</span>
-                <span class="kpi-value text-success">₱<?= number_format($remaining_balance, 2) ?></span>
-            </div>
-        </div>
-
-        
-    </div>
-
-
-    <div class="panel-bottom">
-    <!-- TIMELINE DEDUCTIONS -->
-        <div class="card-custom2">
-            <div class="section-title"><i class="bi bi-list-check text-primary"></i> Timeline Deductions</div>
-            <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead class="table-light">
-                        <tr class="small text-muted" style="font-size: 0.75rem;">
-                            <th>No.</th>
-                            <th>DEDUCTION NAME</th>
-                            <th>AMOUNT</th>
-                            <th>PAYMENT METHOD</th>
-                            <th>DATE ADDED</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    <?php if (!empty($timelineExpenses)): foreach ($timelineExpenses as $index => $exp): ?>
-                        <tr>
-                            <td><?= $index + 1 ?></td>
-                            <td class="fw-semibold small"><?= htmlspecialchars($exp['description']) ?></td>
-                            <td class="text-danger fw-bold">-₱<?= number_format($exp['amount'], 2) ?></td>
-                            <td><?= htmlspecialchars($exp['payment_method_name']) ?></td>
-                            <td class="text-muted small"><?= date("F j, Y", strtotime($exp['expense_date'])) ?></td>
-                        </tr>
-                    <?php endforeach; else: ?>
-                        <tr><td colspan="4" class="text-center text-muted py-3">No deductions available.</td></tr>
-                    <?php endif; ?>
-                    </tbody>
-                </table>
-            </div>
+                </tbody>
+            </table>
         </div>
     </div>
-    
 </div>
 
 <button class="fab" data-bs-toggle="modal" data-bs-target="#createBudgetModal">
@@ -470,391 +229,138 @@ $remaining_balance = $total_budgeted - $total_spent;
 </button>
 
 <div class="modal fade" id="createBudgetModal" tabindex="-1">
-  <div class="modal-dialog modal-lg modal-dialog-centered">
-    <div class="modal-content" style="border-radius:16px; overflow:hidden;">
-
-      <!-- HEADER -->
-      <div class="modal-header">
-        <h5 class="modal-title fw-bold">
-          <i class="bi bi-plus-circle text-primary me-2"></i>Set Allowance for Spender
-        </h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-
-      <!-- BODY -->
-      <div class="modal-body">
-
-
-        <!-- FORM -->
-        <form action="add_budget.php" method="POST" id="budgetForm">
-            <input type="hidden" name="budget_id" id="budget_id">
-
-        <div class="mb-3">
-    <label class="form-label fw-semibold small text-muted">Select Spender</label>
-    <select name="spender_id" id="spender_id" class="form-select form-control-custom" required>
-        <option value="">-- Select Spender--</option>
-        <?php
-        // Fetch all students linked to this parent
-        $stmt = $conn->prepare("
-            SELECT u.id, u.fullname
-            FROM users u
-            INNER JOIN sponsor_spender ss ON u.id = ss.spender_id
-            WHERE ss.sponsor_id = ?
-        ");
-        $stmt->execute([$user_id]); // $user_id is parent
-        $students = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-        foreach ($students as $s) {
-            echo "<option value=\"{$s['id']}\">" . htmlspecialchars($s['fullname']) . "</option>";
-        }
-        ?>
-    </select>
-</div>
-
-
-          <div class="mb-3">
-            <label class="form-label fw-semibold small text-muted">BUDGET NAME</label>
-            <input type="text" name="budget_name" id="budget_name" class="form-control form-control-custom"
-                   placeholder="e.g. March 1-7 Budget" required>
-          </div>
-
-          <div class="mb-4">
-            <label class="form-label fw-semibold small text-muted">TOTAL AMOUNT</label>
-            <div class="input-group">
-              <span class="input-group-text bg-white border-end-0">₱</span>
-              <input type="number" step="0.01" name="budget_amount" id="budget_amount"
-                     class="form-control form-control-custom border-start-0"
-                     placeholder="0.00" required>
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content" style="border-radius:24px; border:none; overflow:hidden;">
+            <div class="modal-header border-0 px-4 pt-4">
+                <h5 class="modal-title fw-800" id="modalTitle">Configure Budget</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-          </div>
-
-          <!-- HIDDEN DATES -->
-          <input type="hidden" name="start_date" id="start_date">
-          <input type="hidden" name="end_date" id="end_date">
-
-          <!-- CALENDAR -->
-          <div class="card-custom2 mt-3">
-            <div class="section-title">Timeline Range</div>
-
-            <div id="calendar"></div>
-
-            <div class="selection-box">
-              <span id="range-preview">No dates selected</span>
-              <button type="button" id="clear-date-btn">Clear</button>
+            <div class="modal-body px-4 pb-4">
+                <form action="add_budget.php" method="POST" id="budgetForm">
+                    <input type="hidden" name="budget_id" id="budget_id">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label small fw-700 text-muted">SELECT SPENDER</label>
+                            <select name="spender_id" id="spender_id" class="form-select custom-input" required>
+                                <option value="">-- Choose Spender --</option>
+                                <?php
+                                $stmtS = $conn->prepare("SELECT u.id, u.fullname FROM users u INNER JOIN sponsor_spender ss ON u.id = ss.spender_id WHERE ss.sponsor_id = ?");
+                                $stmtS->execute([$user_id]);
+                                while($s = $stmtS->fetch(PDO::FETCH_ASSOC)) echo "<option value='{$s['id']}'>".htmlspecialchars($s['fullname'])."</option>";
+                                ?>
+                            </select>
+                        </div>
+                        <div class="col-md-7">
+                            <label class="form-label small fw-700 text-muted">BUDGET NAME</label>
+                            <input type="text" name="budget_name" id="budget_name" class="form-control custom-input" required>
+                        </div>
+                        <div class="col-md-5">
+                            <label class="form-label small fw-700 text-muted">AMOUNT</label>
+                            <input type="number" step="0.01" name="budget_amount" id="budget_amount" class="form-control custom-input" required>
+                        </div>
+                        <div class="col-12 mt-4">
+                            <label class="form-label small fw-700 text-muted">TIMELINE RANGE</label>
+                            <div class="border rounded-4 p-2 bg-white"><div id="calendar"></div></div>
+                            <div class="d-flex justify-content-between align-items-center mt-2 p-3 bg-light rounded-3">
+                                <span id="range-preview" class="small fw-700 text-primary">No dates selected</span>
+                                <button type="button" id="clear-date-btn" class="btn btn-sm btn-link text-danger text-decoration-none fw-700">Clear</button>
+                            </div>
+                        </div>
+                    </div>
+                    <input type="hidden" name="start_date" id="start_date">
+                    <input type="hidden" name="end_date" id="end_date">
+                    <button type="submit" id="budgetSubmitBtn" name="add_budget" class="btn btn-dark w-100 py-3 mt-4 fw-700" style="border-radius:14px; background: var(--brand-purple);">Create Budget Record</button>
+                </form>
             </div>
-          </div>
-
-          <!-- ERROR -->
-          <div id="date-error-msg"
-               class="text-danger small fw-bold mt-3 text-center"
-               style="display: none;">
-            <i class="bi bi-exclamation-circle me-1"></i>
-            Selection of Timeline Range is required!
-          </div>
-
-          <!-- FOOTER BUTTON -->
-          <div class="mt-4">
-            <button type="submit" id="budgetSubmitBtn"
-                    name="add_budget"
-                    class="btn btn-purple w-100">
-                Add Budget Record
-            </button>
-          </div>
-        </form>
-
-      </div>
-    </div>
-  </div>
-</div>
-
-
-<!-- VIEW EXPENSES MODAL -->
-<div class="modal fade" id="viewExpensesModal" tabindex="-1">
-  <div class="modal-dialog modal-lg modal-dialog-centered">
-    <div class="modal-content">
-
-      <div class="modal-header">
-        <h5 class="modal-title">Budget Expenses</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-
-      <div class="modal-body">
-        <div id="expensesContent">
-            <p class="text-center text-muted">Loading...</p>
         </div>
-      </div>
-
     </div>
-  </div>
 </div>
-
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script>
-    function switchBudgetView(view, btn) {
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        document.getElementById('view-recent').classList.toggle('d-none', view !== 'recent');
-        document.getElementById('view-history').classList.toggle('d-none', view !== 'history');
-    }
-
-const calendar = document.getElementById("calendar");
-const preview = document.getElementById("range-preview");
-const startInput = document.getElementById("start_date");
-const endInput = document.getElementById("end_date");
-
-let startDate = null;
-let endDate = null;
-
-// dynamic month
-let current = new Date();
-let year = current.getFullYear();
-let month = current.getMonth();
+let startDate = null, endDate = null;
+let current = new Date(), year = current.getFullYear(), month = current.getMonth();
+const calendar = document.getElementById("calendar"), preview = document.getElementById("range-preview");
+const startInput = document.getElementById("start_date"), endInput = document.getElementById("end_date");
 
 function renderCalendar() {
     calendar.innerHTML = "";
-
-    /* ================= HEADER WITH NAV ================= */
     const header = document.createElement("div");
-    header.className = "calendar-header";
-    header.style.display = "flex";
-    header.style.justifyContent = "space-between";
-    header.style.alignItems = "center";
-
-    const prevBtn = document.createElement("button");
-    prevBtn.textContent = "←";
-    prevBtn.style.border = "none";
-    prevBtn.style.background = "transparent";
-    prevBtn.style.cursor = "pointer";
-
-    const nextBtn = document.createElement("button");
-    nextBtn.textContent = "→";
-    nextBtn.style.border = "none";
-    nextBtn.style.background = "transparent";
-    nextBtn.style.cursor = "pointer";
-
-    const title = document.createElement("div");
-    title.textContent = new Date(year, month).toLocaleString("default", {
-        month: "long",
-        year: "numeric"
-    });
-
-    prevBtn.onclick = () => {
-        month--;
-        if (month < 0) {
-            month = 11;
-            year--;
-        }
-        renderCalendar();
-    };
-
-    nextBtn.onclick = () => {
-        month++;
-        if (month > 11) {
-            month = 0;
-            year++;
-        }
-        renderCalendar();
-    };
-
-    header.appendChild(prevBtn);
-    header.appendChild(title);
-    header.appendChild(nextBtn);
+    header.className = "calendar-header d-flex justify-content-between px-2";
+    header.innerHTML = `<span onclick="changeMonth(-1)" style="cursor:pointer">←</span><span>${new Date(year, month).toLocaleString('default', { month: 'long', year: 'numeric' })}</span><span onclick="changeMonth(1)" style="cursor:pointer">→</span>`;
     calendar.appendChild(header);
 
-    /* ================= WEEKDAYS ================= */
     const weekdays = document.createElement("div");
     weekdays.className = "weekdays";
-    ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].forEach(d=>{
-        const el = document.createElement("div");
-        el.textContent = d;
-        weekdays.appendChild(el);
-    });
+    ["S","M","T","W","T","F","S"].forEach(d => weekdays.innerHTML += `<div>${d}</div>`);
     calendar.appendChild(weekdays);
 
-    /* ================= DAYS ================= */
     const daysGrid = document.createElement("div");
     daysGrid.className = "days";
-
     const firstDay = new Date(year, month, 1).getDay();
     const totalDays = new Date(year, month + 1, 0).getDate();
 
-    // blanks
-    for(let i=0;i<firstDay;i++){
-        daysGrid.appendChild(document.createElement("div"));
-    }
-
-    for(let d=1; d<=totalDays; d++){
-        const day = document.createElement("div");
-        day.className = "day";
-        day.textContent = d;
-
+    for(let i=0; i<firstDay; i++) daysGrid.appendChild(document.createElement("div"));
+    for(let d=1; d<=totalDays; d++) {
         const date = new Date(year, month, d);
-
-        day.addEventListener("click", ()=>{
-            if(!startDate || (startDate && endDate)){
-                startDate = date;
-                endDate = null;
-            } else {
-                endDate = date;
-                if(endDate < startDate){
-                    [startDate, endDate] = [endDate, startDate];
-                }
-            }
+        const dayEl = document.createElement("div");
+        dayEl.className = "day";
+        dayEl.textContent = d;
+        dayEl.onclick = () => {
+            if(!startDate || (startDate && endDate)) { startDate = date; endDate = null; }
+            else { endDate = date; if(endDate < startDate) [startDate, endDate] = [endDate, startDate]; }
             updateRange();
-        });
-
-        daysGrid.appendChild(day);
+        };
+        daysGrid.appendChild(dayEl);
     }
-
     calendar.appendChild(daysGrid);
-    highlightSelected();
+    highlightDays();
 }
 
-/* ================= RANGE HIGHLIGHT ================= */
-function highlightSelected(){
-    const days = document.querySelectorAll(".day");
+function changeMonth(dir) { month += dir; if(month<0){month=11; year--;} if(month>11){month=0; year++;} renderCalendar(); }
 
-    days.forEach(d=>{
-        d.classList.remove("selected","in-range");
-
-        const dayNum = parseInt(d.textContent);
-        if(!dayNum) return;
-
-        const date = new Date(year, month, dayNum);
-
-        if(startDate && sameDay(date, startDate)){
-            d.classList.add("selected");
-        }
-
-        if(endDate && sameDay(date, endDate)){
-            d.classList.add("selected");
-        }
-
-        if(startDate && endDate && date > startDate && date < endDate){
-            d.classList.add("in-range");
-        }
+function highlightDays() {
+    document.querySelectorAll(".day").forEach(el => {
+        const d = new Date(year, month, parseInt(el.textContent));
+        el.classList.remove("selected", "in-range");
+        if(startDate && d.getTime() === startDate.getTime()) el.classList.add("selected");
+        if(endDate && d.getTime() === endDate.getTime()) el.classList.add("selected");
+        if(startDate && endDate && d > startDate && d < endDate) el.classList.add("in-range");
     });
 }
 
-function sameDay(a,b){
-    return a.getFullYear() === b.getFullYear() &&
-           a.getMonth() === b.getMonth() &&
-           a.getDate() === b.getDate();
-}
-
-/* ================= UPDATE INPUTS ================= */
-
-function formatLocalDate(date) {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-    return `${year}-${month}-${day}`;
-}
-
-function updateRange(){
-    highlightSelected();
-
-    if(startDate && endDate){
-        startInput.value = formatLocalDate(startDate);
-        endInput.value = formatLocalDate(endDate);
-
-        preview.textContent =
-            startDate.toDateString() + " → " + endDate.toDateString();
+function updateRange() {
+    highlightDays();
+    if(startDate && endDate) {
+        startInput.value = startDate.toISOString().split('T')[0];
+        endInput.value = endDate.toISOString().split('T')[0];
+        preview.textContent = startDate.toDateString() + " - " + endDate.toDateString();
     }
 }
 
-/* ================= CLEAR BUTTON ================= */
-document.getElementById("clear-date-btn").onclick = ()=>{
-    startDate = null;
-    endDate = null;
-    startInput.value = "";
-    endInput.value = "";
-    preview.textContent = "No dates selected";
-    renderCalendar();
-};
-
-renderCalendar();
-
-
-const budgetModal = document.getElementById('createBudgetModal');
-
-budgetModal.addEventListener('shown.bs.modal', () => {
-    renderCalendar(); // re-init your custom calendar
-});
-
-
+document.getElementById("clear-date-btn").onclick = () => { startDate = null; endDate = null; preview.textContent = "No dates selected"; renderCalendar(); };
 
 function editBudget(id, name, amount, start, end) {
-
-    // Open modal
-    let modal = new bootstrap.Modal(document.getElementById('createBudgetModal'));
-    modal.show();
-
-    // Change modal title
-    document.querySelector('#createBudgetModal .modal-title').innerHTML =
-        '<i class="bi bi-pencil text-primary me-2"></i>Edit Budget';
-
-    // Change form action
+    const m = new bootstrap.Modal(document.getElementById('createBudgetModal'));
     document.getElementById('budgetForm').action = 'update_budget.php';
-
-    // Fill fields
     document.getElementById('budget_id').value = id;
     document.getElementById('budget_name').value = name;
     document.getElementById('budget_amount').value = amount;
-
-    // Set dates
-    startDate = new Date(start);
-    endDate   = new Date(end);
-
-    updateRange();
-    renderCalendar();
-
-    // Change button text
-    const btn = document.getElementById('budgetSubmitBtn');
-    btn.textContent = "Update Budget";
-    btn.name = "update_budget";
+    startDate = new Date(start); endDate = new Date(end);
+    updateRange(); renderCalendar();
+    document.getElementById('budgetSubmitBtn').textContent = "Update Budget";
+    document.getElementById('budgetSubmitBtn').name = "update_budget";
+    m.show();
 }
 
-
-
-function viewBudgetExpenses(budgetId) {
-
-    let modal = new bootstrap.Modal(document.getElementById('viewExpensesModal'));
-    modal.show();
-
-    fetch('get_budget_expenses.php?budget_id=' + budgetId)
-        .then(response => response.text())
-        .then(data => {
-            document.getElementById('expensesContent').innerHTML = data;
-        })
-        .catch(error => {
-            document.getElementById('expensesContent').innerHTML =
-                "<p class='text-danger text-center'>Error loading expenses.</p>";
-        });
-}
-
-budgetModal.addEventListener('hidden.bs.modal', () => {
-
+document.getElementById('createBudgetModal').addEventListener('shown.bs.modal', renderCalendar);
+document.getElementById('createBudgetModal').addEventListener('hidden.bs.modal', () => {
     document.getElementById('budgetForm').reset();
     document.getElementById('budgetForm').action = 'add_budget.php';
-
-    document.querySelector('#createBudgetModal .modal-title').innerHTML =
-        '<i class="bi bi-plus-circle text-primary me-2"></i>Create Budget';
-
-    const btn = document.getElementById('budgetSubmitBtn');
-    btn.textContent = "Add Budget Record";
-    btn.name = "add_budget";
-
-    document.getElementById('budget_id').value = "";
-
-    startDate = null;
-    endDate = null;
-    preview.textContent = "No dates selected";
-    renderCalendar();
+    document.getElementById('budgetSubmitBtn').textContent = "Create Budget Record";
 });
 
+renderCalendar();
 </script>
 </body>
 </html>

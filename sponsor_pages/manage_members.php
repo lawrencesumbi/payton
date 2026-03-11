@@ -58,67 +58,207 @@ $students = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Manage Members</title>
-<style>
-body { font-family: Arial, sans-serif; background:#f5f3ff; color:#1f2937; }
-.container { max-width:800px; margin:30px auto; padding:20px; }
-table { width:100%; border-collapse: collapse; margin-top:20px; }
-th, td { padding:12px 15px; border:1px solid #e5e7eb; text-align:left; }
-th { background:#7c3aed; color:white; }
-tr:hover { background:#f3f4f6; }
-.btn { padding:8px 12px; border:none; border-radius:6px; cursor:pointer; }
-.btn-primary { background:#7c3aed; color:white; }
-.fab { position:fixed; bottom:30px; right:30px; background:#7c3aed; color:white; width:60px; height:60px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:24px; cursor:pointer; }
-/* Modal */
-#modalOverlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.4); justify-content:center; align-items:center; }
-.modal-card { background:white; padding:30px; border-radius:16px; max-width:400px; width:100%; }
-.modal-card h2 { margin-top:0; }
-.input-box { width:100%; padding:10px; margin-top:15px; border:1px solid #ddd; border-radius:6px; }
-.modal-actions { margin-top:20px; display:flex; justify-content:flex-end; gap:10px; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Members</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --bg-body: #f9fafb;
+            --text-main: #111827;
+            --text-muted: #6b7280;
+            --border: #e5e7eb;
+            --white: #ffffff;
+        }
+
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: var(--bg-body); 
+            color: var(--text-main); 
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        .container { 
+            max-width: 900px; 
+            margin: 50px auto; 
+            padding: 0 20px; 
+        }
+
+        /* Header Section */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .header h1 { font-size: 1.5rem; font-weight: 600; margin: 0; }
+
+        /* Table Card */
+        .card {
+            background: var(--white);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        table { width: 100%; border-collapse: collapse; }
+        
+        th { 
+            background: #fafafa; 
+            padding: 12px 20px; 
+            text-align: left; 
+            font-size: 0.75rem; 
+            text-transform: uppercase; 
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border);
+        }
+
+        td { 
+            padding: 16px 20px; 
+            border-bottom: 1px solid var(--border); 
+            font-size: 0.9rem;
+        }
+
+        tr:last-child td { border-bottom: none; }
+        tr:hover { background: #fcfcfd; }
+
+        .member-name { font-weight: 500; color: var(--text-main); }
+        .member-email { color: var(--text-muted); }
+
+        /* Success Message */
+        .alert {
+            padding: 12px 16px;
+            background: #ecfdf5;
+            color: #065f46;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            border: 1px solid #a7f3d0;
+        }
+
+        /* Buttons */
+        .btn { 
+            padding: 10px 18px; 
+            border: 1px solid var(--border);
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-weight: 500;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary { 
+            background: var(--primary); 
+            color: white; 
+            border: none;
+        }
+        
+        .btn-primary:hover { background: var(--primary-hover); transform: translateY(-1px); }
+
+        /* Floating Button - Modernized */
+        .fab { 
+            position: fixed; bottom: 30px; right: 30px; 
+            background: var(--primary); color: white; 
+            width: 56px; height: 56px; border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center; 
+            font-size: 24px; cursor: pointer; 
+            box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.4);
+            transition: transform 0.2s;
+        }
+        .fab:hover { transform: scale(1.1); }
+
+        /* Modal Redesign */
+        #modalOverlay { 
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(17, 24, 39, 0.7); backdrop-filter: blur(4px);
+            justify-content: center; align-items: center; z-index: 1000;
+        }
+
+        .modal-card { 
+            background: white; padding: 32px; border-radius: 16px; 
+            max-width: 400px; width: 90%; 
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .input-box { 
+            width: 100%; padding: 12px; margin: 16px 0; 
+            border: 1px solid var(--border); border-radius: 8px; 
+            box-sizing: border-box; font-size: 1rem;
+        }
+        
+        .input-box:focus { outline: 2px solid var(--primary); border-color: transparent; }
+
+        .modal-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 8px; }
+
+        .empty-state { text-align: center; padding: 40px; color: var(--text-muted); }
+    </style>
 </head>
 <body>
 
 <div class="container">
-    
+    <div class="header">
+        <h1>Manage Members</h1>
+        <button class="btn btn-primary" onclick="openModal()">+ Add Member</button>
+    </div>
 
-    <?php if($message != ""): ?>
-        <p style="color:green;"><?php echo htmlspecialchars($message); ?></p>
+    <?php if(!empty($message)): ?>
+        <div class="alert">
+            ✓ <?php echo htmlspecialchars($message); ?>
+        </div>
     <?php endif; ?>
 
-    <table>
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Email</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php if(count($students) > 0): ?>
-                <?php foreach($students as $s): ?>
+    <div class="card">
+        <table>
+            <thead>
+                <tr>
+                    <th>Member Details</th>
+                    <th>Email Address</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php if(!empty($students)): ?>
+                    <?php foreach($students as $s): ?>
+                        <tr>
+                            <td>
+                                <div class="member-name"><?php echo htmlspecialchars($s['fullname'] ?? 'Pending Invite'); ?></div>
+                            </td>
+                            <td>
+                                <div class="member-email"><?php echo htmlspecialchars($s['email']); ?></div>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                <?php else: ?>
                     <tr>
-                        <td><?php echo htmlspecialchars($s['fullname'] ?? 'No name'); ?></td>
-                        <td><?php echo htmlspecialchars($s['email']); ?></td>
+                        <td colspan="2" class="empty-state">
+                            No members found. Click the button to invite someone.
+                        </td>
                     </tr>
-                <?php endforeach; ?>
-            <?php else: ?>
-                <tr><td colspan="2">No members linked yet.</td></tr>
-            <?php endif; ?>
-        </tbody>
-    </table>
+                <?php endif; ?>
+            </tbody>
+        </table>
+    </div>
 </div>
 
-<!-- Floating Add Button -->
 <div class="fab" onclick="openModal()">+</div>
 
-<!-- Modal -->
 <div id="modalOverlay">
     <div class="modal-card">
-        <h2>Add Members</h2>
+        <h2 style="margin:0 0 8px 0;">Invite Member</h2>
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 24px;">Enter an email address to send a workspace invitation.</p>
+        
         <form method="POST">
-            <input type="email" name="student_email" placeholder="Spender's email" class="input-box" required>
+            <label style="font-size: 0.8rem; font-weight: 600;">Email Address</label>
+            <input type="email" name="student_email" placeholder="e.g. name@company.com" class="input-box" required>
+            
             <div class="modal-actions">
                 <button type="button" onclick="closeModal()" class="btn">Cancel</button>
                 <button type="submit" name="send_invite" class="btn btn-primary">Send Invite</button>
@@ -128,11 +268,11 @@ tr:hover { background:#f3f4f6; }
 </div>
 
 <script>
-function openModal() { document.getElementById('modalOverlay').style.display = 'flex'; }
-function closeModal() { document.getElementById('modalOverlay').style.display = 'none'; }
-window.onclick = function(event){
-    if(event.target == document.getElementById('modalOverlay')) closeModal();
-}
+    function openModal() { document.getElementById('modalOverlay').style.display = 'flex'; }
+    function closeModal() { document.getElementById('modalOverlay').style.display = 'none'; }
+    window.onclick = function(event){
+        if(event.target == document.getElementById('modalOverlay')) closeModal();
+    }
 </script>
 
 </body>
