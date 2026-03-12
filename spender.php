@@ -475,7 +475,7 @@ $_SESSION['email'] = $user['email'];
     </a>
 
     <!-- Notifications -->
-    <a href="notifications.php" class="icon-btn notif" title="Notifications">
+    <a href="http://localhost/payton/spender.php?page=notifications" class="icon-btn notif" title="Notifications">
       <i class="fa-regular fa-bell"></i>
       <span class="notif-badge">1</span>
     </a>

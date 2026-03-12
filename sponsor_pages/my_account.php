@@ -60,7 +60,7 @@ if (isset($_POST['save_profile'])) {
     // Optional success message
     echo "<script>
       alert('Personal information updated successfully');
-      window.location.href = 'login.php';
+      window.location.href = 'sponsor.php?page=my_account';
     </script>";
   }
 }
@@ -153,7 +153,7 @@ if (isset($_POST['update_photo']) && !empty($_FILES['profile_pic']['name'])) {
 
         echo "<script>
             alert('Profile photo updated successfully');
-            window.location.href = 'login.php';
+            window.location.href = 'sponsor.php?page=my_account';
         </script>";
 
     } else {
@@ -511,8 +511,8 @@ $email    = $userData['email'] ?? "No email";
 
     <div class="profile-left">
       <div class="profile-pic">
-          <img src="<?= htmlspecialchars($profilePath) ?>" alt="Profile">
-      </div>
+          <img id="profilePreview" src="<?= htmlspecialchars($profilePath) ?>" alt="Profile">
+     </div>
 
       <div class="profile-meta">
         <h4>Upload new photo</h4>
@@ -635,6 +635,33 @@ $email    = $userData['email'] ?? "No email";
     </div>
   </div>
 </div>
+
+
+<script>
+const profileInput = document.getElementById('profilePicInput');
+const profilePreview = document.getElementById('profilePreview');
+
+// When a file is selected
+profileInput.addEventListener('change', function(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    // Only allow images
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+    if (!allowedTypes.includes(file.type)) {
+        alert('Only JPG or PNG files are allowed.');
+        profileInput.value = ""; // reset input
+        return;
+    }
+
+    // Use FileReader to read the image
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        profilePreview.src = e.target.result; // update the <img> src
+    }
+    reader.readAsDataURL(file);
+});
+</script>
 
 </body>
 </html>
