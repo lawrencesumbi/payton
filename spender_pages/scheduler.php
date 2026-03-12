@@ -45,9 +45,8 @@ body {
 .app-container {
             display: flex;
             width: 100%;
-            
             border-radius: 10px;
-            overflow: hidden;
+            margin-top: 20px;
             box-shadow: 0 20px 50px rgba(0,0,0,0.1);
             max-height: 100vh;
         }
@@ -216,6 +215,7 @@ body {
             display: flex;
             flex-direction: column;
             gap: 20px;
+            border-radius: 6px;
         }
 
  /* Right Panel UI */
@@ -369,11 +369,8 @@ body {
             <label>Amount</label>
         </div>
             <input type="number" step="0.01" name="amount" required>
-
-        
-
             <button type="submit">Save Payment</button>
-            <button type="button" onclick="closeModal()">Cancel</button>
+            <button type="button" class="cancel" onclick="closeModal()">Cancel</button>
         </form>
     </div>
 </div>

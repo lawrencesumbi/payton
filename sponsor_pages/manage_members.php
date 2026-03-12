@@ -78,7 +78,7 @@ $students = $stmt->fetchAll(PDO::FETCH_ASSOC);
             background: var(--bg-body); 
             color: var(--text-main); 
             margin: 0;
-            line-height: 1.5;
+            
         }
 
         .container { 

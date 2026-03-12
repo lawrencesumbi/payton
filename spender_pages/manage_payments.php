@@ -50,7 +50,7 @@ body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f6f9; margin: 
 
 
 /* --- ANALYTICS --- */
-.analytics-row { display: flex; gap: 15px;  width: 100%; }
+.analytics-row { display: flex; gap: 15px;  width: 100%; margin-top: 20px; }
 .stat-card {
     flex: 1; background: #ffffff; padding: 18px; border-radius: 12px; border: 1px solid #eef1f6;
     box-shadow: 0 4px 10px rgba(15, 23, 42, 0.05); position: relative; overflow: hidden;
@@ -67,7 +67,7 @@ body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f6f9; margin: 
 /* --- SCROLLABLE TABLE CONTAINER --- */
 .container { 
     width: 100%; 
-    margin-top: 10px;
+    margin-top: 20px;
     background: white; 
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0,0,0,0.03);
@@ -75,7 +75,7 @@ body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f6f9; margin: 
 }
 
 .table-wrapper {
-    max-height: 560px; /* Adjust this height as needed */
+    max-height: 530px; /* Adjust this height as needed */
     overflow-y: auto;
     width: 100%;
 }
