@@ -181,7 +181,7 @@ if ($prevMonthTotal > 0) {
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
 
   <style>
-    * { margin:0; padding:0; box-sizing:border-box; font-family: Arial, sans-serif; }
+    * { margin:0; padding:0; box-sizing:border-box; }
 
     body { background: #f5f5f5; height: 100%; margin: 0; }
 
@@ -191,8 +191,8 @@ if ($prevMonthTotal > 0) {
 
 .dashboard-top-row {
    display: flex;
-    gap: 10px;
-    margin-bottom: 10px;
+    gap: 20px;
+    margin-bottom: 20px;
     align-items: flex-start;
     height: 300px;
 }
@@ -534,12 +534,13 @@ h2 {
   display: flex;
   flex-direction: column;
   height: 100%;
+  margin-top: 20px;
 }
 
 
 .table-container {
   flex: 1;
-  max-height: calc(100vh - 400px); /* viewport - topbar - margin/padding */
+  max-height: calc(100vh - 450px); /* viewport - topbar - margin/padding */
   overflow-y: auto;
   overflow-x: auto;
   background: white;
@@ -699,15 +700,17 @@ tr:hover {
 
     /* MODAL */
     .modal-overlay {
-      display: none;
-      position: fixed;
-      top:0; left:0;
-      width:100%; height:100%;
-      background: rgba(0,0,0,0.5);
+      display: none; /* Controlled by JS */
+      position: fixed; /* Stays in place even if you scroll */
+      top: 0;
+      left: 0;
+      width: 100vw; /* 100% of the viewport width */
+      height: 100vh; /* 100% of the viewport height */
+      background: rgba(0, 0, 0, 0.6); /* This is the "gray/dim" effect */
       justify-content: center;
       align-items: center;
-      z-index: 999;
-    }
+      z-index: 9999; /* Ensure this is higher than your sidebar's z-index */
+  }
 
     .expense-area {
       background: #f5eded;

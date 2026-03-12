@@ -16,517 +16,210 @@ $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
 // Page routing
 $page = $_GET['page'] ?? 'dashboard';
+$allowed_pages = ['dashboard', 'manage_groups', 'manage_expenses', 'manage_payments', 'scheduler', 'manage_reminders', 'notifications', 'my_account'];
 
-$allowed_pages = [
-    'dashboard',
-    'manage_groups',
-    'manage_expenses',
-    'manage_payments',
-    'scheduler',
-    'manage_reminders',
-    'notifications',
-    'my_account'
-];
+if (!in_array($page, $allowed_pages)) { $page = 'dashboard'; }
 
-if (!in_array($page, $allowed_pages)) {
-    $page = 'dashboard';
-}
-
-
-
-
-
-// Example fetching from DB
-$userId = $_SESSION['user_id'];
-$query = "SELECT profile_pic, fullname, email FROM users WHERE id = ?";
-$stmt = $conn->prepare($query);
-$stmt->execute([$userId]);
-$user = $stmt->fetch();
-
-$profilePath = $user['profile_pic']; // this goes into our check above
+// Profile data
+$profilePath = $user['profile_pic'];
 $_SESSION['fullname'] = $user['fullname'];
 $_SESSION['email'] = $user['email'];
-
-
-
-
-
 ?>
 <!DOCTYPE html>
 <html>
 <head>
   <title>Spender Dashboard</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
- <style>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
     /* ===== BASIC RESET ===== */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: Arial, sans-serif;
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', Arial, sans-serif; }
+    body { background: #fcfcfc; min-height: 100vh; }
+    .app { display: flex; min-height: 100vh; }
+
+    /* ===== SIDEBAR (FIXED - NO HOVER) ===== */
+    .sidebar {
+      width: 200px; /* Fixed professional width */
+      background: white; 
+      padding: 10px 0; 
+      display: flex; 
+      flex-direction: column;
+      height: 100vh; 
+      position: sticky; 
+      top: 0; 
+      overflow-y: auto; 
+      border-right: 1px solid #eee; 
+      z-index: 1000;
     }
     
-
-    body {
-      background: #f5f7fb;
-      min-height: 100vh;
+    .left-nav { 
+      display: flex; 
+      align-items: center; 
+      padding: 15px 25px; 
+      margin-bottom: 10px; 
+      gap: 12px; 
+      white-space: nowrap; 
     }
+    
+    .left-nav img { width: 40px; height: 40px; border-radius: 10px; object-fit: cover; }
+    
+    /* Text visible by default */
+    .left-nav h3 { font-size: 20px; font-weight: 700; color: #222; opacity: 1; }
 
-    .app {
+    .menu { flex: 1; display: flex; flex-direction: column; gap: 4px; padding-left: 10px; }
+    
+    .menu a { 
+      text-decoration: none; 
+      padding: 12px 20px; 
+      color: #444; 
+      font-weight: 600; 
+      font-size: 14px; 
+      display: flex; 
+      align-items: center; 
+      gap: 15px; 
+      transition: all 0.2s ease; 
+      border-radius: 25px 0 0 25px; 
+      white-space: nowrap; 
+    }
+    
+    .menu a i { font-size: 18px; min-width: 25px; text-align: center; color: #7f308f; }
+    
+    /* Labels visible by default */
+    .menu a span { opacity: 1; }
+
+    .menu a.active { background: #ebe0f7; color: #7f308f !important; }
+    .menu a:hover:not(.active) { background: #f9f9f9; color: #7f308f; }
+
+    /* ===== MODERN TOPBAR (TUNA BAY STYLE) ===== */
+    .main { flex: 1; display: flex; flex-direction: column; }
+
+    .topbar {
+      height: 64px;
+      background: #ffffff;
       display: flex;
-      min-height: 100vh;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 30px;
+      border-bottom: 1px solid #f1f1f1;
+      position: sticky;
+      top: 0;
+      z-index: 999;
     }
 
-  /* ===== WHITE SIDEBAR: HOVER TO EXPAND ===== */
-.sidebar {
-  width: 90px; /* Collapsed width */
-  background: #f4edf8; /* Original White Background */
-  padding: 10px 0;
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  position: sticky;
-  top: 0;
-  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  overflow: hidden; 
-  border-right: 1px solid #eee; /* Original border */
-  z-index: 1000;
-}
+    .topbar-left { display: flex; align-items: center; gap: 12px; color: #6b7280; font-size: 13px; }
+    .topbar-left i { cursor: pointer; transition: 0.2s; }
+    .topbar-left i:hover { color: #7f308f; }
+    .topbar-left span.sep { color: #e5e7eb; margin: 0 4px; }
+    .topbar-left span.current-page { color: #111827; font-weight: 600; }
 
-/* Expand on Hover */
-.sidebar:hover {
-  width: 200px;
-}
+    .topbar-right { display: flex; align-items: center; gap: 24px; }
 
-/* BRANDING (payton logo/name) */
-.left-nav {
-  
-  display: flex;
-  align-items: center;
-  padding: 5px 25px;
-  margin-bottom: 10px;
-  gap: 10px;
-  white-space: nowrap;
-}
+    .header-icons { display: flex; align-items: center; gap: 18px; color: #6b7280; font-size: 16px; }
+    .header-icons i { cursor: pointer; transition: 0.2s; }
+    .header-icons i:hover { color: #7f308f; }
 
-.left-nav img {
-  width: 45px;
-  min-width: 45px;
-  height: 45px;
-  border-radius: 12px;
-  object-fit: cover;
-}
-
-.left-nav h3 {
-  font-size: 20px;
-  font-weight: 800;
-  color: #222; /* Original dark text */
-  opacity: 0;
-  transition: opacity 0.2s;
-}
-
-.sidebar:hover .left-nav h3 {
-  opacity: 1;
-}
-
-/* MENU LAYOUT */
-.menu {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding-left: 15px;
-}
-
-.menu a {
-  text-decoration: none;
-  padding: 14px 20px;
-  color: #444; /* Original dark gray text */
-  font-weight: 600;
-  font-size: 14px;
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  transition: all 0.2s ease;
-  border-radius: 30px 0 0 30px; /* Capsule shape */
-  white-space: nowrap;
-}
-
-.menu a i {
-  font-size: 18px;
-  min-width: 25px;
-  text-align: center;
-  color: #7f308f; /* Original Purple for icons */
-}
-
-/* Hide labels when collapsed */
-.menu a span {
-  opacity: 0;
-  transition: opacity 0.2s;
-}
-
-.sidebar:hover .menu a span {
-  opacity: 1;
-}
-
-/* ACTIVE STATE (Light Purple Capsule) */
-.menu a.active {
-  background: #ebe0f7; /* Light Purple / Lavender background */
-  color: #7f308f !important; /* Original Purple text */
-}
-
-.menu a.active i {
-  color: #7f308f;
-}
-
-.menu a:hover:not(.active) {
-  background: #f9f9f9;
-  color: #7f308f;
-}
-    /* MAIN */
-    .main {
-      flex: 1;
-      padding: 10px;
+    .profile-dropdown { position: relative; }
+    .profile-btn {
+      background: none; border: none; padding: 0; cursor: pointer;
+      width: 34px; height: 34px; border-radius: 50%;
+      background: #7f308f; 
+      border: 2px solid #fff;
+      box-shadow: 0 0 0 1px #e5e7eb;
+      overflow: hidden;
     }
+    .profile-btn img { width: 100%; height: 100%; object-fit: cover; }
 
-    /* TOPBAR */
-   /* TOPBAR */
-.topbar {
-  
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
-}
+    .profile-menu {
+      position: absolute; top: 45px; right: 0; width: 220px;
+      background: white; border-radius: 10px; padding: 8px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+      border: 1px solid #f1f5f9; display: none; z-index: 1000;
+    }
+    .profile-menu.show { display: block; }
+    .profile-menu a {
+      display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+      text-decoration: none; font-size: 14px; color: #374151; border-radius: 8px; transition: 0.2s;
+    }
+    .profile-menu a:hover { background: #fff7ed; color: #7f308f; }
+    .profile-menu a i { width: 18px; color: #94a3b8; }
+    .menu-divider { height: 1px; background: #f1f5f9; margin: 6px 0; }
+    .profile-menu a.danger { color: #ef4444; }
 
-.topbar-left h1 {
-  font-size: 26px;
-  color: #222;
-}
+    .content-header { padding: 30px 30px 10px 30px; display: flex; justify-content: space-between; align-items: center; }
+    .content-header h1 { font-size: 24px; font-weight: 700; color: #111827; }
+    .content { padding: 0 30px 30px 30px; }
 
-.topbar-left p {  
-  margin-top: 4px;
-  color: #777;
-  font-size: 14px;
-}
-
-.topbar-right {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-
-/* Search bar */
-.search-form {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: #f2f4f8;
-  padding: 10px 12px;
-  border-radius: 10px;
-  border: 1px solid #e5e7eb;
-}
-
-.search-form i {
-  color: #777;
-  font-size: 14px;
-}
-
-.search-form input {
-  border: none;
-  outline: none;
-  background: transparent;
-  width: 180px;
-  font-size: 14px;
-  color: #333;
-}
-
-/* Icons */
-.icon-btn {
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
-  background: #f2f4f8;
-  border: 1px solid #e5e7eb;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-decoration: none;
-  position: relative;
-  transition: 0.2s ease;
-}
-
-.icon-btn i {
-  font-size: 16px;
-  color: #444;
-}
-
-.icon-btn:hover {
-  background: #eaf2ff;
-  border-color: #cfe2ff;
-}
-
-.icon-btn:hover i {
-  color: #1d4ed8;
-}
-
-/* Notification badge */
-.notif-badge {
-  position: absolute;
-  top: -6px;
-  right: -6px;
-  background: #ef4444;
-  color: white;
-  font-size: 11px;
-  padding: 3px 6px;
-  border-radius: 50px;
-  font-weight: 700;
-}
-
-/* PROFILE DROPDOWN */
-.profile-dropdown {
-  position: relative;
-  display: inline-block;
-}
-
-.profile-btn {
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 12px;
-  border-radius: 18px;
-  box-shadow: 0 6px 18px rgba(109, 40, 217, 0.08);
-}
-
-.profile-btn img {
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  object-fit: cover;
-}.profile-info {
-  display: flex;
-  flex-direction: column; /* Stacks name and role vertically */
-  align-items: flex-start; /* Forces alignment to the left */
-  justify-content: center;
-  text-align: left;
-}
-
-.profile-info h4 {
-  font-size: 13px;
-  font-weight: 800;
-  color: #222;
-  margin: 0;
-  line-height: 1.2;
-}
-
-.profile-info span {
-  font-size: 11px; /* Slightly smaller for better hierarchy */
-  color: #777;
-  display: block; /* Ensures it stays on its own line */
-  margin-top: 2px;
-}
-
-.profile-btn i {
-  font-size: 12px;
-  color: #666;
-  margin-left: 6px;
-}
-
-/* DROPDOWN MENU */
-.profile-menu {
-  position: absolute;
-  top: 58px;
-  right: 0;
-  width: 230px;
-  background: white;
-  border-radius: 16px;
-  box-shadow: 0 18px 40px rgba(0,0,0,0.12);
-  padding: 10px;
-  display: none;
-  z-index: 999;
-  border: 1px solid #f1f5f9;
-}
-
-.profile-menu.show {
-  display: block;
-}
-
-.profile-menu a {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 12px;
-  border-radius: 12px;
-  text-decoration: none;
-  font-size: 13px;
-  font-weight: 700;
-  color: #111827;
-  transition: 0.2s ease;
-}
-
-.profile-menu a:hover {
-  background: #f3f4f6;
-}
-
-.profile-menu a i {
-  width: 18px;
-  text-align: center;
-  color: #6d28d9;
-}
-
-.profile-menu .menu-divider {
-  height: 1px;
-  background: #eef2ff;
-  margin: 8px 0;
-}
-
-.profile-menu a.danger {
-  color: #b91c1c;
-}
-
-.profile-menu a.danger i {
-  color: #b91c1c;
-}
-
-
-
-    .profile {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: white;
-  padding: 8px 12px;
-  border-radius: 18px;
-  box-shadow: 0 6px 18px rgba(253, 76, 224, 0.06);
-}
-
-
-    /* RESPONSIVE */
-    @media (max-width: 800px) {
-      .sidebar {
-        display: none;
-      }
-      .main {
-        padding: 18px;
-      }
+    @media (max-width: 1000px) { 
+        .sidebar { width: 80px; }
+        .sidebar .left-nav h3, .sidebar .menu a span { display: none; }
+        .sidebar .menu a { justify-content: center; padding: 15px; border-radius: 10px; margin: 0 10px; }
+        .sidebar .menu a i { margin: 0; }
     }
   </style>
 </head>
-
 <body>
 
 <div class="app">
-
-  <!-- SIDEBAR -->
   <aside class="sidebar">
-  <div class="left-nav">
-    <img src="img/logo.jpg" alt="logo">
-    <h3>payton</h3>
-  </div>
-
-  <nav class="menu">
-    <a href="?page=dashboard" class="<?= $page=='dashboard'?'active':'' ?>">
-      <i class="fa-solid fa-house"></i>
-      <span>Dashboard</span>
-    </a>
-    
-    <a href="?page=manage_expenses" class="<?= $page=='manage_expenses'?'active':'' ?>">
-      <i class="fa-solid fa-file-invoice-dollar"></i>
-      <span>Expenses</span>
-    </a>
-
-    <a href="?page=manage_payments" class="<?= $page=='manage_payments'?'active':'' ?>">
-      <i class="fa-solid fa-money-bill-transfer"></i>
-      <span>Payments</span>
-    </a>
-
-    <a href="?page=scheduler" class="<?= $page=='scheduler'?'active':'' ?>">
-      <i class="fa-solid fa-calendar-days"></i>
-      <span>Scheduler</span>
-    </a>
-
-    <a href="?page=notifications" class="<?= $page=='notifications'?'active':'' ?>">
-      <i class="fa-solid fa-bell"></i>
-      <span>Notifications</span>
-    </a>
-  </nav>
-</aside>
-  <!-- MAIN -->
-  <main class="main">
-
-    <header class="topbar">
-  <div class="topbar-left">
-    <h1><?= ucwords(str_replace('_',' ', $page)) ?></h1>
-  </div>
-
-  <div class="topbar-right">
-
-    <!-- Search -->
-    <form class="search-form" method="get" action="">
-      <i class="fa-solid fa-magnifying-glass"></i>
-      <input type="text" name="search" placeholder="Search..." />
-    </form>
-
-    <!-- Home -->
-    <a href="spender.php?page=dashboard" class="icon-btn" title="Dashboard">
-      <i class="fa-solid fa-house"></i>
-    </a>
-
-    <!-- Notifications -->
-    <a href="http://localhost/payton/spender.php?page=notifications" class="icon-btn notif" title="Notifications">
-      <i class="fa-regular fa-bell"></i>
-      <span class="notif-badge">1</span>
-    </a>
-
-    <!-- Profile -->
-    <div class="profile-dropdown">
-  <button class="profile-btn" id="profileBtn">
-    <img src="<?= htmlspecialchars($profilePath) ?>" alt="Profile">
-
-    <div class="profile-info">
-      <h4><?= htmlspecialchars($_SESSION['fullname']) ?></h4>
-      <span><?= htmlspecialchars($_SESSION['role']) ?></span>
+    <div class="left-nav">
+      <img src="img/logo.jpg" alt="logo">
+      <h3>payton</h3>
     </div>
+    <nav class="menu">
+      <a href="?page=dashboard" class="<?= $page=='dashboard'?'active':'' ?>">
+        <i class="fa-solid fa-house"></i> <span>Dashboard</span>
+      </a>
+      <a href="?page=manage_expenses" class="<?= $page=='manage_expenses'?'active':'' ?>">
+        <i class="fa-solid fa-file-invoice-dollar"></i> <span>Expenses</span>
+      </a>
+      <a href="?page=manage_payments" class="<?= $page=='manage_payments'?'active':'' ?>">
+        <i class="fa-solid fa-money-bill-transfer"></i> <span>Payments</span>
+      </a>
+      <a href="?page=scheduler" class="<?= $page=='scheduler'?'active':'' ?>">
+        <i class="fa-solid fa-calendar-days"></i> <span>Scheduler</span>
+      </a>
+      <a href="?page=notifications" class="<?= $page=='notifications'?'active':'' ?>">
+        <i class="fa-solid fa-bell"></i> <span>Notifications</span>
+      </a>
+    </nav>
+  </aside>
 
-    <i class="fa-solid fa-chevron-down"></i>
-  </button>
+  <main class="main">
+    <header class="topbar">
+      <div class="topbar-left">
+        <i class="fa-solid fa-desktop"></i>
+        <span class="sep">/</span>
+        <i class="fa-solid fa-house"></i>
+        <span class="sep">/</span>
+        <span class="current-page"><?= ucwords(str_replace('_',' ', $page)) ?></span>
+      </div>
 
-  <div class="profile-menu" id="profileMenu">
-    <a href="create_group.php">
-      <i class="fa-solid fa-users"></i> Create Group
-    </a>
+      <div class="topbar-right">
+        <div class="header-icons">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <i class="fa-solid fa-sun"></i>
+          <i class="fa-solid fa-bell"></i>
+        </div>
 
-    <a href="sponsor_linked.php">
-      <i class="fa-solid fa-hand-holding-dollar"></i> Sponsor Linked Account
-    </a>
+        <div class="profile-dropdown">
+          <button class="profile-btn" id="profileBtn">
+            <img src="<?= htmlspecialchars($profilePath) ?>" alt="Profile">
+          </button>
 
-    <a href="?page=my_account">
-      <i class="fa-solid fa-user"></i> My Account
-    </a>
+          <div class="profile-menu" id="profileMenu">
+            <a href="?page=my_account"><i class="fa-solid fa-user"></i> My Profile</a>
+            <a href="create_group.php"><i class="fa-solid fa-users"></i> Manage Groups</a>
+            <a href="activity_logs.php"><i class="fa-solid fa-clock-rotate-left"></i> Activity Logs</a>
+            <div class="menu-divider"></div>
+            <a href="logout.php" class="danger" onclick="return confirm('Logout?');">
+              <i class="fa-solid fa-right-from-bracket"></i> Logout
+            </a>
+          </div>
+        </div>
+      </div>
+    </header>
 
-    <a href="activity_logs.php">
-      <i class="fa-solid fa-clock-rotate-left"></i> Activity Logs
-    </a>
-
-    <div class="menu-divider"></div>
-
-    <a href="logout.php" class="danger"
-       onclick="return confirm('Logout?');">
-      <i class="fa-solid fa-right-from-bracket"></i> Logout
-    </a>
-  </div>
-</div>
-
-
-  </div>
-</header>
-
-
-
-
-          
+    
 
     <section class="content">
       <?php
@@ -538,12 +231,10 @@ $_SESSION['email'] = $user['email'];
         }
       ?>
     </section>
-
   </main>
 </div>
 
-</body>
-  <script>
+<script>
   const profileBtn = document.getElementById("profileBtn");
   const profileMenu = document.getElementById("profileMenu");
 
@@ -557,5 +248,5 @@ $_SESSION['email'] = $user['email'];
   });
 </script>
 
-
+</body>
 </html>
