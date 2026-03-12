@@ -20,7 +20,7 @@ $page = $_GET['page'] ?? 'dashboard';
 $allowed_pages = [
     'dashboard',
     'manage_members',
-    'manage_budget',
+    'manage_allowance',
     'monitoring_page',
     'my_account'
 ];
@@ -479,8 +479,8 @@ try {
         <i class="fa-solid fa-users"></i> <span>Members</span>
     </a>
 
-    <a href="?page=manage_budget" class="<?= $page=='manage_budget'?'active':'' ?>">
-        <i class="fa-solid fa-wallet"></i> <span>Budgets</span>
+    <a href="?page=manage_allowance" class="<?= $page=='manage_allowance'?'active':'' ?>">
+        <i class="fa-solid fa-wallet"></i> <span>Allowance</span>
     </a>
 
     <a href="?page=monitoring_page" class="<?= $page=='monitoring_page'?'active':'' ?>">
