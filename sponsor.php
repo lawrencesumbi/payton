@@ -484,7 +484,7 @@ try {
     </a>
 
     <a href="?page=monitoring_page" class="<?= $page=='monitoring_page'?'active':'' ?>">
-        <i class="fa-solid fa-bell"></i> <span>Monitoring</span>
+        <i class="fa-solid fa-file-invoice-dollar"></i> <span>Monitoring</span>
     </a>
 </nav>
   </aside>

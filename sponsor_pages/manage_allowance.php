@@ -213,11 +213,20 @@ function getStatusBadge($status) {
                         <td><span class="amount-text">₱<?= number_format($budget['budget_amount'], 2) ?></span></td>
                         <td class="text-end">
                             <button class="btn-action" onclick="viewBudgetExpenses(<?= $budget['id'] ?>)"><i class="bi bi-eye"></i></button>
-                            <button class="btn-action" onclick="editBudget(<?= $budget['id'] ?>, '<?= addslashes($budget['budget_name']) ?>', <?= $budget['budget_amount'] ?>, '<?= $budget['start_date'] ?>', '<?= $budget['end_date'] ?>')"><i class="bi bi-pencil"></i></button>
-                            <form method="POST" action="delete_budget.php" style="display:inline;">
-                                <input type="hidden" name="budget_id" value="<?= $budget['id'] ?>">
-                                <button type="submit" class="btn-action" onclick="return confirm('Delete this budget?');"><i class="bi bi-trash text-danger"></i></button>
-                            </form>
+                            <button class="btn-action" onclick="editBudget(
+                            <?= $budget['id'] ?>,
+                            '<?= addslashes($budget['budget_name']) ?>',
+                            <?= $budget['budget_amount'] ?>,
+                            '<?= $budget['start_date'] ?>',
+                            '<?= $budget['end_date'] ?>',
+                            <?= $budget['user_id'] ?>
+                            )"><i class="bi bi-pencil"></i></button>
+                                <form method="POST" action="delete_budget.php" style="display:inline;">
+                                    <input type="hidden" name="budget_id" value="<?= $budget['id'] ?>">
+                                    <button type="submit" class="btn-action" onclick="return confirm('Delete this budget?');">
+                                        <i class="bi bi-trash text-danger"></i>
+                                    </button>
+                                </form>
                         </td>
                     </tr>
                     <?php endforeach; else: ?>
@@ -334,28 +343,54 @@ function highlightDays() {
     });
 }
 
+function formatLocalDate(date){
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2,'0');
+    const d = String(date.getDate()).padStart(2,'0');
+    return `${y}-${m}-${d}`;
+}
+
 function updateRange() {
     highlightDays();
+
     if(startDate && endDate) {
-        startInput.value = startDate.toISOString().split('T')[0];
-        endInput.value = endDate.toISOString().split('T')[0];
-        preview.textContent = startDate.toDateString() + " - " + endDate.toDateString();
+
+        startInput.value = formatLocalDate(startDate);
+        endInput.value = formatLocalDate(endDate);
+
+        preview.textContent =
+            startDate.toDateString() + " - " + endDate.toDateString();
     }
 }
 
 document.getElementById("clear-date-btn").onclick = () => { startDate = null; endDate = null; preview.textContent = "No dates selected"; renderCalendar(); };
 
-function editBudget(id, name, amount, start, end) {
-    const m = new bootstrap.Modal(document.getElementById('createBudgetModal'));
+function parseLocalDate(dateString) {
+    const parts = dateString.split("-");
+    return new Date(parts[0], parts[1]-1, parts[2]);
+}
+
+function editBudget(id, name, amount, start, end, spender_id) {
+
+    const modal = new bootstrap.Modal(document.getElementById('createBudgetModal'));
+
     document.getElementById('budgetForm').action = 'update_budget.php';
+
     document.getElementById('budget_id').value = id;
     document.getElementById('budget_name').value = name;
     document.getElementById('budget_amount').value = amount;
-    startDate = new Date(start); endDate = new Date(end);
-    updateRange(); renderCalendar();
+    document.getElementById('spender_id').value = spender_id;
+
+    startDate = parseLocalDate(start);
+    endDate = parseLocalDate(end);
+
+    updateRange();
+    renderCalendar();
+
     document.getElementById('budgetSubmitBtn').textContent = "Update Budget";
     document.getElementById('budgetSubmitBtn').name = "update_budget";
-    m.show();
+
+    modal.show();
 }
 
 document.getElementById('createBudgetModal').addEventListener('shown.bs.modal', renderCalendar);

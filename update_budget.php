@@ -1,36 +1,35 @@
 <?php
-session_start();
-$conn = new PDO("mysql:host=localhost;dbname=payton", "root", "");
+require 'db.php';
 
-if (isset($_POST['update_budget'])) {
+if(isset($_POST['update_budget'])){
 
-    $budget_id    = $_POST['budget_id'];
-    $budget_name  = $_POST['budget_name'];
-    $budget_amount = $_POST['budget_amount'];
-    $start_date   = $_POST['start_date'];
-    $end_date     = $_POST['end_date'];
-    $user_id      = $_SESSION['user_id'];
+    $id = $_POST['budget_id'];
+    $name = $_POST['budget_name'];
+    $amount = $_POST['budget_amount'];
+    $start = $_POST['start_date'];
+    $end = $_POST['end_date'];
+    $spender = $_POST['spender_id'];
 
     $stmt = $conn->prepare("
-        UPDATE budget
-        SET budget_name = ?,
-            budget_amount = ?,
-            start_date = ?,
-            end_date = ?
+        UPDATE budget 
+        SET budget_name = ?, 
+            budget_amount = ?, 
+            start_date = ?, 
+            end_date = ?, 
+            user_id = ?, 
+            updated_at = NOW()
         WHERE id = ?
-        AND user_id = ?
     ");
 
     $stmt->execute([
-        $budget_name,
-        $budget_amount,
-        $start_date,
-        $end_date,
-        $budget_id,
-        $user_id
+        $name,
+        $amount,
+        $start,
+        $end,
+        $spender,
+        $id
     ]);
 
-    header("Location: http://localhost/payton/spender.php?page=manage_budget");
+    header("Location: http://localhost/payton/sponsor.php?page=manage_allowance");
     exit;
 }
-?>

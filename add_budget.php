@@ -32,7 +32,7 @@ if (empty($spender_id)) {
 
     $stmt->execute([$spender_id, $sponsor_id, $name, $amount, $start, $end, $status]);
 
-    header("Location: http://localhost/payton/spender.php?page=manage_budget");
+    header("Location: http://localhost/payton/sponsor.php?page=manage_allowance");
     exit();
 }
 ?>
