@@ -8,6 +8,11 @@ if (!isset($_SESSION['user_id'])) {
 
 $sponsor_id = $_SESSION['user_id'];
 $selected_spender = $_GET['spender_id'] ?? null;
+if (!$selected_spender && isset($spenders[0]['id'])) {
+    header("Location: monitoring_page.php?spender_id=" . $spenders[0]['id']);
+    exit;
+}
+
 
 // FETCH SPENDERS
 $stmt = $conn->prepare("

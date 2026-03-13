@@ -215,7 +215,9 @@ function getStatusBadge($status) {
                         <td><?= getStatusBadge($budget['status']) ?></td>
                         <td><span class="amount-text">₱<?= number_format($budget['budget_amount'], 2) ?></span></td>
                         <td class="text-end">
-                            <button class="btn-action" onclick="viewBudgetExpenses(<?= $budget['id'] ?>)"><i class="bi bi-eye"></i></button>
+                        <a href="sponsor.php?page=monitoring_page&spender_id=<?= $budget['user_id'] ?>" class="btn-action">
+                            <i class="bi bi-eye"></i>
+                        </a>                        
                             <button class="btn-action" onclick="editBudget(
                             <?= $budget['id'] ?>,
                             '<?= addslashes($budget['budget_name']) ?>',
