@@ -127,29 +127,33 @@ if ($selected_spender) {
             </form>
         </div>
 
-        <div class="right">
-            <div class="right-left">
-                <div class="card dashboard-card stat-card-blue">
-                    <small class="text-muted fw-bold">TOTAL ALLOWANCE</small>
-                    <h3 class="fw-bold text-dark mt-1 mb-0">₱<?= number_format($total_budget, 2) ?></h3>
-                </div>
-            </div>
-            <div class="right-mid">
-                <div class="card dashboard-card stat-card-blue">
-                    <small class="text-muted fw-bold">TOTAL SPENT</small>
-                    <h3 class="fw-bold text-dark mt-1 mb-0">- ₱<?= number_format($total_spent, 2) ?></h3>
-                </div>
-            </div>
-            
-            <div class="right-right">
-            <div class="card dashboard-card stat-card-green">
-                <small class="text-muted fw-bold">ALLOWANCE LEFT</small>
-                <h3 class="fw-bold text-dark mt-1 mb-0">₱<?= number_format($allowance_left, 2) ?></h3>
-            </div>
-        </div>
-        </div>
-    </div>
+            <div class="right d-flex gap-3">
 
+                    <!-- Total Allowance -->
+                    <div class="flex-fill">
+                        <div class="card dashboard-card stat-card-blue">
+                            <small class="card-label">TOTAL ALLOWANCE</small>
+                            <h5 class="card-value">₱<?= number_format($total_budget, 2) ?></h5>
+                        </div>
+                    </div>
+
+                    <!-- Total Spent -->
+                    <div class="flex-fill">
+                        <div class="card dashboard-card stat-card-blue">
+                            <small class="card-label">TOTAL SPENT</small>
+                            <h5 class="card-value text-danger">- ₱<?= number_format($total_spent, 2) ?></h5>
+                        </div>
+                    </div>
+
+                    <!-- Allowance Left -->
+                    <div class="flex-fill">
+                        <div class="card dashboard-card stat-card-green">
+                            <small class="card-label">ALLOWANCE LEFT</small>
+                            <h5 class="card-value text-success">₱<?= number_format($allowance_left, 2) ?></h5>
+                        </div>
+                    </div>
+            </div>
+        </div>
     <?php if($selected_spender): ?>
         <div class="card dashboard-card overflow-hidden border-0">
             <div class="card-header bg-white py-3 border-bottom-0">

@@ -115,9 +115,9 @@ if (isset($_POST['update_photo']) && !empty($_FILES['profile_pic']['name'])) {
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <style>
 /* ---------- GLOBAL ---------- */
-*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif;}
+*{margin:0;padding:0;box-sizing:border-box;}
 body{background:#f5f7fb;}
-.acc-page{width:100%;}
+.acc-page{width:100%; margin-top: 30px;}
 .acc-wrapper{width:100%;border-radius:22px;}
 .acc-layout{display:grid;grid-template-columns:1fr 340px;gap:20px;align-items:start;width:100%;}
 .acc-main,.acc-right{display:flex;flex-direction:column;gap:18px;width:100%;}

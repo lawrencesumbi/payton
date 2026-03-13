@@ -177,7 +177,10 @@ function getStatusBadge($status) {
             <h1>Allowance Overview</h1>
             <p class="text-muted small m-0">Tracking all active allowance.</p>
         </div>
-        <button class="btn btn-dark px-4 py-2" style="border-radius: 10px;" data-bs-toggle="modal" data-bs-target="#createBudgetModal">
+       <button class="btn px-4 py-2" 
+            style="border-radius: 10px; background-color: #6f42c1; color: white;"
+            data-bs-toggle="modal" 
+            data-bs-target="#createBudgetModal">
             <i class="bi bi-plus-lg me-2"></i> New Allowance
         </button>
     </div>
@@ -238,9 +241,7 @@ function getStatusBadge($status) {
     </div>
 </div>
 
-<button class="fab" data-bs-toggle="modal" data-bs-target="#createBudgetModal">
-    <i class="bi bi-plus-lg"></i>
-</button>
+
 
 <div class="modal fade" id="createBudgetModal" tabindex="-1">
     <div class="modal-dialog modal-lg modal-dialog-centered">
