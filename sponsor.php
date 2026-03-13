@@ -197,8 +197,7 @@ $_SESSION['email'] = $user['email'];
           </button>
 
           <div class="profile-menu" id="profileMenu">
-            <a href="create_group.php"><i class="fa-solid fa-users-rectangle"></i> Create Group</a>
-            <a href="sponsor_linked.php"><i class="fa-solid fa-link"></i> Linked Accounts</a>
+            
             <a href="?page=my_account"><i class="fa-solid fa-gears"></i> My Account</a>
             <a href="activity_logs.php"><i class="fa-solid fa-clock-rotate-left"></i> Activity Logs</a>
             <div class="menu-divider"></div>

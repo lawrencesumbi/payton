@@ -207,8 +207,7 @@ $_SESSION['email'] = $user['email'];
           </button>
 
           <div class="profile-menu" id="profileMenu">
-            <a href="?page=my_account"><i class="fa-solid fa-user"></i> My Profile</a>
-            <a href="create_group.php"><i class="fa-solid fa-users"></i> Manage Groups</a>
+            <a href="?page=my_account"><i class="fa-solid fa-user"></i> My Account</a>
             <a href="activity_logs.php"><i class="fa-solid fa-clock-rotate-left"></i> Activity Logs</a>
             <div class="menu-divider"></div>
             <a href="logout.php" class="danger" onclick="return confirm('Logout?');">
