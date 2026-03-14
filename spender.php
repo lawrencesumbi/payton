@@ -149,6 +149,66 @@ $_SESSION['email'] = $user['email'];
     .content-header h1 { font-size: 24px; font-weight: 700; color: #111827; }
     .content { padding: 0 30px 30px 30px; }
 
+    /* ===== SIDEBAR USER INFO ===== */
+.sidebar-footer {
+    padding: 20px;
+    border-top: 1px solid #f1f1f1;
+    margin-top: auto; /* This pushes the footer to the bottom */
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.sidebar-footer .user-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: #111827;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.sidebar-footer .user-email {
+    font-size: 12px;
+    color: #6b7280;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.sidebar-footer .user-role {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #7f308f;
+    background: #ebe0f7;
+    padding: 2px 8px;
+    border-radius: 10px;
+    width: fit-content;
+    margin-top: 5px;
+}
+
+/* Hide text in sidebar footer when collapsed on small screens */
+@media (max-width: 1000px) {
+    .sidebar-footer {
+        padding: 15px 5px;
+        align-items: center;
+    }
+    .sidebar-footer .user-name, 
+    .sidebar-footer .user-email, 
+    .sidebar-footer .user-role {
+        display: none;
+    }
+    /* Optional: Show a small icon instead when collapsed */
+    .sidebar-footer::before {
+        content: '\f007'; /* FontAwesome user icon */
+        font-family: "Font Awesome 6 Free";
+        font-weight: 900;
+        color: #7f308f;
+    }
+}
+
     @media (max-width: 1000px) { 
         .sidebar { width: 80px; }
         .sidebar .left-nav h3, .sidebar .menu a span { display: none; }
@@ -181,6 +241,11 @@ $_SESSION['email'] = $user['email'];
       <a href="?page=notifications" class="<?= $page=='notifications'?'active':'' ?>">
         <i class="fa-solid fa-bell"></i> <span>Notifications</span>
       </a>
+      <div class="sidebar-footer">
+        <span class="user-name"><?= htmlspecialchars($user['fullname']) ?></span>
+        <span class="user-email"><?= htmlspecialchars($user['email']) ?></span>
+        <span class="user-role"><?= htmlspecialchars($_SESSION['role']) ?></span>
+      </div>
     </nav>
   </aside>
 

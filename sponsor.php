@@ -144,6 +144,46 @@ $_SESSION['email'] = $user['email'];
 
     .content { padding: 30px; }
 
+        /* ===== SIDEBAR USER INFO ===== */
+.sidebar-footer {
+    padding: 20px;
+    border-top: 1px solid #f1f1f1;
+    margin-top: auto; /* This pushes the footer to the bottom */
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.sidebar-footer .user-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: #111827;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.sidebar-footer .user-email {
+    font-size: 12px;
+    color: #6b7280;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.sidebar-footer .user-role {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #7f308f;
+    background: #ebe0f7;
+    padding: 2px 8px;
+    border-radius: 10px;
+    width: fit-content;
+    margin-top: 5px;
+}
+
     @media (max-width: 1000px) { 
         .sidebar { width: 80px; }
         .sidebar .left-nav h3, .sidebar .menu a span { display: none; }
@@ -173,6 +213,11 @@ $_SESSION['email'] = $user['email'];
         <i class="fa-solid fa-chart-line"></i> <span>Monitoring</span>
       </a>
     </nav>
+    <div class="sidebar-footer">
+        <span class="user-name"><?= htmlspecialchars($user['fullname']) ?></span>
+        <span class="user-email"><?= htmlspecialchars($user['email']) ?></span>
+        <span class="user-role"><?= htmlspecialchars($_SESSION['role']) ?></span>
+      </div>
   </aside>
 
   <main class="main">

@@ -78,7 +78,7 @@ if ($selected_spender) {
         /* Global & Layout */
         body {width:100%;  background-color: #f8f9fa; color: #334155; margin: 0;}
         .main { width: 100%; margin: 0 auto; }
-        .select{padding: 20px; border: none; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); background: #fff; height: 100%; }
+        .select{padding: 20px; border: none; border-radius: 12px; box-shadow: 4px 4px 6px -1px rgba(0,0,0,0.05); background: #fff; height: 100%; }
         .above { width: 100%; display: flex; align-items: center; margin-bottom: 20px; flex-wrap: wrap; }
         .left { width: 50%; }
         .right { width: 50%; display: flex; gap: 15px; padding: 10px; }
