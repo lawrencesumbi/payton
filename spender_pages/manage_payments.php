@@ -1,42 +1,51 @@
 <?php
-// Start session at the very top to ensure toasts work
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
 $pdo = new PDO("mysql:host=localhost;dbname=payton", "root", "");
-
-// use logged-in user
 $user_id = $_SESSION['user_id'] ?? 1;
 
-/* ================= FETCH PAYMENTS WITH JOINS ================= */
-$stmt = $pdo->prepare("
+// Get the filter from URL, default to 'unpaid_overdue'
+$filter = $_GET['filter'] ?? 'unpaid_overdue';
+
+/* ================= FETCH PAYMENTS WITH FILTER ================= */
+$query = "
     SELECT 
-        sp.id,
-        sp.payment_name,
-        sp.amount,
-        sp.due_date,
-        sp.paid_date,
+        sp.id, sp.payment_name, sp.amount, sp.due_date, sp.paid_date,
         pm.payment_method_name AS payment_method,
         ds.due_status_name AS status
     FROM scheduled_payments sp
     LEFT JOIN payment_method pm ON sp.payment_method_id = pm.id
     LEFT JOIN due_status ds ON sp.due_status_id = ds.id
     WHERE sp.user_id = ?
-    ORDER BY id DESC
-");
+";
+
+if ($filter === 'paid') {
+    $query .= " AND ds.due_status_name = 'Paid'";
+} else {
+    $query .= " AND (ds.due_status_name = 'Unpaid' OR ds.due_status_name = 'Overdue')";
+}
+
+$query .= " ORDER BY id DESC";
+
+$stmt = $pdo->prepare($query);
 $stmt->execute([$user_id]);
 $payments = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-/* ================= ANALYTICS LOGIC ================= */
-$totalCount = count($payments);
-$totalPaid = 0; $totalUnpaid = 0; $totalOverdue = 0;
+/* ================= ANALYTICS LOGIC (Always total everything) ================= */
+// We fetch all for analytics regardless of table filter to keep stats accurate
+$statStmt = $pdo->prepare("SELECT amount, ds.due_status_name as status FROM scheduled_payments sp 
+                           LEFT JOIN due_status ds ON sp.due_status_id = ds.id WHERE user_id = ?");
+$statStmt->execute([$user_id]);
+$allStats = $statStmt->fetchAll(PDO::FETCH_ASSOC);
 
-foreach ($payments as $p) {
-    $status = strtolower($p['status'] ?? '');
-    if ($status === 'paid') $totalPaid += $p['amount'];
-    elseif ($status === 'unpaid') $totalUnpaid += $p['amount'];
-    elseif ($status === 'overdue') $totalOverdue += $p['amount'];
+$totalPaid = 0; $totalUnpaid = 0; $totalOverdue = 0; $totalCount = count($allStats);
+foreach ($allStats as $s) {
+    $status = strtolower($s['status'] ?? '');
+    if ($status === 'paid') $totalPaid += $s['amount'];
+    elseif ($status === 'unpaid') $totalUnpaid += $s['amount'];
+    elseif ($status === 'overdue') $totalOverdue += $s['amount'];
 }
 ?>
 
@@ -140,6 +149,25 @@ td { padding: 12px; border-bottom: .5px solid #ddd; text-align: center; }
 @keyframes toastSlideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 @keyframes toastSlideOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(120%); opacity: 0; } }
 .slide-out { animation: toastSlideOut 0.5s ease forwards; }
+
+.filter-container {
+        display: flex;
+        align-items: center;
+        background: white;
+        padding: 0 15px;
+        border-radius: 12px;
+        border: 1px solid #eef1f6;
+        box-shadow: 0 4px 10px rgba(15, 23, 42, 0.05);
+    }
+    .filter-container select {
+        border: none;
+        outline: none;
+        font-weight: 700;
+        color: #8c3bf6;
+        background: transparent;
+        cursor: pointer;
+        padding: 10px;
+    }
 </style>
 </head>
 
@@ -163,6 +191,13 @@ td { padding: 12px; border-bottom: .5px solid #ddd; text-align: center; }
     <div class="stat-card stat-purple"><div><div class="stat-label">Total Paid</div><div class="stat-value">₱<?= number_format($totalPaid, 2) ?></div></div><div class="stat-icon">✅</div></div>
     <div class="stat-card stat-orange"><div><div class="stat-label">Total Unpaid</div><div class="stat-value">₱<?= number_format($totalUnpaid, 2) ?></div></div><div class="stat-icon">⌛</div></div>
     <div class="stat-card stat-red"><div><div class="stat-label">Total Overdue</div><div class="stat-value">₱<?= number_format($totalOverdue, 2) ?></div></div><div class="stat-icon">⚠️</div></div>
+    <div class="filter-container">
+        <label class="stat-label" style="margin-right: 5px;">Filter:</label>
+        <select onchange="location.href='?page=manage_payments&filter=' + this.value">
+            <option value="unpaid_overdue" <?= $filter == 'unpaid_overdue' ? 'selected' : '' ?>>Unpaid & Overdue</option>
+            <option value="paid" <?= $filter == 'paid' ? 'selected' : '' ?>>Paid Only</option>
+        </select>
+    </div>
 </div>
 
 <div class="container">
@@ -182,7 +217,10 @@ td { padding: 12px; border-bottom: .5px solid #ddd; text-align: center; }
                 <td><?= $p['payment_method'] ?? '-' ?></td>
                 <td class="<?= strtolower($p['status'] ?? '') ?>"><?= ucfirst($p['status'] ?? '') ?></td>
                 <td class="actions"> 
-                    <a href="javascript:void(0);" class="btn-edit" onclick="openEditModal(<?= $p['id'] ?>)">✏️ Edit</a>
+                    <?php if (strtolower($p['status']) !== 'paid'): ?>
+                        <a href="javascript:void(0);" class="btn-edit" onclick="openEditModal(<?= $p['id'] ?>)">✏️ Update</a>
+                    <?php endif; ?>
+                    
                     <a href="delete_payment.php?id=<?= $p['id'] ?>" class="btn-delete" onclick="return confirm('Delete?');">🗑 Delete</a>
                 </td>
             </tr>

@@ -144,7 +144,7 @@ $_SESSION['email'] = $user['email'];
 
     .content { padding: 30px; }
 
-        /* ===== SIDEBAR USER INFO ===== */
+        /* ===== SIDEBAR USER INFO ===== */ 
 .sidebar-footer {
     padding: 20px;
     border-top: 1px solid #f1f1f1;
