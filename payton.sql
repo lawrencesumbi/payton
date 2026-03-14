@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 09, 2026 at 05:08 AM
+-- Generation Time: Mar 14, 2026 at 07:07 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -45,7 +45,9 @@ CREATE TABLE `budget` (
 --
 
 INSERT INTO `budget` (`id`, `budget_name`, `budget_amount`, `start_date`, `end_date`, `user_id`, `sponsor_id`, `status`, `created_at`, `updated_at`) VALUES
-(34, 'March 21 - 30', 1000.00, '2026-03-21', '2026-03-30', 1, 2, 'Active', '2026-03-08 15:28:03', '2026-03-08 15:28:03');
+(35, 'March 10-20', 1000.00, '2026-03-10', '2026-03-20', 1, 2, 'Active', '2026-03-11 10:07:19', '2026-03-12 04:42:36'),
+(38, 'March 1-31', 10000.00, '2026-03-01', '2026-03-31', 5, 2, 'Active', '2026-03-12 05:39:40', '2026-03-12 05:39:40'),
+(39, 'March 25-30', 500.00, '2026-03-25', '2026-03-30', 1, 2, 'Inactive', '2026-03-20 17:08:26', '2026-03-20 17:08:26');
 
 -- --------------------------------------------------------
 
@@ -119,9 +121,16 @@ CREATE TABLE `expenses` (
 --
 
 INSERT INTO `expenses` (`id`, `user_id`, `budget_id`, `category_id`, `description`, `amount`, `payment_method_id`, `receipt_upload`, `expense_date`, `created_at`, `updated_at`) VALUES
-(53, 1, 34, 1, 'Jollibee', 100.00, 1, NULL, '2026-03-08', '2026-03-08 15:53:05', '2026-03-08 15:53:05'),
-(54, 1, 34, 2, 'Gas', 100.00, 1, NULL, '2026-03-09', '2026-03-08 16:06:44', '2026-03-08 16:06:44'),
-(55, 1, 34, 2, 'Gasoline', 100.00, 1, NULL, '2026-03-09', '2026-03-08 16:07:48', '2026-03-08 16:07:48');
+(58, 1, 35, 1, 'Jollibee', 100.00, 1, NULL, '2026-03-11', '2026-03-11 10:07:43', '2026-03-11 10:07:43'),
+(59, 1, 35, 2, 'Gas Motor', 150.00, 1, NULL, '2026-03-12', '2026-03-12 05:41:04', '2026-03-12 05:41:04'),
+(60, 1, 35, 1, 'Chowking', 200.00, 1, 'uploads/69b2d4381216b-receipt-768x992.jpg', '2026-03-12', '2026-03-12 05:41:16', '2026-03-12 14:56:56'),
+(61, 5, 38, 4, 'Water Bill', 143.00, 1, NULL, '2026-03-12', '2026-03-12 05:44:06', '2026-03-12 05:44:35'),
+(62, 5, 38, 1, 'Mcdo', 149.00, 1, NULL, '2026-03-12', '2026-03-12 05:44:49', '2026-03-12 05:44:49'),
+(63, 5, 38, 2, 'Minglanilla - SanFernando', 25.00, 1, NULL, '2026-03-12', '2026-03-12 05:45:19', '2026-03-12 06:10:22'),
+(64, 1, 35, 4, 'Internet Bill', 199.00, 7, NULL, '2026-03-12', '2026-03-12 06:10:50', '2026-03-12 14:41:35'),
+(65, 1, 35, 10, 'Sample', 10.00, 1, NULL, '2026-03-12', '2026-03-12 14:42:26', '2026-03-12 14:42:26'),
+(66, 1, 35, 10, 'Sample 2', 10.00, 1, NULL, '2026-03-12', '2026-03-12 14:42:42', '2026-03-12 14:42:42'),
+(67, 1, 39, 1, 'Mang Inasal', 125.00, 1, NULL, '2026-03-25', '2026-03-24 17:09:54', '2026-03-24 17:09:54');
 
 -- --------------------------------------------------------
 
@@ -144,7 +153,9 @@ CREATE TABLE `notifications` (
 --
 
 INSERT INTO `notifications` (`id`, `user_id`, `parent_id`, `type`, `message`, `status`, `created_at`) VALUES
-(5, 1, 2, 'invite', 'You have been invited by Patricia Ann Mae Obaob. Click accept to join.', 'read', '2026-03-08 14:40:39');
+(5, 1, 2, 'invite', 'You have been invited by Patricia Ann Mae Obaob. Click accept to join.', 'read', '2026-03-08 14:40:39'),
+(6, 5, 2, 'invite', 'You have been invited by Patricia Ann Mae Obaob. Click accept to join.', 'read', '2026-03-11 09:36:00'),
+(7, 4, 2, 'invite', 'You have been invited by Patricia Ann Mae Obaob. Click accept to join.', 'read', '2026-03-14 04:31:29');
 
 -- --------------------------------------------------------
 
@@ -195,7 +206,6 @@ CREATE TABLE `scheduled_payments` (
 --
 
 INSERT INTO `scheduled_payments` (`id`, `user_id`, `payment_name`, `amount`, `due_date`, `paid_date`, `payment_method_id`, `due_status_id`, `created_at`, `updated_at`) VALUES
-(10, 1, 'Tuition', 2000.00, '2026-02-14', '2026-02-19', 5, 2, '2026-02-21 12:48:51', '2026-02-21 12:48:51'),
 (11, 1, 'Load', 100.00, '2026-02-21', NULL, NULL, 3, '2026-02-21 12:49:21', '2026-02-21 12:49:21'),
 (13, 1, 'sample', 100.00, '2026-02-20', '2026-02-14', 1, 2, '2026-02-21 12:53:24', '2026-02-21 12:53:24'),
 (14, 1, '25', 100.00, '2026-02-27', NULL, NULL, 3, '2026-02-21 12:54:53', '2026-02-21 12:54:53'),
@@ -204,7 +214,10 @@ INSERT INTO `scheduled_payments` (`id`, `user_id`, `payment_name`, `amount`, `du
 (19, 1, 'Loklok', 149.00, '2026-02-22', NULL, NULL, 3, '2026-02-21 14:45:12', '2026-02-21 14:45:12'),
 (20, 1, '280', 280.00, '2026-02-28', '2026-02-22', 2, 2, '2026-02-21 15:11:01', '2026-02-21 15:11:01'),
 (22, 1, '4', 4.00, '2026-02-04', NULL, NULL, 3, '2026-02-22 04:45:24', '2026-02-22 04:45:24'),
-(24, 1, 'sample', 100.00, '2026-03-01', '2026-02-22', 1, 2, '2026-02-22 08:09:48', '2026-02-22 08:09:48');
+(24, 1, 'sample', 100.00, '2026-03-01', '2026-02-22', 1, 2, '2026-02-22 08:09:48', '2026-02-22 08:09:48'),
+(29, 1, 'Water Bill', 143.00, '2026-03-28', NULL, NULL, 1, '2026-03-11 10:09:32', '2026-03-11 10:09:32'),
+(30, 1, 'Sample', 10.00, '2026-03-21', '2026-03-13', 2, 2, '2026-03-12 15:17:24', '2026-03-12 15:17:24'),
+(31, 1, 'Sample', 10.00, '2026-03-25', NULL, NULL, 1, '2026-03-12 15:25:57', '2026-03-12 15:25:57');
 
 -- --------------------------------------------------------
 
@@ -224,7 +237,8 @@ CREATE TABLE `sponsor_spender` (
 --
 
 INSERT INTO `sponsor_spender` (`id`, `sponsor_id`, `spender_id`, `created_at`) VALUES
-(4, 2, 1, '2026-03-08 14:40:51');
+(4, 2, 1, '2026-03-08 14:40:51'),
+(5, 2, 5, '2026-03-11 09:37:00');
 
 -- --------------------------------------------------------
 
@@ -247,11 +261,13 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `fullname`, `email`, `password`, `role`, `profile_pic`, `created_at`) VALUES
-(1, 'Lawrence Sumbi', 'guiansumbi@gmail.com', '$2y$10$cKIACjgglVTrRjDZaKSZjulwkdA0CIDUwOBkU12h2PPGKK03U0aT6', 'spender', 'profile/1771773625_699b1eb98867d.jpg', '2026-02-07 17:08:23'),
-(2, 'Patricia Ann Mae Obaob', 'patriciaannmaeobaob721@gmail.com', '$2y$10$gVokRQej23KaxSKKUZPiSOn/mL5IE0kvfoGyPRTZfN1in/ZpNAQku', 'sponsor', '', '2026-02-08 11:52:14'),
+(1, 'Lawrence Sumbi', 'guiansumbi@gmail.com', '$2y$10$cKIACjgglVTrRjDZaKSZjulwkdA0CIDUwOBkU12h2PPGKK03U0aT6', 'spender', 'profile/1773301216_69b26de0c5031.jpg', '2026-02-07 17:08:23'),
+(2, 'Patricia Ann Mae Obaob', 'patriciaannmaeobaob721@gmail.com', '$2y$10$gVokRQej23KaxSKKUZPiSOn/mL5IE0kvfoGyPRTZfN1in/ZpNAQku', 'sponsor', 'profile/1773380531_69b3a3b3f074d.jpg', '2026-02-08 11:52:14'),
 (3, 'Dranreb Misa', 'draymisa@gmail.com', '$2y$10$Gw3YeLEMfsCIOPV3xFs5h.jClSQLC9rilddvuzZ063CceY9/IVgue', 'spender', '', '2026-02-09 00:03:22'),
 (4, 'Aljon Paragoso', 'aljon@gmail.com', '$2y$10$Wt8Xf9aFRGG6zRdmdsfP1.bzpQS9xPfN/20Rsf.l7gb5ivx7H.t8u', 'spender', '', '2026-02-10 02:32:42'),
-(5, 'King James', 'king@gmail.com', '$2y$10$gEXzRZe1Yx1W/lVHDmk8ju/S//8ksu6iLCjJaJyxXhy3lWOLBBTw6', 'spender', '', '2026-02-23 08:07:35');
+(5, 'King James', 'king@gmail.com', '$2y$10$gEXzRZe1Yx1W/lVHDmk8ju/S//8ksu6iLCjJaJyxXhy3lWOLBBTw6', 'spender', '', '2026-02-23 08:07:35'),
+(6, 'sample1', 'sample1@gmail.com', '$2y$10$XkOSorJMOiPKBmZhqqGwWuRJKdGV5PzCQo3XrueMu3cK8GnHfyOJy', 'spender', 'profile/1773497217_69b56b816f5b2.jpg', '2026-03-14 13:30:53'),
+(7, 'Sponsor User', 'sponsor@gmail.com', '$2y$10$Lr9hm92Iha4J2va9tH7XYOhEiGgscf6qmvHn8oZ16WKrGTBtrsEI6', 'sponsor', '', '2026-03-14 16:24:13');
 
 --
 -- Indexes for dumped tables
@@ -334,7 +350,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `budget`
 --
 ALTER TABLE `budget`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
 
 --
 -- AUTO_INCREMENT for table `category`
@@ -352,13 +368,13 @@ ALTER TABLE `due_status`
 -- AUTO_INCREMENT for table `expenses`
 --
 ALTER TABLE `expenses`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=56;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=68;
 
 --
 -- AUTO_INCREMENT for table `notifications`
 --
 ALTER TABLE `notifications`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `payment_method`
@@ -370,19 +386,19 @@ ALTER TABLE `payment_method`
 -- AUTO_INCREMENT for table `scheduled_payments`
 --
 ALTER TABLE `scheduled_payments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
 
 --
 -- AUTO_INCREMENT for table `sponsor_spender`
 --
 ALTER TABLE `sponsor_spender`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- Constraints for dumped tables

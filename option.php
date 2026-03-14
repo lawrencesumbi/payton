@@ -58,6 +58,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["role"])) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
   <title>Choose Role | Payton</title>
 
   <!-- Font Awesome -->
@@ -71,7 +72,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["role"])) {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      font-family: Arial, sans-serif;
+      font-family: 'Inter', sans-serif; 
     }
 
     body {
@@ -208,7 +209,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["role"])) {
       <h2>How will you use Payton?</h2>
       <p>
         Choose your account type to continue.  
-        You can link a Sponsor account later if needed.
+        You can link a Sponsor account later.
       </p>
     </div>
 
@@ -222,7 +223,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["role"])) {
 
         <h3>Spender</h3>
         <p>
-          Track your expenses, manage your budget, and view your spending reports.
+          Track your expenses, monitor your payment status, and view your spending reports.
         </p>
 
         <input type="hidden" name="role" value="spender">
@@ -237,7 +238,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["role"])) {
 
         <h3>Sponsor</h3>
         <p>
-          Link to a Spender account, set budgets, and receive alerts for overspending.
+          Link to a Spender account, set allowance, and monitor their expenses.
         </p>
 
         <input type="hidden" name="role" value="sponsor">
@@ -247,7 +248,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["role"])) {
     </div>
 
     <div class="note">
-      Tip: A <span>Sponsor</span> account must be linked to a <span>Spender</span> using a code.
+      Tip: A <span>Sponsor</span> account must be linked to a <span>Spender</span> using invitation.
     </div>
 
   </div>

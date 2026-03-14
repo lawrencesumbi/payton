@@ -29,7 +29,8 @@ $stmt = $conn->prepare("
     SELECT b.*, u.fullname as spender_name 
     FROM budget b
     LEFT JOIN users u ON b.user_id = u.id
-    WHERE b.user_id = ? OR b.sponsor_id = ?
+    WHERE (b.user_id = ? OR b.sponsor_id = ?) 
+    AND b.status = 'Active'
     ORDER BY b.created_at DESC
 ");
 $stmt->execute([$user_id, $user_id]);
@@ -229,9 +230,9 @@ function getStatusBadge($status) {
                         <td><?= getStatusBadge($budget['status']) ?></td>
                         <td><span class="amount-text">₱<?= number_format($budget['budget_amount'], 2) ?></span></td>
                         <td class="text-end">
-                        <a href="sponsor.php?page=monitoring_page&spender_id=<?= $budget['user_id'] ?>" class="btn-action">
+                        <a href="sponsor.php?page=monitoring_page&spender_id=<?= $budget['user_id'] ?>&allowance_id=<?= $budget['id'] ?>" class="btn-action">
                             <i class="bi bi-eye"></i>
-                        </a>                        
+                        </a>                    
                             <button class="btn-action" onclick="editBudget(
                             <?= $budget['id'] ?>,
                             '<?= addslashes($budget['budget_name']) ?>',
@@ -242,7 +243,7 @@ function getStatusBadge($status) {
                             )"><i class="bi bi-pencil"></i></button>
                                 <form method="POST" action="delete_budget.php" style="display:inline;">
                                     <input type="hidden" name="budget_id" value="<?= $budget['id'] ?>">
-                                    <button type="submit" class="btn-action" onclick="return confirm('Delete this budget?');">
+                                    <button type="submit" class="btn-action" onclick="return confirm('Delete this allowance?');">
                                         <i class="bi bi-trash text-danger"></i>
                                     </button>
                                 </form>

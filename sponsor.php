@@ -16,7 +16,7 @@ $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
 // Page routing
 $page = $_GET['page'] ?? 'dashboard';
-$allowed_pages = ['dashboard', 'manage_members', 'manage_allowance', 'monitoring_page', 'my_account'];
+$allowed_pages = ['dashboard', 'manage_members', 'manage_allowance', 'monitoring_page', 'my_account', 'archive'];
 
 if (!in_array($page, $allowed_pages)) { $page = 'dashboard'; }
 
@@ -208,6 +208,9 @@ $_SESSION['email'] = $user['email'];
       </a>
       <a href="?page=manage_allowance" class="<?= $page=='manage_allowance'?'active':'' ?>">
         <i class="fa-solid fa-wallet"></i> <span>Allowance</span>
+      </a>
+      <a href="?page=archive" class="<?= $page=='archive'?'active':'' ?>">
+        <i class="fa-solid fa-box-archive"></i> <span>Archive</span>
       </a>
       <a href="?page=monitoring_page" class="<?= $page=='monitoring_page'?'active':'' ?>">
         <i class="fa-solid fa-chart-line"></i> <span>Monitoring</span>
