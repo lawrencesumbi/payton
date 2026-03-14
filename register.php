@@ -8,13 +8,13 @@
   rel="stylesheet"
   href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
   />
-
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
   <style>
   * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: Arial, sans-serif;
+    font-family: 'Inter', sans-serif; 
   }
 
   body {
@@ -44,6 +44,10 @@
     padding: 45px;
   }
 
+
+  .form-header{
+    text-align: center;
+  }
   /* LEFT FORM HEADER */
   .form-header h2 {
     margin-bottom: 8px;
@@ -297,15 +301,7 @@
 
     </form>
 
-    <div class="divider">
-      <span>Or sign up with</span>
-    </div>
-
-    <div class="social-icons">
-      <a href="#" class="google" aria-label="Google"><i class="fab fa-google"></i></a>
-      <a href="#" class="twitter" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
-      <a href="#" class="facebook" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
-    </div>
+    
 
   </div>
 
