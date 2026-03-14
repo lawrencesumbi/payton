@@ -43,6 +43,15 @@ if(isset($_POST['send_invite'])){
     }
 }
 
+// Handle deleting/unlinking a member
+if(isset($_POST['delete_member'])){
+    $delete_id = $_POST['spender_id'];
+    $stmt = $conn->prepare("DELETE FROM sponsor_spender WHERE sponsor_id = ? AND spender_id = ?");
+    if($stmt->execute([$sponsor_id, $delete_id])){
+        $message = "Member removed successfully.";
+    }
+}
+
 // Fetch students already linked to this parent
 $stmt = $conn->prepare("
     SELECT u.id, u.fullname, u.email
@@ -200,15 +209,28 @@ $students = $stmt->fetchAll(PDO::FETCH_ASSOC);
         .modal-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 8px; }
 
         .empty-state { text-align: center; padding: 40px; color: var(--text-muted); }
+
+        .btn-danger {
+            background: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fee2e2;
+        }
+        .btn-danger:hover {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+        .actions-column { text-align: right; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="header">
-        <h1>Manage Members</h1>
-        <button class="btn btn-primary" onclick="openModal()">+ Add Member</button>
-    </div>
+        <div class="header d-flex justify-content-between align-items-center">
+            <h1>Manage Members</h1>
+            <button class="btn" style="background-color:#6f42c1; color:white; border-radius:8px;" onclick="openModal()">
+                + Add Member
+            </button>
+        </div>
 
     <?php if(!empty($message)): ?>
         <div class="alert">
@@ -222,6 +244,7 @@ $students = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <tr>
                     <th>Member Details</th>
                     <th>Email Address</th>
+                    <th class="actions-column">Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -233,6 +256,14 @@ $students = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             </td>
                             <td>
                                 <div class="member-email"><?php echo htmlspecialchars($s['email']); ?></div>
+                            </td>
+                            <td class="actions-column">
+                                <form method="POST" onsubmit="return confirmDelete();" style="display:inline;">
+                                    <input type="hidden" name="spender_id" value="<?php echo $s['id']; ?>">
+                                    <button type="submit" name="delete_member" class="btn btn-danger">
+                                        Remove
+                                    </button>
+                                </form>
                             </td>
                         </tr>
                     <?php endforeach; ?>
@@ -248,7 +279,6 @@ $students = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </div>
 </div>
 
-<div class="fab" onclick="openModal()">+</div>
 
 <div id="modalOverlay">
     <div class="modal-card">
