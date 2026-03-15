@@ -82,7 +82,7 @@ if ($budgetId && $budgetStart && $budgetEnd) {
         WHERE e.user_id = ?
           AND e.budget_id = ?
           AND e.expense_date BETWEEN ? AND ?
-        ORDER BY e.expense_date DESC
+        ORDER BY id DESC
     ");
     $stmt->execute([$user_id, $budgetId, $budgetStart, $budgetEnd]);
     $expenses = $stmt->fetchAll(PDO::FETCH_ASSOC);

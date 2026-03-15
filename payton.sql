@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 15, 2026 at 10:12 AM
+-- Generation Time: Mar 15, 2026 at 04:01 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -131,8 +131,9 @@ INSERT INTO `expenses` (`id`, `user_id`, `budget_id`, `category_id`, `descriptio
 (65, 1, 35, 10, 'Sample', 10.00, 1, NULL, '2026-03-12', '2026-03-12 14:42:26', '2026-03-12 14:42:26'),
 (66, 1, 35, 10, 'Sample 2', 10.00, 1, NULL, '2026-03-12', '2026-03-12 14:42:42', '2026-03-12 14:42:42'),
 (67, 1, 39, 1, 'Mang Inasal', 125.00, 1, NULL, '2026-03-25', '2026-03-24 17:09:54', '2026-03-24 17:09:54'),
-(71, 1, NULL, 1, 'Dinner at Jollibee', 100.00, 1, NULL, '2026-03-15', '2026-03-15 07:40:52', '2026-03-15 07:40:52'),
-(72, 1, NULL, 1, 'Chowking', 50.00, 1, NULL, '2026-03-15', '2026-03-15 08:29:41', '2026-03-15 08:29:41');
+(76, 1, 35, 1, 'Mang Inasal', 100.00, 1, NULL, '2026-03-15', '2026-03-15 13:19:24', '2026-03-15 13:19:24'),
+(77, 1, 35, 1, 'Snack', 50.00, 1, NULL, '2026-03-15', '2026-03-15 13:24:15', '2026-03-15 13:24:15'),
+(79, 1, 35, 1, 'Softdrink', 25.00, 1, NULL, '2026-03-15', '2026-03-15 13:51:26', '2026-03-15 13:51:26');
 
 -- --------------------------------------------------------
 
@@ -144,6 +145,7 @@ CREATE TABLE `expense_shares` (
   `id` int(11) NOT NULL,
   `expense_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
+  `people_id` int(11) NOT NULL,
   `amount_owed` decimal(10,2) NOT NULL,
   `status` enum('unpaid','paid') NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
@@ -153,12 +155,14 @@ CREATE TABLE `expense_shares` (
 -- Dumping data for table `expense_shares`
 --
 
-INSERT INTO `expense_shares` (`id`, `expense_id`, `user_id`, `amount_owed`, `status`, `created_at`) VALUES
-(1, 71, 3, 33.33, 'unpaid', '2026-03-15 07:40:52'),
-(2, 71, 5, 33.33, 'unpaid', '2026-03-15 07:40:52'),
-(3, 71, 1, 0.00, 'unpaid', '2026-03-15 07:40:52'),
-(4, 72, 4, 25.00, 'unpaid', '2026-03-15 08:29:41'),
-(5, 72, 1, 0.00, 'unpaid', '2026-03-15 08:29:41');
+INSERT INTO `expense_shares` (`id`, `expense_id`, `user_id`, `people_id`, `amount_owed`, `status`, `created_at`) VALUES
+(11, 76, 1, 1, 25.00, 'paid', '2026-03-15 13:19:24'),
+(12, 76, 1, 2, 25.00, 'paid', '2026-03-15 13:19:24'),
+(13, 76, 1, 3, 25.00, 'unpaid', '2026-03-15 13:19:24'),
+(14, 77, 1, 5, 16.67, 'unpaid', '2026-03-15 13:24:15'),
+(15, 77, 1, 4, 16.67, 'unpaid', '2026-03-15 13:24:15'),
+(18, 79, 1, 1, 10.00, 'unpaid', '2026-03-15 13:51:26'),
+(19, 79, 1, 4, 10.00, 'unpaid', '2026-03-15 13:51:26');
 
 -- --------------------------------------------------------
 
@@ -213,6 +217,30 @@ INSERT INTO `payment_method` (`id`, `payment_method_name`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `people`
+--
+
+CREATE TABLE `people` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `name` text NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `people`
+--
+
+INSERT INTO `people` (`id`, `user_id`, `name`, `created_at`) VALUES
+(1, 1, 'Dray Misa', '2026-03-15 12:36:14'),
+(2, 1, 'Jaylon Mantillas', '2026-03-15 12:39:38'),
+(3, 1, 'Jaymaica Narvasa', '2026-03-15 12:59:43'),
+(4, 1, 'Jay Cabatuan', '2026-03-15 13:23:43'),
+(5, 1, 'Ivan Laluna', '2026-03-15 13:23:50');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `scheduled_payments`
 --
 
@@ -247,29 +275,6 @@ INSERT INTO `scheduled_payments` (`id`, `user_id`, `payment_name`, `amount`, `du
 (30, 1, 'Sample', 10.00, '2026-03-21', '2026-03-13', 2, 2, '2026-03-12 15:17:24', '2026-03-12 15:17:24'),
 (31, 1, 'Sample', 10.00, '2026-03-25', NULL, NULL, 1, '2026-03-12 15:25:57', '2026-03-12 15:25:57'),
 (32, 1, '16', 160.00, '2026-03-16', NULL, NULL, 1, '2026-03-14 18:17:45', '2026-03-14 18:17:45');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `spender_friends`
---
-
-CREATE TABLE `spender_friends` (
-  `id` int(11) NOT NULL,
-  `requester_id` int(11) NOT NULL,
-  `addressee_id` int(11) NOT NULL,
-  `status` enum('pending','accepted','declined') NOT NULL,
-  `created_at` int(11) NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `spender_friends`
---
-
-INSERT INTO `spender_friends` (`id`, `requester_id`, `addressee_id`, `status`, `created_at`) VALUES
-(2, 1, 5, 'accepted', 2147483647),
-(3, 1, 3, 'accepted', 2147483647),
-(4, 1, 4, 'accepted', 2147483647);
 
 -- --------------------------------------------------------
 
@@ -362,7 +367,8 @@ ALTER TABLE `expenses`
 ALTER TABLE `expense_shares`
   ADD PRIMARY KEY (`id`),
   ADD KEY `expense_id` (`expense_id`),
-  ADD KEY `user_id` (`user_id`);
+  ADD KEY `user_id` (`user_id`),
+  ADD KEY `people_id` (`people_id`);
 
 --
 -- Indexes for table `notifications`
@@ -379,6 +385,13 @@ ALTER TABLE `payment_method`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `people`
+--
+ALTER TABLE `people`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `user_id` (`user_id`);
+
+--
 -- Indexes for table `scheduled_payments`
 --
 ALTER TABLE `scheduled_payments`
@@ -386,14 +399,6 @@ ALTER TABLE `scheduled_payments`
   ADD KEY `user_id` (`user_id`),
   ADD KEY `due_status_id` (`due_status_id`),
   ADD KEY `payment_method_id` (`payment_method_id`);
-
---
--- Indexes for table `spender_friends`
---
-ALTER TABLE `spender_friends`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `spender_friends_requester_id_fr` (`requester_id`),
-  ADD KEY `spender_friends_addressee_id_fr` (`addressee_id`);
 
 --
 -- Indexes for table `sponsor_spender`
@@ -436,13 +441,13 @@ ALTER TABLE `due_status`
 -- AUTO_INCREMENT for table `expenses`
 --
 ALTER TABLE `expenses`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=73;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=80;
 
 --
 -- AUTO_INCREMENT for table `expense_shares`
 --
 ALTER TABLE `expense_shares`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- AUTO_INCREMENT for table `notifications`
@@ -457,16 +462,16 @@ ALTER TABLE `payment_method`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
+-- AUTO_INCREMENT for table `people`
+--
+ALTER TABLE `people`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
 -- AUTO_INCREMENT for table `scheduled_payments`
 --
 ALTER TABLE `scheduled_payments`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
-
---
--- AUTO_INCREMENT for table `spender_friends`
---
-ALTER TABLE `spender_friends`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `sponsor_spender`
@@ -505,6 +510,7 @@ ALTER TABLE `expenses`
 --
 ALTER TABLE `expense_shares`
   ADD CONSTRAINT `expense_shares_expense_id_fr` FOREIGN KEY (`expense_id`) REFERENCES `expenses` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `expense_shares_people_id_fr` FOREIGN KEY (`people_id`) REFERENCES `people` (`id`),
   ADD CONSTRAINT `expense_shares_user_id_fr` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
 
 --
@@ -515,19 +521,18 @@ ALTER TABLE `notifications`
   ADD CONSTRAINT `notifications_user_id_fr` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
 
 --
+-- Constraints for table `people`
+--
+ALTER TABLE `people`
+  ADD CONSTRAINT `people_user_id_fr` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
+
+--
 -- Constraints for table `scheduled_payments`
 --
 ALTER TABLE `scheduled_payments`
   ADD CONSTRAINT `scheduled_payments_due_status_id_fr` FOREIGN KEY (`due_status_id`) REFERENCES `due_status` (`id`),
   ADD CONSTRAINT `scheduled_payments_payment_method_id_fr` FOREIGN KEY (`payment_method_id`) REFERENCES `payment_method` (`id`),
   ADD CONSTRAINT `scheduled_payments_user_id_fr` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
-
---
--- Constraints for table `spender_friends`
---
-ALTER TABLE `spender_friends`
-  ADD CONSTRAINT `spender_friends_addressee_id_fr` FOREIGN KEY (`addressee_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `spender_friends_requester_id_fr` FOREIGN KEY (`requester_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `sponsor_spender`
