@@ -1,0 +1,311 @@
+<?php
+require 'db.php';
+
+
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit;
+}
+
+$user_id = $_SESSION['user_id'];
+
+/* =====================================================
+   1. BUDGET & SPENDING LOGIC (From manage_expense)
+===================================================== */
+$budgetStmt = $conn->prepare("
+    SELECT id, budget_amount, budget_name, start_date, end_date
+    FROM budget
+    WHERE user_id = :user_id AND status = 'Active'
+      AND CURDATE() BETWEEN start_date AND end_date
+    LIMIT 1
+");
+$budgetStmt->execute(['user_id' => $user_id]);
+$activeBudget = $budgetStmt->fetch(PDO::FETCH_ASSOC);
+
+$budgetId = $activeBudget['id'] ?? null;
+$budgetAmount = floatval($activeBudget['budget_amount'] ?? 0);
+
+$budgetExpenses = 0;
+$categoryData = [];
+
+if ($budgetId) {
+    // Live spending calculation
+    $spentStmt = $conn->prepare("SELECT SUM(amount) FROM expenses WHERE budget_id = ?");
+    $spentStmt->execute([$budgetId]);
+    $budgetExpenses = floatval($spentStmt->fetchColumn());
+
+    // Chart Data
+    $catStmt = $conn->prepare("
+        SELECT c.category_name, SUM(e.amount) as total 
+        FROM expenses e
+        JOIN category c ON e.category_id = c.id
+        WHERE e.budget_id = ?
+        GROUP BY c.category_name
+    ");
+    $catStmt->execute([$budgetId]);
+    $categoryData = $catStmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+$availableBalance = max(0, $budgetAmount - $budgetExpenses);
+
+/* =====================================================
+   2. TOTAL OWED (From expense_shares)
+===================================================== */
+$owedStmt = $conn->prepare("
+    SELECT SUM(amount_owed) 
+    FROM expense_shares 
+    WHERE user_id = ? AND status = 'Unpaid'
+");
+$owedStmt->execute([$user_id]);
+$totalOwed = floatval($owedStmt->fetchColumn());
+
+/* =====================================================
+   3. UPCOMING PAYMENTS (Future only)
+===================================================== */
+$upcomingStmt = $conn->prepare("
+    SELECT payment_name, amount, due_date 
+    FROM scheduled_payments 
+    WHERE user_id = ? 
+      AND paid_date IS NULL 
+      AND due_date >= CURDATE()
+    ORDER BY due_date ASC LIMIT 4
+");
+$upcomingStmt->execute([$user_id]);
+$upcomingPayments = $upcomingStmt->fetchAll(PDO::FETCH_ASSOC);
+
+/* =====================================================
+   4. MONTHLY TRENDS
+===================================================== */
+$thisMonth = date('Y-m-01');
+$lastMonth = date('Y-m-01', strtotime('-1 month'));
+$trendStmt = $conn->prepare("
+    SELECT 
+        SUM(CASE WHEN expense_date >= :tm THEN amount ELSE 0 END) as tm,
+        SUM(CASE WHEN expense_date >= :lm AND expense_date < :tm THEN amount ELSE 0 END) as lm
+    FROM expenses WHERE user_id = :uid
+");
+$trendStmt->execute(['tm' => $thisMonth, 'lm' => $lastMonth, 'uid' => $user_id]);
+$trends = $trendStmt->fetch(PDO::FETCH_ASSOC);
+$percChange = ($trends['lm'] > 0) ? (($trends['tm'] - $trends['lm']) / $trends['lm']) * 100 : 0;
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payton | Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root { 
+            --primary: #7c3aed; 
+            --primary-light: #f5f3ff;
+            --text-main: #0f172a; 
+            --text-muted: #64748b;
+            --bg: #f8fafc; 
+        }
+
+        body { 
+            background: var(--bg); 
+            margin: 0; 
+            color: var(--text-main); 
+            font-family: 'Inter', sans-serif;
+            
+        }
+
+        .wrapper {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Stats Grid - uses auto-fit for better responsiveness */
+        .stats-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
+            gap: 20px; 
+            margin-bottom: 20px; 
+        }
+        
+        .stat-card {
+            background: #fff; 
+            padding: 25px; 
+            border-radius: 24px; 
+            border: 1px solid #eef1f6;
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+        }
+
+        .stat-label { font-size: 11px; color: var(--text-muted); font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; margin: 0; }
+        .stat-value { font-size: 24px; font-weight: 900; margin: 5px 0; }
+        .stat-icon { width: 48px; height: 48px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        
+        .purple-box { background: var(--primary-light); color: var(--primary); }
+        .orange-box { background: #fff7ed; color: #f59e0b; }
+
+        /* Content Layout */
+        .dashboard-container { 
+            display: grid; 
+            grid-template-columns: 1.6fr 1fr; 
+            gap: 20px; 
+            align-items: start; /* Prevents panels from stretching unevenly */
+        }
+
+        .panel { 
+            background: #fff; 
+            border-radius: 28px; 
+            padding: 25px; 
+            border: 1px solid #eef1f6; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.02);
+            min-height: 400px; /* Ensures panels look balanced */
+            display: flex;
+            flex-direction: column;
+        }
+
+        .panel-header { font-weight: 800; font-size: 18px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+        .panel-header::before { content: ""; width: 5px; height: 20px; background: var(--primary); border-radius: 10px; }
+
+        /* Chart Container - Fixed height for stability */
+        .chart-container {
+            position: relative;
+            flex-grow: 1;
+            min-height: 300px;
+            width: 100%;
+        }
+
+        /* Payment UI */
+        .payment-row { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: 15px; 
+            background: #f8fafc; 
+            border-radius: 18px; 
+            margin-bottom: 12px;
+            transition: all 0.2s ease;
+        }
+        .payment-row:hover { background: #f1f5f9; transform: translateY(-2px); }
+        .p-title { font-weight: 700; font-size: 14px; margin: 0; }
+        .p-sub { font-size: 12px; color: var(--text-muted); margin: 3px 0 0; }
+        .p-price { font-weight: 900; color: var(--primary); font-size: 15px; }
+
+        @media (max-width: 1000px) { 
+            .dashboard-container { grid-template-columns: 1fr; } 
+            .panel { min-height: auto; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="wrapper">
+    <header style="margin-bottom: 20px; margin-top: 15px;">
+        <h1 style="font-weight: 900; font-size: clamp(24px, 5vw, 32px); margin: 0;">Payton <span style="color: var(--primary);">Dashboard</span></h1>
+        <p style="color: var(--text-muted); margin: 5px 0 0; font-weight: 500;">Overview of your financial obligations</p>
+    </header>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div>
+                <p class="stat-label">Available</p>
+                <h3 class="stat-value">₱ <?= number_format($availableBalance, 2) ?></h3>
+                <span style="font-size:11px; color:#22c55e; font-weight:700;">
+                    <?= $activeBudget ? htmlspecialchars($activeBudget['budget_name']) : 'No active budget' ?>
+                </span>
+            </div>
+            <div class="stat-icon purple-box"><i class="fa-solid fa-wallet"></i></div>
+        </div>
+
+        <div class="stat-card">
+            <div>
+                <p class="stat-label">Total Owed</p>
+                <h3 class="stat-value">₱ <?= number_format($totalOwed, 2) ?></h3>
+                <span style="font-size:11px; color:#f59e0b; font-weight:700;">From Shared Expenses</span>
+            </div>
+            <div class="stat-icon orange-box"><i class="fa-solid fa-users-rays"></i></div>
+        </div>
+
+        <div class="stat-card">
+            <div>
+                <p class="stat-label">Monthly Spending</p>
+                <h3 class="stat-value">₱ <?= number_format($trends['tm'], 2) ?></h3>
+                <span style="font-size:11px; color:<?= $percChange > 0 ? '#ef4444' : '#22c55e' ?>; font-weight:700;">
+                    <?= $percChange > 0 ? '↑' : '↓' ?> <?= abs(round($percChange, 1)) ?>% vs last month
+                </span>
+            </div>
+            <div class="stat-icon purple-box"><i class="fa-solid fa-chart-line"></i></div>
+        </div>
+    </div>
+
+    <div class="dashboard-container">
+        <div class="panel">
+            <div class="panel-header">Spending Breakdown</div>
+            <div class="chart-container">
+                <canvas id="mainChart"></canvas>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-header">Upcoming Payments</div>
+            <div class="payment-list">
+                <?php if (!empty($upcomingPayments)): ?>
+                    <?php foreach ($upcomingPayments as $p): ?>
+                        <div class="payment-row">
+                            <div>
+                                <p class="p-title"><?= htmlspecialchars($p['payment_name']) ?></p>
+                                <p class="p-sub">Due: <?= date('M d, Y', strtotime($p['due_date'])) ?></p>
+                            </div>
+                            <div class="p-price">₱ <?= number_format($p['amount'], 2) ?></div>
+                        </div>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <div style="text-align:center; padding: 60px 0;">
+                        <i class="fa-regular fa-calendar-check" style="font-size: 30px; color: #cbd5e1; margin-bottom: 10px;"></i>
+                        <p style="color: var(--text-muted); font-size: 14px;">No upcoming bills scheduled.</p>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const ctx = document.getElementById('mainChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'polarArea',
+        data: {
+            labels: <?= json_encode(array_column($categoryData, 'category_name')) ?>,
+            datasets: [{
+                data: <?= json_encode(array_column($categoryData, 'total')) ?>,
+                backgroundColor: [
+                    'rgba(124, 58, 237, 0.75)', 
+                    'rgba(59, 130, 246, 0.75)', 
+                    'rgba(245, 158, 11, 0.75)', 
+                    'rgba(16, 185, 129, 0.75)',
+                    'rgba(239, 68, 68, 0.75)'
+                ],
+                borderWidth: 2,
+                borderColor: '#ffffff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { 
+                    position: 'bottom', 
+                    labels: { 
+                        font: { weight: '600' }, 
+                        padding: 15 
+                    } 
+                }
+            },
+            scales: {
+                r: { ticks: { display: false }, grid: { color: '#f1f5f9' } }
+            }
+        }
+    });
+</script>
+</body>
+</html>
