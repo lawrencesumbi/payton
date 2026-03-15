@@ -16,7 +16,8 @@ $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
 // Page routing
 $page = $_GET['page'] ?? 'dashboard';
-$allowed_pages = ['dashboard', 'manage_groups', 'manage_expenses', 'manage_payments', 'scheduler', 'manage_reminders', 'notifications', 'my_account', 'split_expense', 'friends', 'archive'];
+$allowed_pages = ['dashboard', 'manage_groups', 'manage_expenses', 'manage_payments', 'scheduler', 'manage_reminders', 'notifications', 'my_account', 'split_expense', 'view_split_expense', 'friends', 'archive'];
+
 
 if (!in_array($page, $allowed_pages)) { $page = 'dashboard'; }
 
@@ -238,11 +239,14 @@ $_SESSION['email'] = $user['email'];
       <a href="?page=scheduler" class="<?= $page=='scheduler'?'active':'' ?>">
         <i class="fa-solid fa-calendar-days"></i> <span>Scheduler</span>
       </a>
+      <a href="?page=friends" class="<?= $page=='friends'?'active':'' ?>">
+        <i class="fa-solid fa-user-group"></i> <span>Friends</span>
+      </a>
       <a href="?page=split_expense" class="<?= $page=='split_expense'?'active':'' ?>">
         <i class="fa-solid fa-layer-group"></i> <span>Split Expense</span>
       </a>
-      <a href="?page=friends" class="<?= $page=='friends'?'active':'' ?>">
-        <i class="fa-solid fa-user-group"></i> <span>Friends</span>
+      <a href="?page=view_split_expense" class="<?= $page=='view_split_expense'?'active':'' ?>">
+        <i class="fa-solid fa-diagram-predecessor"></i> <span>Breakdown</span>
       </a>
       <a href="?page=archive" class="<?= $page=='archive'?'active':'' ?>">
         <i class="fa-solid fa-box-archive"></i> <span>Archive</span>

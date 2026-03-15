@@ -927,15 +927,28 @@ tr:hover {
     <div class="stat-card-content">
         <div class="stat-label">Allowance Period</div>
 
-        <?php if ($activeBudget && !$budgetExpired): ?>
-            <div class="stat-value">
-                <?= htmlspecialchars($activeBudget['budget_name'] ?? 'No active Allowance') ?>
-            </div>
-        <?php else: ?>
-            <div class="stat-value">No active Allowance</div>
-        <?php endif; ?>
+        
+
+<?php if ($activeBudget && !$budgetExpired): ?>
+    <div class="stat-value">
+        <?= htmlspecialchars($activeBudget['budget_name']) ?>
     </div>
+
+    <div class="stat-subtitle">
+        <?= date("M d, Y", strtotime($budgetStart)) ?>
+        -
+        <?= date("M d, Y", strtotime($budgetEnd)) ?>
+    </div>
+
+<?php else: ?>
+    <div class="stat-value">No active Allowance</div>
+<?php endif; ?>
+
+
 </div>
+
+    </div>
+  
 
             <div class="stat-card stat-orange">
                 <div class="stat-icon"><i class="fa-solid fa-calendar-days"></i></div>

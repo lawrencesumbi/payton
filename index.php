@@ -291,7 +291,7 @@ section{min-height: 100vh;}
     <div class="footer-container">
       <div class="footer-left">
         <h3><span class="pay">PAY</span><span class="ton">TON</span></h3>
-        <p>AI-enhanced financial management system for smarter tracking, payments, and insights.</p>
+        <p>AI-assisted financial management system for smarter tracking, expense, and insights.</p>
       </div>
       <div class="footer-links">
         <h4>Quick Links</h4>

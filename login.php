@@ -317,7 +317,7 @@
   <!-- RIGHT SECTION -->
   <div class="login-right">
 
-    <a href="index.html" class="close-btn">×</a>
+    <a href="index.php" class="close-btn">×</a>
 
     <div class="form-header">
       <h2>Welcome Guest!</h2>
