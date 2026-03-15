@@ -91,8 +91,7 @@ $students = $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
 
         .container { 
-            max-width: 900px; 
-            margin: 50px auto; 
+            width: 100%;  
             padding: 0 20px; 
         }
 

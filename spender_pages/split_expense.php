@@ -121,7 +121,7 @@ $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <style>
         :root { --primary: #6366f1; --primary-light: #e0e7ff; --bg: #f8fafc; --text-main: #1e293b; --text-muted: #64748b; --border: #e2e8f0; --danger: #ef4444; --success: #22c55e; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text-main); margin: 0; }
-        .container { width:100%; margin: 40px auto; padding: 0 24px; box-sizing: border-box;}
+        .container { width:100%; margin: 30px auto; padding: 0 24px; box-sizing: border-box;}
         .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; }
         .card { background: white; border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); overflow: hidden; }
         table { width: 100%; border-collapse: collapse; }
@@ -135,6 +135,7 @@ $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         #modalOverlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); justify-content:center; align-items:center; z-index: 9999; }
         .modal-card { background: white; padding: 32px; border-radius: 20px; width: 100%; max-width: 480px; transition: max-width 0.4s ease; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); }
+        .modal-card h2{margin-bottom: 10px;}
         label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; color: var(--text-muted); }
         .input-box { width: 100%; padding: 12px; margin-bottom: 20px; border: 1px solid var(--border); border-radius: 10px; font-family: inherit; box-sizing: border-box; }
         .friend-grid { display: grid; grid-template-columns: 1fr; gap: 8px; max-height: 200px; overflow-y: auto; }

@@ -69,9 +69,9 @@ body{
 }
 
 .main-content{
-    max-width:1200px;
+    width: 100%;
     margin:auto;
-    padding:30px;
+    
 }
 
 .header{

@@ -54,8 +54,8 @@ $people = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <title>Manage People</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
-        body{ font-family:Inter; background:#f9fafb; margin:0; }
-        .container{ width: 100%; margin:50px auto; padding:20px; }
+        body{background:#f9fafb; margin:0; }
+        .container{ width: 100%; margin:10px auto; padding:20px; }
         .header{ display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
         .btn{ padding:10px 18px; border:none; border-radius:8px; cursor:pointer; font-weight:500; transition: 0.2s; }
         .btn-primary{ background:#6f42c1; color:white; }
@@ -89,7 +89,7 @@ $people = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 <div class="container">
     <div class="header">
-        <h2>People</h2>
+        <h2>Manage People</h2>
         <button class="btn btn-primary" onclick="openModal()">+ Add Person</button>
     </div>
 
@@ -110,7 +110,7 @@ $people = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <?php if(!empty($people)): ?>
                     <?php foreach($people as $p): ?>
                     <tr>
-                        <td><strong><?php echo htmlspecialchars($p['name']); ?></strong></td>
+                        <td><?php echo htmlspecialchars($p['name']); ?></td>
                         <td style="color:#6b7280; font-size: 0.9em;">
                             <?php echo date("M d, Y", strtotime($p['created_at'])); ?>
                         </td>

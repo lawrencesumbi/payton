@@ -46,7 +46,6 @@ $total_budget = 0;
 $allowance_left = 0;
 
 if ($selected_spender && $selected_allowance) {
-    // Get Expenses
     $stmt = $conn->prepare("
         SELECT e.*, c.category_name, pm.payment_method_name
         FROM expenses e
@@ -62,7 +61,6 @@ if ($selected_spender && $selected_allowance) {
         $total_spent += $ex['amount'];
     }
 
-    // Get Budget Info
     $stmtB = $conn->prepare("SELECT budget_amount FROM budget WHERE id = ?");
     $stmtB->execute([$selected_allowance]);
     $total_budget = (float) $stmtB->fetchColumn();
@@ -91,7 +89,6 @@ if ($selected_spender && $selected_allowance) {
             font-family: 'Inter', sans-serif;
             background-color: var(--bg-body);
             color: #334155;
-            
         }
 
         .main-wrapper {
@@ -99,7 +96,6 @@ if ($selected_spender && $selected_allowance) {
             margin: 0 auto;
         }
 
-        /* Top Bar Layout */
         .top-row {
             display: flex;
             gap: 20px;
@@ -108,9 +104,8 @@ if ($selected_spender && $selected_allowance) {
             flex-wrap: wrap;
         }
 
-        /* FLEX SELECTION FORM */
         .selection-container {
-            flex: 2; /* Takes up more space */
+            flex: 2;
             min-width: 400px;
         }
 
@@ -129,7 +124,6 @@ if ($selected_spender && $selected_allowance) {
             box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
         }
 
-        /* Stats Cards Layout */
         .stats-container {
             flex: 3;
             display: flex;
@@ -164,7 +158,7 @@ if ($selected_spender && $selected_allowance) {
             margin: 0;
         }
 
-        /* Table Styling */
+        /* --- SCROLLABLE TABLE UPDATES --- */
         .activity-card {
             background: #fff;
             border-radius: 16px;
@@ -173,8 +167,35 @@ if ($selected_spender && $selected_allowance) {
             overflow: hidden;
         }
 
-        .table thead {
-            background-color: #f1f5f9;
+        /* 1. Fix the height and enable vertical scroll */
+        .table-scroll-container {
+            max-height: 400px; /* Adjust this value as needed */
+            overflow-y: auto;
+            position: relative;
+        }
+
+        /* 2. Make the header sticky */
+        .table-scroll-container thead th {
+            position: sticky;
+            top: 0;
+            background-color: #f1f5f9 !important; /* Forces color even during scroll */
+            z-index: 10;
+            box-shadow: inset 0 -1px 0 var(--border-color); /* Bottom border replacement */
+        }
+
+        /* 3. Custom scrollbar for better UI */
+        .table-scroll-container::-webkit-scrollbar {
+            width: 8px;
+        }
+        .table-scroll-container::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        .table-scroll-container::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        .table-scroll-container::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
         }
 
         .table thead th {
@@ -191,7 +212,6 @@ if ($selected_spender && $selected_allowance) {
             font-weight: 600;
         }
 
-        /* Responsive */
         @media (max-width: 992px) {
             .top-row { flex-direction: column; }
             .selection-form { flex-direction: column; }
@@ -257,7 +277,7 @@ if ($selected_spender && $selected_allowance) {
             <div class="p-4 border-bottom">
                 <h6 class="mb-0 fw-bold"><i class="bi bi-list-ul me-2 text-primary"></i>Transactions</h6>
             </div>
-            <div class="table-responsive">
+            <div class="table-responsive table-scroll-container">
                 <table class="table align-middle mb-0">
                     <thead>
                         <tr>
