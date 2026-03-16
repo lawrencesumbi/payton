@@ -35,15 +35,10 @@ $_SESSION['email'] = $user['email'];
   <style>
     /* ===== BASIC RESET ===== */
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', Arial, sans-serif; }
-    body { 
-        background: #fcfcfc; 
-        min-height: 100vh;
-        /* Ensure Bootstrap doesn't add extra line-height or font-size shifts */
-        line-height: 1.5; 
-    }
+    body { background: #fcfcfc; min-height: 100vh; line-height: 1.5; }
     .app { display: flex; min-height: 100vh; }
 
-    /* ===== SIDEBAR (FIXED) ===== */
+    /* ===== SIDEBAR ===== */
     .sidebar {
       width: 200px;
       background: white; 
@@ -55,88 +50,65 @@ $_SESSION['email'] = $user['email'];
       top: 0; 
       border-right: 1px solid #eee; 
       z-index: 1000;
+      transition: width 0.3s ease;
     }
     
-    .left-nav { 
-      display: flex; 
-      align-items: center; 
-      padding: 15px 25px; 
-      margin-bottom: 10px; 
-      gap: 12px; 
-    }
-    
+    .left-nav { display: flex; align-items: center; padding: 15px 25px; margin-bottom: 10px; gap: 12px; }
     .left-nav img { width: 40px; height: 40px; border-radius: 10px; object-fit: cover; }
-    .left-nav h3 { 
-        font-size: 20px !important; 
-        font-weight: 700 !important; 
-        color: #222 !important; 
-        margin-bottom: 0; /* Bootstrap adds bottom margins to headers */
-    }
+    .left-nav h3 { font-size: 20px !important; font-weight: 700 !important; color: #222 !important; margin-bottom: 0; }
 
     .menu { flex: 1; display: flex; flex-direction: column; gap: 4px; padding-left: 10px; }
-    
     .menu a { 
-      text-decoration: none !important; 
-      padding: 12px 20px; 
-      color: #444; 
-      font-weight: 600; 
-      font-size: 14px; 
-      display: flex; 
-      align-items: center; 
-      gap: 15px; 
-      transition: all 0.2s ease; 
+      text-decoration: none !important; padding: 12px 20px; color: #444; font-weight: 600; 
+      font-size: 14px; display: flex; align-items: center; gap: 15px; transition: all 0.2s ease; 
       border-radius: 25px 0 0 25px; 
     }
-    
     .menu a i { font-size: 18px; min-width: 25px; text-align: center; color: #7f308f; }
     .menu a.active { background: #ebe0f7; color: #7f308f !important; }
     .menu a:hover:not(.active) { background: #f9f9f9; color: #7f308f; }
 
-    /* ===== TOPBAR (TUNA BAY STYLE) ===== */
-    .main { flex: 1; display: flex; flex-direction: column; }
-
-    .topbar {
-      height: 64px;
-      background: #ffffff;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 0 30px;
-      border-bottom: 1px solid #f1f1f1;
-      position: sticky;
-      top: 0;
-      z-index: 999;
+    /* ===== COLLAPSED STATES (USING HTML CLASS FOR NO-FLICKER) ===== */
+    .sidebar-is-collapsed .sidebar { width: 80px; }
+    .sidebar-is-collapsed .sidebar .left-nav h3, 
+    .sidebar-is-collapsed .sidebar .menu a span,
+    .sidebar-is-collapsed .sidebar .sidebar-footer .user-name,
+    .sidebar-is-collapsed .sidebar .sidebar-footer .user-email,
+    .sidebar-is-collapsed .sidebar .sidebar-footer .user-role {
+        display: none;
     }
+    .sidebar-is-collapsed .sidebar .menu a { justify-content: center; padding: 15px; margin: 0 10px; border-radius: 10px; }
+    .sidebar-is-collapsed .footer-avatar { display: block; }
+    .sidebar-is-collapsed .sidebar-footer { align-items: center; padding: 15px 0; }
 
+    /* ===== TOPBAR ===== */
+    .main { flex: 1; display: flex; flex-direction: column; }
+    .topbar {
+      height: 64px; background: #ffffff; display: flex; justify-content: space-between;
+      align-items: center; padding: 0 30px; border-bottom: 1px solid #f1f1f1;
+      position: sticky; top: 0; z-index: 999;
+    }
     .topbar-left { display: flex; align-items: center; gap: 12px; color: #6b7280; font-size: 13px; }
     .topbar-left i { cursor: pointer; transition: 0.2s; }
     .topbar-left span.sep { color: #e5e7eb; margin: 0 4px; }
     .topbar-left span.current-page { color: #111827; font-weight: 600; }
 
     .topbar-right { display: flex; align-items: center; gap: 24px; }
-
     .header-icons { display: flex; align-items: center; gap: 18px; color: #6b7280; font-size: 16px; }
-    .header-icons i { cursor: pointer; }
 
     .profile-dropdown { position: relative; }
     .profile-btn {
       background: #7f308f; border: 2px solid #fff; padding: 0; cursor: pointer;
-      width: 34px; height: 34px; border-radius: 50%;
-      box-shadow: 0 0 0 1px #e5e7eb; overflow: hidden;
+      width: 34px; height: 34px; border-radius: 50%; box-shadow: 0 0 0 1px #e5e7eb; overflow: hidden;
     }
     .profile-btn img { width: 100%; height: 100%; object-fit: cover; }
 
     .profile-menu {
-      position: absolute; top: 45px; right: 0; width: 240px;
-      background: white; border-radius: 10px; padding: 8px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+      position: absolute; top: 45px; right: 0; width: 240px; background: white; 
+      border-radius: 10px; padding: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.08);
       border: 1px solid #f1f5f9; display: none; z-index: 1000;
     }
     .profile-menu.show { display: block; }
-    .profile-menu a {
-      display: flex; align-items: center; gap: 10px; padding: 10px 12px;
-      text-decoration: none; font-size: 14px; color: #374151; border-radius: 8px;
-    }
+    .profile-menu a { display: flex; align-items: center; gap: 10px; padding: 10px 12px; text-decoration: none; font-size: 14px; color: #374151; border-radius: 8px; }
     .profile-menu a:hover { background: #fff7ed; color: #7f308f; }
     .profile-menu a i { width: 18px; color: #94a3b8; }
     .menu-divider { height: 1px; background: #f1f5f9; margin: 6px 0; }
@@ -144,54 +116,29 @@ $_SESSION['email'] = $user['email'];
 
     .content { padding: 30px; }
 
-        /* ===== SIDEBAR USER INFO ===== */ 
-.sidebar-footer {
-    padding: 20px;
-    border-top: 1px solid #f1f1f1;
-    margin-top: auto; /* This pushes the footer to the bottom */
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-.sidebar-footer .user-name {
-    font-size: 14px;
-    font-weight: 700;
-    color: #111827;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.sidebar-footer .user-email {
-    font-size: 12px;
-    color: #6b7280;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.sidebar-footer .user-role {
-    display: inline-block;
-    font-size: 10px;
-    font-weight: 700;
-    text-transform: uppercase;
-    color: #7f308f;
-    background: #ebe0f7;
-    padding: 2px 8px;
-    border-radius: 10px;
-    width: fit-content;
-    margin-top: 5px;
-}
+    /* ===== SIDEBAR FOOTER ===== */
+    .sidebar-footer { padding: 20px; border-top: 1px solid #f1f1f1; margin-top: auto; display: flex; flex-direction: column; gap: 4px; }
+    .footer-avatar { display: none; width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #7f308f; margin: 0 auto; }
+    .sidebar-footer .user-name { font-size: 14px; font-weight: 700; color: #111827; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .sidebar-footer .user-email { font-size: 12px; color: #6b7280; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .sidebar-footer .user-role { font-size: 10px; font-weight: 700; text-transform: uppercase; color: #7f308f; background: #ebe0f7; padding: 2px 8px; border-radius: 10px; width: fit-content; margin-top: 5px; }
 
     @media (max-width: 1000px) { 
         .sidebar { width: 80px; }
-        .sidebar .left-nav h3, .sidebar .menu a span { display: none; }
+        .sidebar .left-nav h3, .sidebar .menu a span, .sidebar-footer span { display: none; }
         .sidebar .menu a { justify-content: center; padding: 15px; border-radius: 10px; margin: 0 10px; }
+        .footer-avatar { display: block; }
     }
   </style>
 </head>
 <body>
+
+<script>
+    // PRE-LOAD CHECK: This prevents the dashboard from "flashing" or expanding then collapsing
+    if (localStorage.getItem("sidebarStatus") === "collapsed") {
+        document.documentElement.classList.add('sidebar-is-collapsed');
+    }
+</script>
 
 <div class="app">
   <aside class="sidebar">
@@ -217,18 +164,19 @@ $_SESSION['email'] = $user['email'];
       </a>
     </nav>
     <div class="sidebar-footer">
+        <img src="<?= htmlspecialchars($profilePath) ?>" class="footer-avatar" alt="User Profile">
         <span class="user-name"><?= htmlspecialchars($user['fullname']) ?></span>
         <span class="user-email"><?= htmlspecialchars($user['email']) ?></span>
         <span class="user-role"><?= htmlspecialchars($_SESSION['role']) ?></span>
-      </div>
+    </div>
   </aside>
 
   <main class="main">
     <header class="topbar">
       <div class="topbar-left">
-        <i class="fa-solid fa-desktop"></i>
+        <i class="fa-solid fa-bars" id="sidebarToggle" title="Toggle Sidebar"></i>
         <span class="sep">/</span>
-        <i class="fa-solid fa-user-tie"></i>
+        <i class="fa-solid fa-house"></i>
         <span class="sep">/</span>
         <span class="current-page"><?= ucwords(str_replace('_',' ', $page)) ?></span>
       </div>
@@ -243,9 +191,7 @@ $_SESSION['email'] = $user['email'];
           <button class="profile-btn" id="profileBtn">
             <img src="<?= htmlspecialchars($profilePath) ?>" alt="Profile">
           </button>
-
           <div class="profile-menu" id="profileMenu">
-            
             <a href="?page=my_account"><i class="fa-solid fa-gears"></i> My Account</a>
             <a href="activity_logs.php"><i class="fa-solid fa-clock-rotate-left"></i> Activity Logs</a>
             <div class="menu-divider"></div>
@@ -271,9 +217,24 @@ $_SESSION['email'] = $user['email'];
 </div>
 
 <script>
+  // DOM Elements
   const profileBtn = document.getElementById("profileBtn");
   const profileMenu = document.getElementById("profileMenu");
+  const sidebarToggle = document.getElementById("sidebarToggle");
 
+  // --- Sidebar Toggle & Memory Logic ---
+  sidebarToggle.addEventListener("click", function() {
+    document.documentElement.classList.toggle("sidebar-is-collapsed");
+    
+    // Save state to LocalStorage
+    if (document.documentElement.classList.contains("sidebar-is-collapsed")) {
+        localStorage.setItem("sidebarStatus", "collapsed");
+    } else {
+        localStorage.setItem("sidebarStatus", "expanded");
+    }
+  });
+
+  // --- Profile Dropdown Logic ---
   profileBtn.addEventListener("click", function(e){
     e.stopPropagation();
     profileMenu.classList.toggle("show");

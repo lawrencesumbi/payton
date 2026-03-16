@@ -129,7 +129,7 @@ $percChange = ($trends['lm'] > 0) ? (($trends['tm'] - $trends['lm']) / $trends['
         
         .stat-card {
             background: #fff; 
-            padding: 25px; 
+            padding: 15px; 
             border-radius: 24px; 
             border: 1px solid #eef1f6;
             display: flex; 
@@ -156,10 +156,10 @@ $percChange = ($trends['lm'] > 0) ? (($trends['tm'] - $trends['lm']) / $trends['
         .panel { 
             background: #fff; 
             border-radius: 28px; 
-            padding: 25px; 
+            padding: 15px; 
             border: 1px solid #eef1f6; 
             box-shadow: 0 10px 30px rgba(0,0,0,0.02);
-            min-height: 400px; /* Ensures panels look balanced */
+            min-height: 350px; /* Ensures panels look balanced */
             display: flex;
             flex-direction: column;
         }
@@ -200,7 +200,7 @@ $percChange = ($trends['lm'] > 0) ? (($trends['tm'] - $trends['lm']) / $trends['
 <body>
 
 <div class="wrapper">
-    <header style="margin-bottom: 20px; margin-top: 15px;">
+    <header style="margin-bottom: 20px;">
         <h1 style="font-weight: 900; font-size: clamp(24px, 5vw, 32px); margin: 0;">Payton <span style="color: var(--primary);">Dashboard</span></h1>
         <p style="color: var(--text-muted); margin: 5px 0 0; font-weight: 500;">Overview of your financial obligations</p>
     </header>
@@ -260,7 +260,7 @@ $percChange = ($trends['lm'] > 0) ? (($trends['tm'] - $trends['lm']) / $trends['
                         </div>
                     <?php endforeach; ?>
                 <?php else: ?>
-                    <div style="text-align:center; padding: 60px 0;">
+                    <div style="text-align:center; padding: 30px 0;">
                         <i class="fa-regular fa-calendar-check" style="font-size: 30px; color: #cbd5e1; margin-bottom: 10px;"></i>
                         <p style="color: var(--text-muted); font-size: 14px;">No upcoming bills scheduled.</p>
                     </div>

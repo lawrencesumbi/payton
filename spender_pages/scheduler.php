@@ -46,7 +46,7 @@ body {
             display: flex;
             width: 100%;
             border-radius: 10px;
-            margin-top: 20px;
+            
             box-shadow: 0 20px 50px rgba(0,0,0,0.1);
             max-height: 100vh;
         }

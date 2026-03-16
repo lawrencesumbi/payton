@@ -89,7 +89,7 @@ $your_share = $expense['amount'] - $total_others_owe;
             --success: #22c55e; --danger: #ef4444; --border: #e2e8f0;
         }
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text-main); margin: 0; }
-        .container { width: 100%; margin: 40px auto; padding: 0 20px; box-sizing: border-box; }
+        .container { width: 100%; padding: 0 20px; box-sizing: border-box; }
         .selector { width: 100%; padding: 14px; border-radius: 12px; border: 2px solid var(--border); background: var(--card); font-weight: 600; font-family: inherit; cursor: pointer; margin-bottom: 24px; }
         .split-container { display: flex; background: var(--card); border-radius: 24px; border: 1px solid var(--border); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); overflow: hidden; min-height: 460px; }
         .left-col { flex: 1; padding: 40px; background: linear-gradient(145deg, #6366f1, #4f46e5); color: white; display: flex; flex-direction: column; justify-content: center; }

@@ -55,7 +55,7 @@ $people = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         body{background:#f9fafb; margin:0; }
-        .container{ width: 100%; margin:10px auto; padding:20px; }
+        .container{ width: 100%; padding:20px; }
         .header{ display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
         .btn{ padding:10px 18px; border:none; border-radius:8px; cursor:pointer; font-weight:500; transition: 0.2s; }
         .btn-primary{ background:#6f42c1; color:white; }
