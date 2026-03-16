@@ -190,7 +190,9 @@ $_SESSION['email'] = $user['email'];
       <div class="topbar-left">
         <i class="fa-solid fa-bars" id="sidebarToggle" style="cursor: pointer;"></i>
         <span class="sep">/</span>
+        <a href="?page=dashboard" class="<?= $page=='dashboard'?'active':'' ?>">
         <i class="fa-solid fa-house"></i>
+        </a>
         <span class="sep">/</span>
         <span class="current-page"><?= ucwords(str_replace('_',' ', $page)) ?></span>
       </div>

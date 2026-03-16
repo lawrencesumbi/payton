@@ -116,7 +116,7 @@ if (isset($_POST['remove_photo'])) {
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
         body { background: var(--bg); color: var(--text-main);}
 
-        .acc-container { width: 100%; margin: 0 auto; margin-top: 20px}
+        .acc-container { width: 100%;}
         .acc-header { margin-bottom: 24px; }
         .acc-header h1 { font-size: 24px; font-weight: 800; color: #0f172a; }
 
@@ -128,13 +128,13 @@ if (isset($_POST['remove_photo'])) {
             padding: 18px; 
             border: 1px solid var(--border);
             box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -2px rgba(0,0,0,0.05);
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
 
         .acc-card h3 { font-size: 16px; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
 
         /* Profile Header Redesign */
-        .profile-section { display: flex; align-items: center; gap: 24px; padding-bottom: 20px; border-bottom: 1px solid var(--border); margin-bottom: 20px; }
+        .profile-section { display: flex; align-items: center; gap: 24px; padding-bottom: 20px; border-bottom: 1px solid var(--border); }
         .profile-pic-container { position: relative; width: 100px; height: 100px; }
         .profile-pic-container img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 4px solid #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
         
