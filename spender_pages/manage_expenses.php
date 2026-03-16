@@ -808,6 +808,478 @@ tr:hover {
         to { transform: translateX(120%); opacity: 0; }
     }
 
+/* Container for the side-by-side layout */
+.expense-flex-wrapper {
+    display: flex;
+    gap: 30px;
+    align-items: flex-start;
+    justify-content: center;
+    perspective: 1000px; /* For a subtle 3D feel */
+}
+
+/* AI Prediction Card - The "Truly AI" Look */
+.ai-prediction-card {
+    flex: 0 0 340px;
+    background: linear-gradient(165deg, #ffffff 0%, #f8faff 100%);
+    border-radius: 24px;
+    padding: 24px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 20px 40px rgba(99, 0, 212, 0.1);
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s ease;
+}
+
+/* Subtle Animated Background Pulse */
+.ai-prediction-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(99, 0, 212, 0.03) 0%, transparent 70%);
+    animation: rotate-bg 10s linear infinite;
+    pointer-events: none;
+}
+
+@keyframes rotate-bg {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* ============================================================
+   AI PREDICTION CARD - PROFESSIONAL STYLING
+   ============================================================ */
+
+.ai-prediction-card {
+    flex: 0 0 340px;
+    background: #ffffff;
+    border-radius: 24px;
+    padding: 24px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 20px 40px rgba(99, 0, 212, 0.1);
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s ease;
+    font-family: 'Inter', sans-serif;
+}
+
+/* AI Header with Pulse */
+.ai-header {
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #6300d4;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+.ai-header::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    background: #6300d4;
+    border-radius: 50%;
+    box-shadow: 0 0 8px #6300d4;
+    animation: blink 1.5s infinite;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.8); }
+}
+
+/* The Category Result */
+#predictedCategoryName {
+    font-size: 22px;
+    font-weight: 800;
+    color: #1a202c;
+    margin: 10px 0 25px 0;
+    background: linear-gradient(90deg, #1a202c, #6300d4);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-align: center;
+}
+
+/* 1. The Container */
+.gauge-box {
+    position: relative;
+    width: 180px;
+    height: 90px;
+    margin: 0 auto 35px;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+}
+
+/* 2. The Static Grey Track */
+.gauge-box::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    border: 12px solid #edf2f7;
+    box-sizing: border-box;
+    z-index: 1;
+}
+
+/* 3. The Circulation/Scanning Effect (NEW) */
+/* This creates a light "sweep" that rotates constantly */
+.gauge-box::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    /* A soft white/purple glow that sweeps around */
+    background: conic-gradient(
+        from 0deg, 
+        transparent 0deg, 
+        rgba(177, 0, 212, 0.1) 300deg, 
+        rgba(177, 0, 212, 0.4) 360deg
+    );
+    z-index: 3;
+    animation: circulate 2s linear infinite;
+    pointer-events: none;
+    /* Mask it so it only shows on the ring path */
+    -webkit-mask: radial-gradient(circle, transparent 65%, black 66%);
+    mask: radial-gradient(circle, transparent 65%, black 66%);
+}
+
+@keyframes circulate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* 4. The Multi-Color AI Fill */
+.gauge-box .arc {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    box-sizing: border-box;
+    z-index: 2;
+
+    background: conic-gradient(
+        from 270deg,
+        #f172e7 0deg 171deg,      
+        #ff9f43 171deg 176.4deg,  
+        #b100d4 176.4deg 180deg,  
+        transparent 180deg
+    );
+
+    -webkit-mask: radial-gradient(circle, transparent 65%, black 66%);
+    mask: radial-gradient(circle, transparent 65%, black 66%);
+
+    transform: rotate(0deg); 
+    transition: transform 1.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* 5. Center Text & Label */
+.dynamic-pct {
+    position: absolute;
+    bottom: 5px;
+    z-index: 10;
+    font-size: 30px; /* Slimmed down slightly */
+    font-weight: 800;
+    color: #1a202c;
+    line-height: 1;
+}
+
+.gauge-box .label {
+    position: absolute;
+    bottom: -22px;
+    width: 100%;
+    text-align: center;
+    font-size: 10px;
+    color: #a0aec0;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+/* Option Items (Confidence Breakdown) */
+.ai-options-list {
+    background: #f8fafc;
+    border-radius: 16px;
+    padding: 8px;
+    margin-bottom: 24px;
+    border: 1px solid #f1f5f9;
+}
+
+/* Container for the list */
+.ai-options-list {
+    background: #f8fafc;
+    border-radius: 16px;
+    padding: 8px;
+    margin-bottom: 24px;
+    border: 1px solid #f1f5f9;
+}
+
+/* Individual rows */
+.option-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 14px;
+    font-size: 13px;
+    color: #64748b;
+    border-radius: 10px;
+    margin-bottom: 2px;
+}
+
+/* Active/Primary prediction row */
+.option-item.active {
+    background: white;
+    box-shadow: 0 4px 12px rgba(241, 114, 231, 0.15); /* Soft pink glow */
+    color: #1a202c;
+    font-weight: 700;
+}
+
+/* Grouping dot + text */
+.label-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Color Dots */
+.dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.dot.pink { background-color: #f172e7; box-shadow: 0 0 6px rgba(241, 114, 231, 0.5); }
+.dot.orange { background-color: #ff9f43; }
+.dot.purple { background-color: #b100d4; }
+
+/* Percentage alignment */
+.dynamic-pct-small, .val {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+}
+
+.dynamic-pct-small {
+    color: #f172e7; /* Matches the 95% Pink */
+}
+
+/* Professional AI Footer */
+.ai-footer {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+/* Primary AI Button: Clean, Sleek, Subtle Glow */
+.btn-confirm {
+    flex: 2;
+    background: #6300d4; /* Solid color is often more professional than gradients */
+    color: white;
+    border: none;
+    padding: 10px 16px; /* Reduced padding for a slimmer look */
+    border-radius: 8px; /* Softer, modern radius */
+    font-weight: 600;
+    font-size: 13px; /* Smaller, cleaner text */
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 6px rgba(99, 0, 212, 0.2);
+}
+
+.btn-confirm:hover {
+    background: #5200b0;
+    box-shadow: 0 4px 12px rgba(99, 0, 212, 0.3);
+    transform: translateY(-1px);
+}
+
+.btn-confirm:active {
+    transform: translateY(0);
+}
+
+/* Secondary Button: Ghost style to reduce visual noise */
+.btn-manual {
+    flex: 1;
+    background: transparent;
+    border: 1px solid #e2e8f0;
+    color: #64748b;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-manual:hover {
+    background: #f8fafc;
+    color: #1e293b;
+    border-color: #cbd5e0;
+}
+
+/* Ensure the AI Body doesn't feel cramped */
+.ai-body {
+    padding-top: 5px;
+}
+
+.ma.manual-category-card {
+    width: 320px; /* Slightly wider for better text fit */
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    padding: 20px;
+    border: 1px solid #e2e8f0;
+}
+
+.manual-header {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #f1f5f9;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.manual-body {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Two columns */
+    gap: 10px;
+}
+
+.cat-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 8px;
+    border-radius: 10px;
+    background: #fff;
+    border: 1px solid #f1f5f9;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+}
+
+/* Icon Styling */
+.cat-card i {
+    font-size: 18px;
+    margin-bottom: 8px;
+    color: #64748b; /* Professional slate color */
+    transition: color 0.2s ease;
+}
+
+/* Label Styling */
+.cat-card span {
+    font-size: 11px;
+    font-weight: 600;
+    color: #475569;
+    line-height: 1.2;
+}
+
+/* Professional Hover State */
+.cat-card:hover {
+    background: #f8fafc;
+    border-color: #6300d4; /* Matches your AI Purple */
+}
+
+.cat-card:hover i {
+    color: #6300d4;
+}
+
+.cat-card:hover span {
+    color: #1e293b;
+}
+
+/* Active State for when a category is selected */
+.cat-card.selected {
+    background: #f5f0ff;
+    border-color: #6300d4;
+}
+
+.cat-card.selected i, .cat-card.selected span {
+    color: #6300d4;
+}
+
+
+/* Container for the AI Suggested Category */
+/* This is the magic part: it shows the badge ONLY when the label has text */
+.ai-suggested-container:has(#selectedCategoryLabel:not(:empty)) {
+    display: flex !important;
+}
+
+/* Base Styles */
+.ai-suggested-container {
+    display: none; /* Hidden by default */
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(98deg, #f5f0ff 0%, #ffffff 100%);
+    border: 1px solid #e9e0ff;
+    border-left: 4px solid #6300d4;
+    padding: 10px 14px;
+    border-radius: 12px;
+    margin: 15px 0;
+    box-shadow: 0 4px 12px rgba(99, 0, 212, 0.05);
+}
+
+.ai-suggestion-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.ai-sparkle-box {
+    width: 32px;
+    height: 32px;
+    background: #6300d4;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+}
+
+.ai-text-wrapper {
+    display: flex;
+    flex-direction: column;
+}
+
+.ai-tiny-title {
+    font-size: 9px;
+    font-weight: 800;
+    color: #8b5cf6;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+}
+
+#selectedCategoryLabel {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.ai-status-pill {
+    font-size: 9px;
+    font-weight: 700;
+    background: #ffffff;
+    color: #6300d4;
+    padding: 3px 8px;
+    border-radius: 20px;
+    border: 1px solid #e9e0ff;
+    text-transform: uppercase;
+}
+
+
     /* Success Theme */
     .toast-success { border: 3px solid #62C976; }
     .toast-success .toast-icon i { color: #62C976; font-size: 32px; }
@@ -1041,71 +1513,170 @@ tr:hover {
 
 
 
-  <button class="fab" title="Add Expense">
-      <i class="fa-solid fa-plus"></i>
-  </button>
+<button class="fab" title="Add Expense">
+    <i class="fa-solid fa-plus"></i>
+</button>
 
-  <div class="modal-overlay" id="modalOverlay">
+<div class="modal-overlay" id="modalOverlay">
     <div class="expense-area">
-      <button class="close-btn">&times;</button>
-      
-      <form class="expense-form" 
-      action="add_expense_process.php" 
-      method="POST" 
-      enctype="multipart/form-data">
-      
-    <input type="hidden" name="category_id" id="categoryInput" value="1">
-    <input type="hidden" name="expense_id" id="expenseId">
+        <button class="close-btn">&times;</button>
 
-    <div class="form-group">
-      <label>Description</label>
-      <input type="text" name="description" id="descInput" placeholder="Transaction Name" required>
-    </div>
+        <!-- FLEX WRAPPER: form + AI container -->
+        <div class="expense-flex-wrapper" style="display: flex; gap: 24px; align-items: stretch; justify-content: center; padding: 10px;">
 
-    <p class="label">Category</p>
-      <div class="cat-grid" id="catGrid">
-        <div class="cat-card active" data-category-id="1"><div class="cat-icon">🍔</div><p class="cat-name">Food & Dining</p></div>
-        <div class="cat-card" data-category-id="2"><div class="cat-icon">🚗</div><p class="cat-name">Transportation</p></div>
-        <div class="cat-card" data-category-id="3"><div class="cat-icon">🏡</div><p class="cat-name">Housing / Rent</p></div>
-        <div class="cat-card" data-category-id="4"><div class="cat-icon">💡</div><p class="cat-name">Bills & Utilities</p></div>
-        <div class="cat-card" data-category-id="5"><div class="cat-icon">🏥</div><p class="cat-name">Personal Care</p></div>
-        <div class="cat-card" data-category-id="6"><div class="cat-icon">📚</div><p class="cat-name">Education</p></div>
-        <div class="cat-card" data-category-id="7"><div class="cat-icon">🎮</div><p class="cat-name">Entertainment</p></div>
-        <div class="cat-card" data-category-id="8"><div class="cat-icon">🛍</div><p class="cat-name">Shopping</p></div>
-        <div class="cat-card" data-category-id="9"><div class="cat-icon">💰</div><p class="cat-name">Savings</p></div>
-        <div class="cat-card" data-category-id="10"><div class="cat-icon">📝</div><p class="cat-name">Miscellaneous</p></div>
-      </div>
+            <!-- ================= FORM ================= -->
+            <form class="expense-form" 
+                  action="add_expense_process.php" 
+                  method="POST" 
+                  enctype="multipart/form-data"
+                  style="flex: 1;">
+                
+                <input type="hidden" name="category_id" id="categoryInput" value="1">
+                <input type="hidden" name="expense_id" id="expenseId">
 
-    <div class="form-group">
-      <label>Amount</label>
-      <input type="number" name="amount" id="amountInput" placeholder="₱" required min="1">
-    </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <input type="text" name="description" id="descInput" placeholder="Transaction Name" required>
+                </div>
 
-    <div class="form-group">
-      <label>Payment Method</label>
-      <select name="payment_method_id" id="paymentInput" required>
-        <option value="1">Cash</option>
-        <option value="2">Credit Card</option>
-        <option value="3">Debit Card</option>
-        <option value="4">GCash</option>
-        <option value="5">Maya / Paymaya</option>
-        <option value="6">Bank Transfer</option>
-        <option value="7">Online Payment</option>
-        <option value="8">Check</option>
-      </select>
-    </div>
+                <div class="ai-suggested-container">
+                  <div class="ai-suggestion-content">
+                      <div class="ai-sparkle-box">
+                          <i class="fa-solid fa-wand-magic-sparkles"></i>
+                      </div>
+                      <div class="ai-text-wrapper">
+                          <span class="ai-tiny-title">AI Predicted</span>
+                          <span id="selectedCategoryLabel"></span>
+                      </div>
+                  </div>
+                  <div class="ai-status-pill">Smart Fill</div>
+              </div>
 
-    <div class="form-group">
-        <label>Proof of Transaction</label>
-        <input type="file" name="receipt_upload" accept="image/*">
-        <p id="currentReceipt" style="font-size:12px; color:#555;">No receipt uploaded</p>
-    </div>
+                <div class="form-group">
+                    <label>Amount</label>
+                    <input type="number" name="amount" id="amountInput" placeholder="₱" required min="1">
+                </div>
 
-    <button type="submit" class="btn-save" id="submitBtn">Add Expense</button>
-</form>
+                <div class="form-group">
+                    <label>Payment Method</label>
+                    <select name="payment_method_id" id="paymentInput" required>
+                        <option value="1">Cash</option>
+                        <option value="2">Credit Card</option>
+                        <option value="3">Debit Card</option>
+                        <option value="4">GCash</option>
+                        <option value="5">Maya / Paymaya</option>
+                        <option value="6">Bank Transfer</option>
+                        <option value="7">Online Payment</option>
+                        <option value="8">Check</option>
+                    </select>
+                </div>
 
-    </div>
-  </div>
+                <div class="form-group">
+                    <label>Proof of Transaction</label>
+                    <input type="file" name="receipt_upload" accept="image/*">
+                    <p id="currentReceipt" style="font-size:12px; color:#555;">No receipt uploaded</p>
+                </div>
+
+                <button type="submit" class="btn-save" id="submitBtn">Add Expense</button>
+            </form>
+
+            <!-- ================= AI PREDICTION CARD ================= -->
+            <div id="aiPredictionContainer" class="ai-prediction-card" style="display: none; min-width: 250px;">
+                <div class="ai-header">AI Category Suggestion</div>
+                
+                <div class="ai-body">
+                    <h2 id="predictedCategoryName">CATEGORY NAME</h2>
+
+                    <div class="gauge-box">
+                        <div class="arc"></div>
+                        <div class="dynamic-pct">0%</div>
+                    </div>
+                     <div class="label">Confidence Level</div>
+
+                    <div class="ai-options-list">
+                        <div class="option-item active">
+                            <div class="label-group">
+                                <span class="dot pink"></span>
+                                <span id="primaryLabel">Food & Drinks</span>
+                            </div>
+                            <span class="dynamic-pct-small" id="primaryPct">95%</span>
+                        </div>
+
+                        <div class="option-item">
+                            <div class="label-group">
+                                <span class="dot orange"></span>
+                                <span>Shopping</span>
+                            </div>
+                            <span class="val">3%</span>
+                        </div>
+
+                        <div class="option-item">
+                            <div class="label-group">
+                                <span class="dot purple"></span>
+                                <span>Personal Care</span>
+                            </div>
+                            <span class="val">2%</span>
+                        </div>
+                    </div>
+
+                    <div class="ai-footer">
+                        <button type="button" onclick="closeAI()" class="btn-manual">Change Manually</button>
+                        <button type="button" id="confirmAI" class="btn-confirm">Confirm</button>
+                    </div>
+                </div>
+            </div>
+            <!-- ================= END AI CARD ================= -->
+              <div id="manualCategoryContainer" class="manual-category-card" style="display:none;">
+                 <div class="manual-header">Select Category</div>
+                    <div class="manual-body">
+                          <div class="cat-card" data-category-id="1">
+                              <i class="fa-solid fa-utensils"></i>
+                              <span>Food & Dining</span>
+                          </div>
+                          <div class="cat-card" data-category-id="2">
+                              <i class="fa-solid fa-car"></i>
+                              <span>Transportation</span>
+                          </div>
+                          <div class="cat-card" data-category-id="3">
+                              <i class="fa-solid fa-house"></i>
+                              <span>Housing / Rent</span>
+                          </div>
+                          <div class="cat-card" data-category-id="4">
+                              <i class="fa-solid fa-file-invoice-dollar"></i>
+                              <span>Bills & Utilities</span>
+                          </div>
+                          <div class="cat-card" data-category-id="5">
+                              <i class="fa-solid fa-heart-pulse"></i>
+                              <span>Health & Care</span>
+                          </div>
+                          <div class="cat-card" data-category-id="6">
+                              <i class="fa-solid fa-graduation-cap"></i>
+                              <span>Education</span>
+                          </div>
+                          <div class="cat-card" data-category-id="7">
+                              <i class="fa-solid fa-clapperboard"></i>
+                              <span>Entertainment</span>
+                          </div>
+                          <div class="cat-card" data-category-id="8">
+                              <i class="fa-solid fa-bag-shopping"></i>
+                              <span>Shopping</span>
+                          </div>
+                          <div class="cat-card" data-category-id="9">
+                              <i class="fa-solid fa-piggy-bank"></i>
+                              <span>Savings</span>
+                          </div>
+                          <div class="cat-card" data-category-id="10">
+                              <i class="fa-solid fa-ellipsis"></i>
+                              <span>Miscellaneous</span>
+                          </div>
+                      </div>
+                  </div>
+        </div> <!-- END FLEX WRAPPER -->
+
+    </div> <!-- END expense-area -->
+</div> <!-- END modal-overlay -->
+
+
 
 <div class="modal-overlay" id="receiptModal">
   <div class="receipt-area">
@@ -1148,16 +1719,17 @@ tr:hover {
 </style>
 
 <script>
+
 // Function to manually close the toast
 function closeToast(button) {
     const toast = button.closest('.custom-toast');
     toast.classList.add('fade-out');
-    setTimeout(() => toast.remove(), 400); // Wait for animation
+    setTimeout(() => toast.remove(), 400);
 }
 
 document.addEventListener("DOMContentLoaded", () => {
 
-  // Auto-remove toasts after 5 seconds
+  /* ================= AUTO REMOVE TOAST ================= */
   document.querySelectorAll('.custom-toast').forEach(toast => {
       setTimeout(() => {
           if (toast.parentElement) {
@@ -1167,6 +1739,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }, 5000);
   });
 
+  /* ================= BASIC ELEMENTS ================= */
   const fab = document.querySelector('.fab');
   const modalOverlay = document.getElementById('modalOverlay');
   const closeBtn = document.querySelector('.close-btn');
@@ -1174,120 +1747,224 @@ document.addEventListener("DOMContentLoaded", () => {
   const categoryInput = document.getElementById('categoryInput');
   const descInput = document.getElementById("descInput");
 
-  // ================= MODAL OPEN/CLOSE =================
+  const aiContainer = document.getElementById('aiPredictionContainer');
+  const manualContainer = document.getElementById('manualCategoryContainer');
+  const categoryLabel = document.getElementById('selectedCategoryLabel');
+
+  /* ================= MODAL OPEN/CLOSE ================= */
+
   fab?.addEventListener('click', () => {
-    modalOverlay.style.display = 'flex';
+      modalOverlay.style.display = 'flex';
+
+      // reset AI UI
+      aiContainer.style.display = "none";
+      if(manualContainer) manualContainer.style.display = "none";
   });
 
   closeBtn?.addEventListener('click', () => {
-    modalOverlay.style.display = 'none';
+      modalOverlay.style.display = 'none';
   });
 
-  // ================= CATEGORY CLICK =================
+  /* ================= CATEGORY CLICK ================= */
+
   catCards.forEach(card => {
-    card.addEventListener('click', () => {
-      catCards.forEach(c => c.classList.remove('active'));
-      card.classList.add('active');
-      categoryInput.value = card.getAttribute('data-category-id');
-    });
+      card.addEventListener('click', () => {
+
+          catCards.forEach(c => c.classList.remove('active'));
+          card.classList.add('active');
+
+          const id = card.getAttribute('data-category-id');
+          categoryInput.value = id;
+
+          if(categoryLabel){
+              categoryLabel.style.display = "block";
+              categoryLabel.innerText = "Category: " + categoryNames[id];
+          }
+
+      });
   });
 
-  // ================= EDIT EXPENSE =================
+  /* ================= EDIT EXPENSE ================= */
+
   document.querySelectorAll('.btn-edit').forEach(btn => {
-    btn.addEventListener('click', function(e) {
-      e.preventDefault();
+      btn.addEventListener('click', function(e) {
 
-      const id = this.dataset.id;
-      const category = this.dataset.category;
-      const description = this.dataset.description;
-      const amount = this.dataset.amount;
-      const payment = this.dataset.payment;
-      const receipt = this.dataset.receipt;
+          e.preventDefault();
 
-      modalOverlay.style.display = 'flex';
+          const id = this.dataset.id;
+          const category = this.dataset.category;
+          const description = this.dataset.description;
+          const amount = this.dataset.amount;
+          const payment = this.dataset.payment;
+          const receipt = this.dataset.receipt;
 
-      categoryInput.value = category;
-      catCards.forEach(c => c.classList.remove('active'));
-      document.querySelector(`.cat-card[data-category-id="${category}"]`)?.classList.add('active');
+          modalOverlay.style.display = 'flex';
 
-      document.querySelector('input[name="description"]').value = description;
-      document.querySelector('input[name="amount"]').value = amount;
-      document.querySelector('select[name="payment_method_id"]').value = payment;
+          categoryInput.value = category;
 
-      const receiptLabel = document.getElementById('currentReceipt');
-      receiptLabel.textContent = receipt
-        ? `Current Receipt: ${receipt.split('/').pop()}`
-        : 'No receipt uploaded';
+          catCards.forEach(c => c.classList.remove('active'));
+          document.querySelector(`.cat-card[data-category-id="${category}"]`)
+              ?.classList.add('active');
 
-      const btnSave = document.querySelector('.btn-save');
-      btnSave.textContent = 'Update Expense';
+          document.querySelector('input[name="description"]').value = description;
+          document.querySelector('input[name="amount"]').value = amount;
+          document.querySelector('select[name="payment_method_id"]').value = payment;
 
-      let hiddenInput = document.querySelector('input[name="expense_id"]');
-      if(!hiddenInput) {
-          hiddenInput = document.createElement('input');
-          hiddenInput.type = 'hidden';
-          hiddenInput.name = 'expense_id';
-          document.querySelector('.expense-form').appendChild(hiddenInput);
-      }
-      hiddenInput.value = id;
+          const receiptLabel = document.getElementById('currentReceipt');
+          receiptLabel.textContent = receipt
+              ? `Current Receipt: ${receipt.split('/').pop()}`
+              : 'No receipt uploaded';
 
-      document.querySelector('.expense-form').action = 'update_expense_process.php';
-    });
+          const btnSave = document.querySelector('.btn-save');
+          btnSave.textContent = 'Update Expense';
+
+          let hiddenInput = document.querySelector('input[name="expense_id"]');
+
+          if (!hiddenInput) {
+              hiddenInput = document.createElement('input');
+              hiddenInput.type = 'hidden';
+              hiddenInput.name = 'expense_id';
+              document.querySelector('.expense-form').appendChild(hiddenInput);
+          }
+
+          hiddenInput.value = id;
+
+          document.querySelector('.expense-form').action = 'update_expense_process.php';
+      });
   });
 
-  // ================= VIEW RECEIPT =================
+  /* ================= VIEW RECEIPT ================= */
+
   const receiptModal = document.getElementById('receiptModal');
   const receiptImage = document.getElementById('receiptImage');
 
   document.querySelectorAll('.btn-view-receipt').forEach(btn => {
-    btn.addEventListener('click', () => {
-      receiptImage.src = btn.dataset.receipt;
-      receiptModal.style.display = 'flex';
-    });
+      btn.addEventListener('click', () => {
+          receiptImage.src = btn.dataset.receipt;
+          receiptModal.style.display = 'flex';
+      });
   });
 
   document.querySelector('.close-receipt-btn')?.addEventListener('click', () => {
-    receiptModal.style.display = 'none';
-    receiptImage.src = '';
+      receiptModal.style.display = 'none';
+      receiptImage.src = '';
   });
 
-  // ================= AI AUTO CATEGORIZE =================
+  /* ================= AI AUTO CATEGORIZE ================= */
+
   let typingTimer;
-  const delay = 300; // faster for offline
+  const delay = 300;
 
-  descInput.addEventListener("input", () => {
-    clearTimeout(typingTimer);
+  const categoryNames = {
+      1: "Food & Dining",
+      2: "Transportation",
+      3: "Housing / Rent",
+      4: "Bills & Utilities",
+      5: "Health & Personal Care",
+      6: "Education",
+      7: "Entertainment & Leisure",
+      8: "Shopping",
+      9: "Savings & Investments",
+      10: "Miscellaneous"
+  };
 
-    typingTimer = setTimeout(() => {
-      classifyOffline(descInput.value);
-    }, delay);
+  descInput?.addEventListener("input", () => {
+      clearTimeout(typingTimer);
+      typingTimer = setTimeout(() => classifyOffline(descInput.value), delay);
   });
 
   function classifyOffline(text) {
-    if (!text.trim()) return;
 
-    fetch("local_categorize.php", {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: "description=" + encodeURIComponent(text)
-    })
-    .then(res => res.json())
-    .then(data => {
-      const detectedCategory = data.category_id || 10;
-
-      // Update UI
-      catCards.forEach(card => card.classList.remove("active"));
-
-      const selectedCard = document.querySelector(`[data-category-id="${detectedCategory}"]`);
-      if (selectedCard) {
-        selectedCard.classList.add("active");
-        categoryInput.value = detectedCategory;
+      if (!text.trim()) {
+          aiContainer.style.display = 'none';
+          return;
       }
-    })
-    .catch(err => console.error("Offline AI error:", err));
+
+      fetch("local_categorize.php", {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: "description=" + encodeURIComponent(text)
+      })
+
+      .then(res => res.json())
+
+      .then(data => {
+
+          const detectedCategoryId = data.category_id || 10;
+          const confidence = data.confidence || 10;
+
+          const catName = categoryNames[detectedCategoryId];
+
+          document.getElementById('predictedCategoryName').innerText = catName.toUpperCase();
+          document.getElementById('primaryLabel').innerText = catName;
+
+          document.querySelectorAll('.dynamic-pct')
+          .forEach(el => el.innerText = confidence + "%");
+
+          aiContainer.style.display = 'block';
+
+          const confirmBtn = document.getElementById('confirmAI');
+
+          if (confirmBtn) {
+              confirmBtn.onclick = () => applyCategory(detectedCategoryId);
+          }
+
+      })
+
+      .catch(err => console.error("Offline AI error:", err));
   }
 
-});
+  /* ================= APPLY CATEGORY ================= */
+
+  function applyCategory(id) {
+
+      categoryInput.value = id;
+
+      if(categoryLabel){
+          categoryLabel.style.display = "block";
+          categoryLabel.innerText = "Category: " + categoryNames[id];
+      }
+
+      catCards.forEach(card => card.classList.remove("active"));
+
+      const selectedCard =
+          document.querySelector(`[data-category-id="${id}"]`);
+
+      if (selectedCard) selectedCard.classList.add("active");
+
+      aiContainer.style.display = "none";
+      if(manualContainer) manualContainer.style.display = "none";
+  }
+
+  /* ================= CHANGE MANUALLY ================= */
+
+  window.closeAI = function () {
+
+      aiContainer.style.display = "none";
+
+      if(manualContainer){
+          manualContainer.style.display = "block";
+      }
+
+  }
+
+  /* ================= MANUAL CATEGORY CLICK ================= */
+
+  document.querySelectorAll("#manualCategoryContainer .cat-card")
+  .forEach(card => {
+
+      card.addEventListener("click", function(){
+
+          const id = this.dataset.categoryId;
+
+          applyCategory(id);
+
+      });
+
+  });
+
+}); // END DOMContentLoaded
+
 </script>
 
 </body>
