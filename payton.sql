@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 15, 2026 at 04:01 PM
+-- Generation Time: Mar 17, 2026 at 03:42 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -47,7 +47,8 @@ CREATE TABLE `budget` (
 INSERT INTO `budget` (`id`, `budget_name`, `budget_amount`, `start_date`, `end_date`, `user_id`, `sponsor_id`, `status`, `created_at`, `updated_at`) VALUES
 (35, 'March 10-20', 1000.00, '2026-03-10', '2026-03-20', 1, 2, 'Active', '2026-03-11 10:07:19', '2026-03-12 04:42:36'),
 (38, 'March 1-31', 10000.00, '2026-03-01', '2026-03-31', 5, 2, 'Active', '2026-03-12 05:39:40', '2026-03-12 05:39:40'),
-(39, 'March 25-30', 500.00, '2026-03-25', '2026-03-30', 1, 2, 'Inactive', '2026-03-20 17:08:26', '2026-03-20 17:08:26');
+(39, 'March 25-30', 500.00, '2026-03-25', '2026-03-30', 1, 2, 'Inactive', '2026-03-20 17:08:26', '2026-03-20 17:08:26'),
+(41, 'February 1 - 15', 400.00, '2026-02-01', '2026-02-15', 1, 2, 'Inactive', '2026-02-14 02:14:43', '2026-02-14 02:14:43');
 
 -- --------------------------------------------------------
 
@@ -133,7 +134,10 @@ INSERT INTO `expenses` (`id`, `user_id`, `budget_id`, `category_id`, `descriptio
 (67, 1, 39, 1, 'Mang Inasal', 125.00, 1, NULL, '2026-03-25', '2026-03-24 17:09:54', '2026-03-24 17:09:54'),
 (76, 1, 35, 1, 'Mang Inasal', 100.00, 1, NULL, '2026-03-15', '2026-03-15 13:19:24', '2026-03-15 13:19:24'),
 (77, 1, 35, 1, 'Snack', 50.00, 1, NULL, '2026-03-15', '2026-03-15 13:24:15', '2026-03-15 13:24:15'),
-(79, 1, 35, 1, 'Softdrink', 25.00, 1, NULL, '2026-03-15', '2026-03-15 13:51:26', '2026-03-15 13:51:26');
+(79, 1, 35, 1, 'Softdrink', 25.00, 1, NULL, '2026-03-15', '2026-03-15 13:51:26', '2026-03-15 13:51:26'),
+(83, 1, 35, 1, 'Jollibee', 10.00, 1, NULL, '2026-03-16', '2026-03-16 04:39:29', '2026-03-16 04:39:29'),
+(84, 1, 41, 1, 'Chicken Joy', 99.00, 1, NULL, '2026-02-11', '2026-02-11 02:15:22', '2026-02-11 02:15:22'),
+(85, 1, 41, 1, 'Taxi', 200.00, 1, NULL, '2026-02-11', '2026-02-11 02:15:43', '2026-02-11 02:15:43');
 
 -- --------------------------------------------------------
 
@@ -160,7 +164,7 @@ INSERT INTO `expense_shares` (`id`, `expense_id`, `user_id`, `people_id`, `amoun
 (12, 76, 1, 2, 25.00, 'paid', '2026-03-15 13:19:24'),
 (13, 76, 1, 3, 25.00, 'unpaid', '2026-03-15 13:19:24'),
 (14, 77, 1, 5, 16.67, 'unpaid', '2026-03-15 13:24:15'),
-(15, 77, 1, 4, 16.67, 'unpaid', '2026-03-15 13:24:15'),
+(15, 77, 1, 4, 16.67, 'paid', '2026-03-15 13:24:15'),
 (18, 79, 1, 1, 10.00, 'unpaid', '2026-03-15 13:51:26'),
 (19, 79, 1, 4, 10.00, 'unpaid', '2026-03-15 13:51:26');
 
@@ -274,7 +278,8 @@ INSERT INTO `scheduled_payments` (`id`, `user_id`, `payment_name`, `amount`, `du
 (29, 1, 'Water Bill', 143.00, '2026-03-28', NULL, NULL, 1, '2026-03-11 10:09:32', '2026-03-11 10:09:32'),
 (30, 1, 'Sample', 10.00, '2026-03-21', '2026-03-13', 2, 2, '2026-03-12 15:17:24', '2026-03-12 15:17:24'),
 (31, 1, 'Sample', 10.00, '2026-03-25', NULL, NULL, 1, '2026-03-12 15:25:57', '2026-03-12 15:25:57'),
-(32, 1, '16', 160.00, '2026-03-16', NULL, NULL, 1, '2026-03-14 18:17:45', '2026-03-14 18:17:45');
+(32, 1, '16', 160.00, '2026-03-16', NULL, NULL, 1, '2026-03-14 18:17:45', '2026-03-14 18:17:45'),
+(33, 1, 'Sample', 100.00, '2026-03-11', NULL, NULL, 1, '2026-03-16 02:42:41', '2026-03-16 02:42:41');
 
 -- --------------------------------------------------------
 
@@ -423,7 +428,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `budget`
 --
 ALTER TABLE `budget`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
 
 --
 -- AUTO_INCREMENT for table `category`
@@ -441,13 +446,13 @@ ALTER TABLE `due_status`
 -- AUTO_INCREMENT for table `expenses`
 --
 ALTER TABLE `expenses`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=80;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=86;
 
 --
 -- AUTO_INCREMENT for table `expense_shares`
 --
 ALTER TABLE `expense_shares`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
 -- AUTO_INCREMENT for table `notifications`
@@ -465,13 +470,13 @@ ALTER TABLE `payment_method`
 -- AUTO_INCREMENT for table `people`
 --
 ALTER TABLE `people`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `scheduled_payments`
 --
 ALTER TABLE `scheduled_payments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
 
 --
 -- AUTO_INCREMENT for table `sponsor_spender`
