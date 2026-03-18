@@ -1536,7 +1536,8 @@ tr:hover {
 
                 <div class="form-group">
                     <label>Description</label>
-                    <input type="text" name="description" id="descInput" placeholder="Transaction Name" required>
+                    <input type="text" id="descInput" name="description" placeholder="What did you buy?">
+
                 </div>
 
                 <div class="ai-suggested-container">
@@ -1720,250 +1721,135 @@ tr:hover {
 
 <script>
 
-// Function to manually close the toast
+/* Keep these outside so HTML onclick can see them */
 function closeToast(button) {
     const toast = button.closest('.custom-toast');
     toast.classList.add('fade-out');
     setTimeout(() => toast.remove(), 400);
 }
 
+function closeAI() {
+    document.getElementById('aiPredictionContainer').style.display = "none";
+    const manual = document.getElementById('manualCategoryContainer');
+    if (manual) manual.style.display = "block";
+}
+
 document.addEventListener("DOMContentLoaded", () => {
-
-  /* ================= AUTO REMOVE TOAST ================= */
-  document.querySelectorAll('.custom-toast').forEach(toast => {
-      setTimeout(() => {
-          if (toast.parentElement) {
-              toast.classList.add('fade-out');
-              setTimeout(() => toast.remove(), 400);
-          }
-      }, 5000);
-  });
-
-  /* ================= BASIC ELEMENTS ================= */
-  const fab = document.querySelector('.fab');
-  const modalOverlay = document.getElementById('modalOverlay');
-  const closeBtn = document.querySelector('.close-btn');
-  const catCards = document.querySelectorAll('.cat-card');
-  const categoryInput = document.getElementById('categoryInput');
-  const descInput = document.getElementById("descInput");
-
-  const aiContainer = document.getElementById('aiPredictionContainer');
-  const manualContainer = document.getElementById('manualCategoryContainer');
-  const categoryLabel = document.getElementById('selectedCategoryLabel');
-
-  /* ================= MODAL OPEN/CLOSE ================= */
-
-  fab?.addEventListener('click', () => {
-      modalOverlay.style.display = 'flex';
-
-      // reset AI UI
-      aiContainer.style.display = "none";
-      if(manualContainer) manualContainer.style.display = "none";
-  });
-
-  closeBtn?.addEventListener('click', () => {
-      modalOverlay.style.display = 'none';
-  });
-
-  /* ================= CATEGORY CLICK ================= */
-
-  catCards.forEach(card => {
-      card.addEventListener('click', () => {
-
-          catCards.forEach(c => c.classList.remove('active'));
-          card.classList.add('active');
-
-          const id = card.getAttribute('data-category-id');
-          categoryInput.value = id;
-
-          if(categoryLabel){
-              categoryLabel.style.display = "block";
-              categoryLabel.innerText = "Category: " + categoryNames[id];
-          }
-
-      });
-  });
-
-  /* ================= EDIT EXPENSE ================= */
-
-  document.querySelectorAll('.btn-edit').forEach(btn => {
-      btn.addEventListener('click', function(e) {
-
-          e.preventDefault();
-
-          const id = this.dataset.id;
-          const category = this.dataset.category;
-          const description = this.dataset.description;
-          const amount = this.dataset.amount;
-          const payment = this.dataset.payment;
-          const receipt = this.dataset.receipt;
-
-          modalOverlay.style.display = 'flex';
-
-          categoryInput.value = category;
-
-          catCards.forEach(c => c.classList.remove('active'));
-          document.querySelector(`.cat-card[data-category-id="${category}"]`)
-              ?.classList.add('active');
-
-          document.querySelector('input[name="description"]').value = description;
-          document.querySelector('input[name="amount"]').value = amount;
-          document.querySelector('select[name="payment_method_id"]').value = payment;
-
-          const receiptLabel = document.getElementById('currentReceipt');
-          receiptLabel.textContent = receipt
-              ? `Current Receipt: ${receipt.split('/').pop()}`
-              : 'No receipt uploaded';
-
-          const btnSave = document.querySelector('.btn-save');
-          btnSave.textContent = 'Update Expense';
-
-          let hiddenInput = document.querySelector('input[name="expense_id"]');
-
-          if (!hiddenInput) {
-              hiddenInput = document.createElement('input');
-              hiddenInput.type = 'hidden';
-              hiddenInput.name = 'expense_id';
-              document.querySelector('.expense-form').appendChild(hiddenInput);
-          }
-
-          hiddenInput.value = id;
-
-          document.querySelector('.expense-form').action = 'update_expense_process.php';
-      });
-  });
-
-  /* ================= VIEW RECEIPT ================= */
-
-  const receiptModal = document.getElementById('receiptModal');
-  const receiptImage = document.getElementById('receiptImage');
-
-  document.querySelectorAll('.btn-view-receipt').forEach(btn => {
-      btn.addEventListener('click', () => {
-          receiptImage.src = btn.dataset.receipt;
-          receiptModal.style.display = 'flex';
-      });
-  });
-
-  document.querySelector('.close-receipt-btn')?.addEventListener('click', () => {
-      receiptModal.style.display = 'none';
-      receiptImage.src = '';
-  });
-
-  /* ================= AI AUTO CATEGORIZE ================= */
-
-  let typingTimer;
-  const delay = 300;
-
-  const categoryNames = {
-      1: "Food & Dining",
-      2: "Transportation",
-      3: "Housing / Rent",
-      4: "Bills & Utilities",
-      5: "Health & Personal Care",
-      6: "Education",
-      7: "Entertainment & Leisure",
-      8: "Shopping",
-      9: "Savings & Investments",
-      10: "Miscellaneous"
-  };
-
-  descInput?.addEventListener("input", () => {
-      clearTimeout(typingTimer);
-      typingTimer = setTimeout(() => classifyOffline(descInput.value), delay);
-  });
-
-  function classifyOffline(text) {
-
-      if (!text.trim()) {
-          aiContainer.style.display = 'none';
-          return;
-      }
-
-      fetch("local_categorize.php", {
-          method: "POST",
-          headers: { "Content-Type": "application/x-www-form-urlencoded" },
-          body: "description=" + encodeURIComponent(text)
-      })
-
-      .then(res => res.json())
-
-      .then(data => {
-
-          const detectedCategoryId = data.category_id || 10;
-          const confidence = data.confidence || 10;
-
-          const catName = categoryNames[detectedCategoryId];
-
-          document.getElementById('predictedCategoryName').innerText = catName.toUpperCase();
-          document.getElementById('primaryLabel').innerText = catName;
-
-          document.querySelectorAll('.dynamic-pct')
-          .forEach(el => el.innerText = confidence + "%");
-
-          aiContainer.style.display = 'block';
-
-          const confirmBtn = document.getElementById('confirmAI');
-
-          if (confirmBtn) {
-              confirmBtn.onclick = () => applyCategory(detectedCategoryId);
-          }
-
-      })
-
-      .catch(err => console.error("Offline AI error:", err));
-  }
-
-  /* ================= APPLY CATEGORY ================= */
-
-  function applyCategory(id) {
-
-      categoryInput.value = id;
-
-      if(categoryLabel){
-          categoryLabel.style.display = "block";
-          categoryLabel.innerText = "Category: " + categoryNames[id];
-      }
-
-      catCards.forEach(card => card.classList.remove("active"));
-
-      const selectedCard =
-          document.querySelector(`[data-category-id="${id}"]`);
-
-      if (selectedCard) selectedCard.classList.add("active");
-
-      aiContainer.style.display = "none";
-      if(manualContainer) manualContainer.style.display = "none";
-  }
-
-  /* ================= CHANGE MANUALLY ================= */
-
-  window.closeAI = function () {
-
-      aiContainer.style.display = "none";
-
-      if(manualContainer){
-          manualContainer.style.display = "block";
-      }
-
-  }
-
-  /* ================= MANUAL CATEGORY CLICK ================= */
-
-  document.querySelectorAll("#manualCategoryContainer .cat-card")
-  .forEach(card => {
-
-      card.addEventListener("click", function(){
-
-          const id = this.dataset.categoryId;
-
-          applyCategory(id);
-
-      });
-
-  });
-
-}); // END DOMContentLoaded
+    /* ================= ELEMENTS ================= */
+    const fab = document.querySelector('.fab');
+    const modalOverlay = document.getElementById('modalOverlay');
+    const closeBtn = document.querySelector('.close-btn');
+    const catCards = document.querySelectorAll('.cat-card');
+    const categoryInput = document.getElementById('categoryInput'); 
+    const descInput = document.getElementById("descInput");
+    const aiContainer = document.getElementById('aiPredictionContainer');
+    const manualContainer = document.getElementById('manualCategoryContainer');
+    const categoryLabel = document.getElementById('selectedCategoryLabel');
+
+    const categoryNames = {
+        1: "Food & Dining", 2: "Transportation", 3: "Housing / Rent",
+        4: "Bills & Utilities", 5: "Health & Personal Care", 6: "Education",
+        7: "Entertainment & Leisure", 8: "Shopping", 9: "Savings & Investments",
+        10: "Miscellaneous"
+    };
+
+    /* ================= APPLY CATEGORY (Unified) ================= */
+    function applyCategory(id, name) {
+        categoryInput.value = id;
+        if(categoryLabel) categoryLabel.innerText = name;
+        
+        // Update visual state of cards in the manual grid
+        catCards.forEach(card => {
+            card.classList.toggle('active', card.getAttribute('data-category-id') == id);
+        });
+    }
+
+    /* ================= AI LOGIC ================= */
+    let typingTimer;
+    descInput?.addEventListener("input", () => {
+        clearTimeout(typingTimer);
+        const text = descInput.value.trim();
+        
+        if (text.length < 3) {
+            aiContainer.style.display = 'none';
+            return;
+        }
+
+        typingTimer = setTimeout(async () => {
+            document.getElementById('predictedCategoryName').innerText = "Analyzing...";
+            
+            try {
+                let formData = new FormData();
+                formData.append('description', text);
+
+                const response = await fetch('local_categorize.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+
+                aiContainer.style.display = 'block';
+                if(manualContainer) manualContainer.style.display = 'none';
+
+                const catName = data.category_name;
+                document.getElementById('predictedCategoryName').innerText = catName.toUpperCase();
+                if(document.getElementById('primaryLabel')) {
+                    document.getElementById('primaryLabel').innerText = catName;
+                }
+
+                const rotation = (data.confidence / 100) * 180;
+                document.querySelector('.gauge-box .arc').style.transform = `rotate(${rotation}deg)`;
+                document.querySelectorAll('.dynamic-pct').forEach(el => el.innerText = data.confidence + "%");
+
+                document.getElementById('confirmAI').onclick = () => {
+                    applyCategory(data.category_id, catName);
+                    aiContainer.style.display = 'none';
+                };
+            } catch (err) {
+                console.error("AI Error:", err);
+            }
+        }, 800);
+    });
+
+    /* ================= MANUAL SELECTION ================= */
+    catCards.forEach(card => {
+        card.addEventListener('click', () => {
+            const id = card.getAttribute('data-category-id');
+            applyCategory(id, categoryNames[id]);
+        });
+    });
+
+    /* ================= MODAL CONTROLS ================= */
+    fab?.addEventListener('click', () => {
+        modalOverlay.style.display = 'flex';
+        aiContainer.style.display = "none";
+        if(manualContainer) manualContainer.style.display = "none";
+        document.querySelector('.expense-form').reset();
+        document.getElementById('submitBtn').textContent = 'Add Expense';
+        document.querySelector('.expense-form').action = 'add_expense_process.php';
+    });
+
+    closeBtn?.addEventListener('click', () => { modalOverlay.style.display = 'none'; });
+
+    /* ================= EDIT LOGIC ================= */
+    document.querySelectorAll('.btn-edit').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const d = this.dataset;
+            modalOverlay.style.display = 'flex';
+            
+            applyCategory(d.category, categoryNames[d.category]);
+            
+            document.querySelector('input[name="description"]').value = d.description;
+            document.querySelector('input[name="amount"]').value = d.amount;
+            document.querySelector('select[name="payment_method_id"]').value = d.payment;
+
+            document.getElementById('submitBtn').textContent = 'Update Expense';
+            document.querySelector('.expense-form').action = 'update_expense_process.php';
+            document.getElementById('expenseId').value = d.id;
+        });
+    });
+});
 
 </script>
 
