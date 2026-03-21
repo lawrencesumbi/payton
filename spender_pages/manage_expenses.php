@@ -125,6 +125,15 @@ foreach ($categoryBreakdown as $category => $amount) {
 
 arsort($categoryBreakdown);
 
+$analyticsStmt = $conn->prepare("
+    SELECT amount, expense_date
+    FROM expenses
+    WHERE user_id = ?
+");
+$analyticsStmt->execute([$user_id]);
+$allExpenses = $analyticsStmt->fetchAll(PDO::FETCH_ASSOC);
+
+
 /* =====================================================
    MONTHLY ANALYTICS
 ===================================================== */
@@ -133,7 +142,7 @@ $startOfThisMonth = (clone $now)->modify('first day of this month')->setTime(0,0
 $startOfNextMonth = (clone $startOfThisMonth)->modify('+1 month');
 $startOfPrevMonth = (clone $startOfThisMonth)->modify('-1 month');
 
-foreach ($expenses as $exp) {
+foreach ($allExpenses as $exp) {
     $d = new DateTime($exp['expense_date']);
     $amt = floatval($exp['amount']);
     if ($d >= $startOfThisMonth && $d < $startOfNextMonth) {
