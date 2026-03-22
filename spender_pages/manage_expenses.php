@@ -10,13 +10,26 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = $_SESSION['user_id'];
 
+/* =====================================================
+   FETCH ACTIVE BUDGET
+===================================================== */
+$budgetStmt = $conn->prepare("
+    SELECT id, budget_amount, start_date, end_date, status
+    FROM budget
+    WHERE user_id = :user_id
+      AND status = 'Active'
+      AND CURDATE() BETWEEN start_date AND end_date
+    LIMIT 1
+");
+$budgetStmt->execute(['user_id' => $user_id]);
+$activeBudget = $budgetStmt->fetch(PDO::FETCH_ASSOC);
 
 /* =====================================================
-   SAFE INITIALIZATION (PREVENT WARNINGS)
+   SAFE INITIALIZATION
 ===================================================== */
 $expenses = [];
-$totalExpenses = 0;      // analytics total (ALL)
-$budgetExpenses = 0;     // budget-only expenses
+$totalExpenses = 0;       // Analytics total
+$budgetExpenses = 0;      // Expenses inside current budget
 $categoryBreakdown = [];
 $categoryPercentages = [];
 $thisMonthTotal = 0;
@@ -24,258 +37,116 @@ $prevMonthTotal = 0;
 $budgetLeft = 0;
 $budgetExpired = false;
 
+$budgetId     = $activeBudget['id'] ?? null;
+$budgetAmount = floatval($activeBudget['budget_amount'] ?? 0);
+$budgetStart  = $activeBudget['start_date'] ?? null;
+$budgetEnd    = $activeBudget['end_date'] ?? null;
 
 /* =====================================================
-   GET USER LATEST BUDGET
-===================================================== */
-$budgetStmt = $conn->prepare("
-    SELECT id, budget_amount, start_date, end_date
-    FROM budget
-    WHERE user_id = ?
-    ORDER BY id DESC
-    LIMIT 1
-");
-$budgetStmt->execute([$user_id]);
-$budget = $budgetStmt->fetch(PDO::FETCH_ASSOC);
-
-$budgetId     = $budget['id'] ?? null;
-$budgetAmount = $budget['budget_amount'] ?? 0;
-$budgetStart  = $budget['start_date'] ?? null;
-$budgetEnd    = $budget['end_date'] ?? null;
-
-
-/* =====================================================
-   CHECK IF BUDGET EXPIRED (DISPLAY PURPOSE ONLY)
+   CHECK IF BUDGET EXPIRED
 ===================================================== */
 $today = new DateTime();
-
 if ($budgetEnd) {
-    // Compare only dates, not times
     $budgetEndDate = new DateTime($budgetEnd);
-    $todayDate = new DateTime(); 
-    $todayDate->setTime(0,0,0);  // ignore the time
-
+    $todayDate = (clone $today)->setTime(0,0,0);
     if ($todayDate > $budgetEndDate) {
         $budgetExpired = true;
         $budgetAmount = 0;
     }
 }
 
-
 /* =====================================================
-   FETCH ALL USER EXPENSES (FOR ANALYTICS PAGE)
+   FETCH EXPENSES WITHIN ACTIVE BUDGET PERIOD
 ===================================================== */
-$stmt = $conn->prepare("
-    SELECT 
-        e.id,
-        e.description,
-        e.amount,
-        e.expense_date,
-        e.receipt_upload,
-        e.category_id,
-        e.payment_method_id,
-        c.category_name,
-        pm.payment_method_name
-    FROM expenses e
-    JOIN category c ON e.category_id = c.id
-    JOIN payment_method pm ON e.payment_method_id = pm.id
-    WHERE e.user_id = ?
-    ORDER BY id DESC
-");
-
-$stmt->execute([$user_id]);
-$expenses = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-
-
-
-
-/* =====================================================
-   ✅ CALCULATE EXPENSES INSIDE CURRENT BUDGET ONLY
-===================================================== */
-if (!$budgetExpired && $budgetStart && $budgetEnd) {
-
-    $budgetExpStmt = $conn->prepare("
-        SELECT SUM(amount) AS total
-        FROM expenses
-        WHERE user_id = ?
-        AND expense_date BETWEEN ? AND ?
+if ($budgetId && $budgetStart && $budgetEnd) {
+    $stmt = $conn->prepare("
+        SELECT e.id, e.description, e.amount, e.expense_date, e.receipt_upload,
+               e.category_id, e.payment_method_id, c.category_name, pm.payment_method_name,
+               e.budget_id
+        FROM expenses e
+        LEFT JOIN category c ON e.category_id = c.id
+        LEFT JOIN payment_method pm ON e.payment_method_id = pm.id
+        WHERE e.user_id = ?
+          AND e.budget_id = ?
+          AND e.expense_date BETWEEN ? AND ?
+        ORDER BY e.expense_date DESC
     ");
-
-    $budgetExpStmt->execute([
-        $user_id,
-        $budgetStart,
-        $budgetEnd
-    ]);
-
-    $budgetExpenses =
-        $budgetExpStmt->fetch(PDO::FETCH_ASSOC)['total'] ?? 0;
+    $stmt->execute([$user_id, $budgetId, $budgetStart, $budgetEnd]);
+    $expenses = $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
-
-
 /* =====================================================
-   ✅ CORRECT BUDGET LEFT CALCULATION
-   (NO MORE OLD EXPENSE DEDUCTION)
+   CALCULATE EXPENSES INSIDE CURRENT BUDGET
 ===================================================== */
+$budgetExpenses = 0;
+foreach ($expenses as $exp) {
+    $budgetExpenses += floatval($exp['amount']);
+}
+// ✅ Calculate remaining allowance (never negative)
 $budgetLeft = max(0, $budgetAmount - $budgetExpenses);
 
 /* =====================================================
    TOTAL EXPENSES (ANALYTICS ONLY)
 ===================================================== */
-
 $totalExpenses = ($budgetAmount - $budgetLeft);
 
-
-
 /* =====================================================
-   CATEGORY BREAKDOWN (ALL EXPENSES)
+   CATEGORY BREAKDOWN & PERCENTAGES
 ===================================================== */
-$catStmt = $conn->prepare("SELECT id, category_name FROM category");
-$catStmt->execute();
-$allCategories = $catStmt->fetchAll(PDO::FETCH_ASSOC);
+$allCategoriesStmt = $conn->query("SELECT id, category_name FROM category");
+$allCategories = $allCategoriesStmt->fetchAll(PDO::FETCH_ASSOC);
 
+// Initialize breakdown
 foreach ($allCategories as $cat) {
     $categoryBreakdown[$cat['category_name']] = 0;
 }
 
+// Sum expenses inside budget
 foreach ($expenses as $exp) {
-    $category = $exp['category_name'];
-    $amount = floatval($exp['amount']);
-    $categoryBreakdown[$category] += $amount;
+    $categoryBreakdown[$exp['category_name']] += floatval($exp['amount']);
 }
 
-if ($totalExpenses > 0) {
-    foreach ($categoryBreakdown as $category => $amount) {
-        $categoryPercentages[$category] =
-            round(($amount / $totalExpenses) * 100, 1);
-    }
-} else {
-    foreach ($categoryBreakdown as $category => $amount) {
-        $categoryPercentages[$category] = 0;
-    }
+// Calculate percentages
+foreach ($categoryBreakdown as $category => $amount) {
+    $categoryPercentages[$category] = $totalExpenses > 0 ? round(($amount / $totalExpenses) * 100, 2) : 0;
 }
 
 arsort($categoryBreakdown);
 
-
 /* =====================================================
-   MONTHLY ANALYTICS (ALWAYS RUNS)
+   MONTHLY ANALYTICS
 ===================================================== */
 $now = new DateTime();
-
-$startOfThisMonth = (clone $now)
-    ->modify('first day of this month')
-    ->setTime(0,0,0);
-
+$startOfThisMonth = (clone $now)->modify('first day of this month')->setTime(0,0,0);
 $startOfNextMonth = (clone $startOfThisMonth)->modify('+1 month');
 $startOfPrevMonth = (clone $startOfThisMonth)->modify('-1 month');
 
 foreach ($expenses as $exp) {
-
     $d = new DateTime($exp['expense_date']);
-
+    $amt = floatval($exp['amount']);
     if ($d >= $startOfThisMonth && $d < $startOfNextMonth) {
-        $thisMonthTotal += floatval($exp['amount']);
+        $thisMonthTotal += $amt;
     }
-
     if ($d >= $startOfPrevMonth && $d < $startOfThisMonth) {
-        $prevMonthTotal += floatval($exp['amount']);
+        $prevMonthTotal += $amt;
     }
 }
-
 
 /* =====================================================
    MONTH CHANGE %
 ===================================================== */
 if ($prevMonthTotal > 0) {
-    $monthChangePct =
-        round((($thisMonthTotal - $prevMonthTotal) / $prevMonthTotal) * 100, 1);
+    $monthChangePct = round((($thisMonthTotal - $prevMonthTotal) / $prevMonthTotal) * 100, 1);
 } elseif ($thisMonthTotal > 0) {
     $monthChangePct = 100.0;
 } else {
     $monthChangePct = 0.0;
 }
 
-
-
-$stmt = $conn->prepare("
-    SELECT e.*, 
-           b.status AS budget_status, 
-           b.budget_name,
-           c.category_name,
-           p.payment_method_name
-    FROM expenses e
-    JOIN budget b ON e.budget_id = b.id
-    LEFT JOIN category c ON e.category_id = c.id
-    LEFT JOIN payment_method p ON e.payment_method_id = p.id
-    WHERE e.user_id = ? 
-      AND b.status = 'Active'
-    ORDER BY id DESC
-");
-
-$stmt->execute([$user_id]);
-$expenses = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-
-
-// 1️⃣ Fetch all categories
-$allCategoriesStmt = $conn->query("SELECT id, category_name FROM category");
-$allCategories = $allCategoriesStmt->fetchAll(PDO::FETCH_ASSOC);
-
-// 2️⃣ Get active budgets
-$activeBudgetsStmt = $conn->prepare("
-    SELECT id 
-    FROM budget 
-    WHERE user_id = ? AND status = 'Active'
-");
-$activeBudgetsStmt->execute([$user_id]);
-$activeBudgetIds = $activeBudgetsStmt->fetchAll(PDO::FETCH_COLUMN);
-
-// 3️⃣ Prepare arrays
-$categoryBreakdown = [];
-$categoryPercentages = [];
-$totalAmount = 0; // ✅ Initialize totalAmount to 0
-
-if (!empty($activeBudgetIds)) {
-    $placeholders = implode(',', array_fill(0, count($activeBudgetIds), '?'));
-
-    // 4️⃣ Fetch expenses JOIN categories for active budgets
-    $expensesStmt = $conn->prepare("
-        SELECT c.id AS category_id, c.category_name, SUM(e.amount) AS total_amount
-        FROM expenses e
-        JOIN category c ON e.category_id = c.id
-        WHERE e.budget_id IN ($placeholders)
-        GROUP BY c.id, c.category_name
-    ");
-    $expensesStmt->execute($activeBudgetIds);
-    $activeExpenses = $expensesStmt->fetchAll(PDO::FETCH_ASSOC);
-
-    // Map totals by category name
-    foreach ($activeExpenses as $exp) {
-        $categoryBreakdown[$exp['category_name']] = floatval($exp['total_amount']);
-        $totalAmount += floatval($exp['total_amount']);
-    }
-}
-
-// 5️⃣ Fill in missing categories with 0
-foreach ($allCategories as $cat) {
-    $name = $cat['category_name'];
-    if (!isset($categoryBreakdown[$name])) {
-        $categoryBreakdown[$name] = 0;
-    }
-}
-
-// 6️⃣ Calculate percentages (safe even if $totalAmount = 0)
-foreach ($allCategories as $cat) {
-    $name = $cat['category_name'];
-    $amt = $categoryBreakdown[$name];
-    $categoryPercentages[$name] = $totalAmount > 0 ? round(($amt / $totalAmount) * 100, 2) : 0;
-}
-
-
-
-
-
+/* =====================================================
+   READY: $budgetLeft WILL NEVER BE NEGATIVE
+   Use $budgetLeft when adding new expense:
+   if ($newExpenseAmount > $budgetLeft) => prevent insertion
+===================================================== */
 ?>
 
 <!DOCTYPE html>
@@ -1092,67 +963,55 @@ tr:hover {
 </div>
 
 <div class="table-container">
-<table>
-    <thead>
-        <tr>
-            <th>No.</th>
-            <th>Description</th>
-            <th>Category</th>
-            
-            <th>Amount</th>
-            <th>Payment Method</th>
-            <th>Date</th>
-            <th>Receipt</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-    <?php 
-    // Filter expenses for only those whose budget status is Active
-    $activeExpenses = array_filter($expenses, function($exp) {
-        return isset($exp['budget_status']) && $exp['budget_status'] === "Active";
-    });
-    ?>
-
-    <?php if ($activeExpenses): ?>
-        <?php foreach ($activeExpenses as $index => $exp): ?>
+    <table>
+        <thead>
             <tr>
-                <td><?= $index + 1 ?></td>
-                <td><?= htmlspecialchars($exp['description']) ?></td>
-                <td><?= htmlspecialchars($exp['category_name']) ?></td>
-                <td>₱ <?= number_format($exp['amount'], 2) ?></td>
-                <td><?= htmlspecialchars($exp['payment_method_name']) ?></td>
-                <td><?= date("M d, Y", strtotime($exp['expense_date'])) ?></td>
-                <td>
-                    <?php if ($exp['receipt_upload']): ?>
-                        <button class="btn-view-receipt" data-receipt="<?= htmlspecialchars($exp['receipt_upload']) ?>">👁 View</button>
-                    <?php else: ?>
-                        -
-                    <?php endif; ?>
-                </td>
-                <td class="actions"> 
-                    <a href="#"
-                        class="btn-edit"
-                        data-id="<?= $exp['id'] ?>"
-                        data-category="<?= $exp['category_id'] ?>"
-                        data-description="<?= htmlspecialchars($exp['description']) ?>"
-                        data-amount="<?= $exp['amount'] ?>"
-                        data-payment="<?= $exp['payment_method_id'] ?>"
-                        data-receipt="<?= htmlspecialchars($exp['receipt_upload']) ?>">
-                        ✏️ Edit
-                    </a>
-
-                    <a href="delete_expense.php?id=<?= $exp['id'] ?>" class="btn-delete" onclick="return confirm('Delete this expense?');">🗑 Delete</a>
-                </td>
+                <th>No.</th>
+                <th>Description</th>
+                <th>Category</th>
+                <th>Amount</th>
+                <th>Payment Method</th>
+                <th>Date</th>
+                <th>Receipt</th>
+                <th>Actions</th>
             </tr>
-        <?php endforeach; ?>
-    <?php else: ?>
-        <tr><td colspan="8" style="text-align:center;">No expenses recorded yet.</td></tr>
-    <?php endif; ?>
-</tbody>
-</table>
-
-</div>
+        </thead>
+        <tbody>
+            <?php if (!empty($expenses)): ?>
+                <?php foreach ($expenses as $index => $exp): ?>
+                    <tr>
+                        <td><?= $index + 1 ?></td>
+                        <td><?= htmlspecialchars($exp['description']) ?></td>
+                        <td><?= htmlspecialchars($exp['category_name']) ?></td>
+                        <td>₱ <?= number_format($exp['amount'], 2) ?></td>
+                        <td><?= htmlspecialchars($exp['payment_method_name']) ?></td>
+                        <td><?= date("M d, Y", strtotime($exp['expense_date'])) ?></td>
+                        <td>
+                            <?php if ($exp['receipt_upload']): ?>
+                                <button class="btn-view-receipt" data-receipt="<?= htmlspecialchars($exp['receipt_upload']) ?>">👁 View</button>
+                            <?php else: ?>
+                                -
+                            <?php endif; ?>
+                        </td>
+                        <td class="actions"> 
+                            <a href="#" class="btn-edit"
+                                data-id="<?= $exp['id'] ?>"
+                                data-category="<?= $exp['category_id'] ?>"
+                                data-description="<?= htmlspecialchars($exp['description']) ?>"
+                                data-amount="<?= $exp['amount'] ?>"
+                                data-payment="<?= $exp['payment_method_id'] ?>"
+                                data-receipt="<?= htmlspecialchars($exp['receipt_upload']) ?>">
+                                ✏️ Edit
+                            </a>
+                            <a href="delete_expense.php?id=<?= $exp['id'] ?>" class="btn-delete" onclick="return confirm('Delete this expense?');">🗑 Delete</a>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <tr><td colspan="8" style="text-align:center;">No expenses recorded yet.</td></tr>
+            <?php endif; ?>
+        </tbody>
+    </table>
 </div>
 
 
