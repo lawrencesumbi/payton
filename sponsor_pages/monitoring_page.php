@@ -90,7 +90,23 @@ if ($selected_spender && $selected_allowance) {
             background-color: var(--bg-body);
             color: #334155;
         }
+        /* --- Force Hide Scrollbar but allow scrolling --- */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            /* Hide for IE, Edge and Firefox */
+            -ms-overflow-style: none;  
+            scrollbar-width: none;  
+        }
 
+        /* Hide for Chrome, Safari and Opera */
+        html::-webkit-scrollbar, 
+        body::-webkit-scrollbar {
+            display: none;
+            width: 0 !important;
+            height: 0 !important;
+        }
         .main-wrapper {
             width: 100%;
             margin: 0 auto;

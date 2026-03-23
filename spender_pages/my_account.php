@@ -115,7 +115,23 @@ if (isset($_POST['remove_photo'])) {
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
         body { background: var(--bg); color: var(--text-main);}
+        /* --- Force Hide Scrollbar but allow scrolling --- */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            /* Hide for IE, Edge and Firefox */
+            -ms-overflow-style: none;  
+            scrollbar-width: none;  
+        }
 
+        /* Hide for Chrome, Safari and Opera */
+        html::-webkit-scrollbar, 
+        body::-webkit-scrollbar {
+            display: none;
+            width: 0 !important;
+            height: 0 !important;
+        }
         .acc-container { width: 100%;}
         .acc-header { margin-bottom: 24px; }
         .acc-header h1 { font-size: 24px; font-weight: 800; color: #0f172a; }

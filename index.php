@@ -13,8 +13,44 @@
 
 * {margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
 html{scroll-behavior: smooth;}
-body {background: #f5f7fb;}
-.navbar {width: 100%; background: white; display: flex; justify-content: space-between; align-items: center; padding: 18px 60px; box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.08); position: fixed; top: 0;  left: 0;  z-index: 999;}
+body {background: #f5f7fb; overflow-x: hidden;} /* Added overflow-x to prevent scroll bounce */
+
+/* --- Force Hide Scrollbar but allow scrolling --- */
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    /* Hide for IE, Edge and Firefox */
+    -ms-overflow-style: none;  
+    scrollbar-width: none;  
+}
+
+/* Hide for Chrome, Safari and Opera */
+html::-webkit-scrollbar, 
+body::-webkit-scrollbar {
+    display: none;
+    width: 0 !important;
+    height: 0 !important;
+}
+
+/* --- Effect: Glassmorphism Navbar --- */
+.navbar {
+    width: 100%; 
+    background: rgba(255, 255, 255, 0.8); 
+    backdrop-filter: blur(10px); 
+    -webkit-backdrop-filter: blur(10px);
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    padding: 18px 60px; 
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.08); 
+    position: fixed; 
+    top: 0;  
+    left: 0;  
+    z-index: 999;
+    transition: all 0.4s ease; /* For the shrink effect */
+}
+
 .left-nav{width: 150px;  display: flex; justify-content: space-between;}
 .left-nav img{width: 50px; height: 50px; border-radius: 10px;}
 .left-nav h3{font-size: 25px; font-weight: bold; color: #111; padding-top: 10px;}
@@ -23,7 +59,9 @@ body {background: #f5f7fb;}
 .nav-links li a:hover { color: #7f308f;}
 .btn-start { text-decoration: none; background: #7f308f; color: white; padding: 10px 18px; border-radius: 20px; font-size: 14px; font-weight: 700; transition: 0.3s;}
 .btn-start:hover { background: #7f308f; transform: scale(1.05);}
+
 section{min-height: 100vh;}
+
 .home { width: 100%; padding: 50px 20px; background: white;}
 .home-container {max-width: 1200px; height: auto; margin: auto; display: flex; justify-content: space-between; align-items: center; gap: 40px;}
 .home-text { position: relative; z-index: 2; width: 50%; margin-top: 200px; margin-left: 40px; margin-bottom: 200px; animation: slideInLeft 1s ease forwards;}
@@ -36,8 +74,16 @@ section{min-height: 100vh;}
 .home-text .btn-start:hover { background: #c084fc; color: #2b0a3d; transform: translateY(-3px);}
 .home-text .btn-contact { text-decoration: none; background: #7f308f; color: white; padding: 10px 18px; border-radius: 20px; font-size: 14px; font-weight: 700; transition: 0.3s;}
 .home-text .btn-contact:hover { background: #c084fc; color: #2b0a3d; transform: translateY(-3px);}
-.home-image {width: 500px; height: 500px; margin-right: 25px;}
+
+/* --- Effect: Floating Hero Image --- */
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
+  100% { transform: translateY(0px); }
+}
+.home-image {width: 500px; height: 500px; margin-right: 25px; animation: float 4s ease-in-out infinite;}
 .home-image img { width: 100%; height: 100%; object-fit: contain; border-radius: 20px;}
+
 @media (max-width: 768px) { 
 .home-container { flex-direction: column; text-align: center;}
 .home-text, .home-image {width: 100%; text-align: center;}
@@ -46,7 +92,9 @@ section{min-height: 100vh;}
 .home-text h1 { font-size: 36px; text-align: center;}
 .home-text p { font-size: 16px; text-align: center;}
 .home-text .btn-container { justify-content: center;}}
+
 @keyframes slideInLeft { from { opacity: 0; transform: translateX(-50px);}to{opacity: 1; transform: translateX(0);}}
+
 .about{padding-top: 150px; background-color: white;}
 .about-container { max-width: 1200px; margin: auto; display: flex; gap: 40px; align-items: center; z-index: 1; position: relative;}
 .about-left { width: 50%; text-align: center;}
@@ -67,6 +115,7 @@ section{min-height: 100vh;}
 .about-text .pay { color: #9357f5;}
 .about-text .ton { color: #7a1fa2;}
 .about-text p { font-size: 18px; line-height: 1.7; color: #09050f; margin-bottom: 20px; text-align: justify;}
+
 @media (max-width: 900px) {
 .about-container { flex-direction: column;}
 .about-left, .about-text { width: 100%;}
@@ -75,6 +124,7 @@ section{min-height: 100vh;}
 .about-container { flex-direction: column; text-align: center;}
 .about-text, .about-image { width: 100%; text-align: center;}
 .about-image img {margin: auto;}}
+
 .services {background: #f9f6ff; padding-top: 150px;}
 .services-container {max-width: 1200px; margin: auto; text-align: center;}
 .services h2 { font-size: 36px; font-weight: 800; color: #7f308f; margin-bottom: 15px;}
@@ -85,10 +135,12 @@ section{min-height: 100vh;}
 .service-icon { font-size: 40px; margin-bottom: 15px; color: #9357f5; transition: transform 0.3s;}
 .service-card h3 { font-size: 18px; margin-bottom: 10px; color: #7f308f;}
 .service-img { width: 100%; height: 150px; object-fit: cover; border-radius: 15px; margin-bottom: 15px;}
+
 @media (max-width: 768px) {
 .service-card { text-align: center; padding: 20px;}
 .service-card ul {padding-left: 0; list-style: none;}
 .service-icon {margin-bottom: 12px;}}
+
 .contact { padding-top: 180px; background: #f4f0ff;}
 .contact-container { max-width: 900px; margin: auto;}
 .contact h2 { font-size: 36px; font-weight: 800; color: #7f308f; margin-bottom: 15px; text-align: center;}
@@ -100,8 +152,16 @@ section{min-height: 100vh;}
 .team-member { display: flex; flex-direction: column; align-items: center; gap: 10px;}
 .team-name { margin-top: 10px; font-weight: 700; font-size: 15px; color: #09050f; text-align: center;}
 .team-role {margin-top: 3px; font-size: 13px; color: #555; text-align: center;}
-.team-img { width: 100px; height: 100px; border-radius: 50%; justify-content: center; object-fit: cover; border: 3px solid #9357f5; box-shadow: 0 6px 15px rgba(0, 0, 0, 0.12); transition: transform 0.3s, box-shadow 0.3s;}
+
+/* --- Effect: Team Image Transition Base --- */
+.team-img { 
+    width: 100px; height: 100px; border-radius: 50%; justify-content: center; object-fit: cover; border: 3px solid #9357f5; 
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.12); 
+    transition: transform 0.3s ease-out, box-shadow 0.3s; 
+    will-change: transform;
+}
 .team-img:hover { transform: scale(1.12); box-shadow: 0 10px 20px rgba(0, 0, 0, 0.18);}
+
 .footer { background: #1a0b2e; color: #fff; padding: 60px 20px 20px;}
 .footer-container { max-width: 1200px; margin: auto; display: flex;}
 .footer-left {width: 70%;}
@@ -118,6 +178,7 @@ section{min-height: 100vh;}
 .footer-right p { margin-bottom: 10px; font-size: 15px; color: #ddd;}
 .footer-bottom { margin-top: 40px; text-align: center; border-top: 1px solid rgba(255, 255, 255, 0.15); padding-top: 18px;}
 .footer-bottom p { font-size: 14px; color: #bbb;}
+
 @media(max-width:768px){
 .contact h2 {font-size: 32px;}
 .contact p { font-size: 16px;}
@@ -125,6 +186,17 @@ section{min-height: 100vh;}
 @media (max-width: 900px) {
 .navbar { flex-direction: column; gap: 15px; padding: 20px;}
 .nav-links { flex-wrap: wrap; justify-content: center; gap: 18px;}}
+
+/* --- Effect: Scroll Reveal Base --- */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.8s ease-out;
+}
+.reveal.active {
+  opacity: 1;
+  transform: translateY(0);
+}
 
 </style>
 
@@ -162,7 +234,7 @@ section{min-height: 100vh;}
     </div>
   </section>
 
-  <section id="services" class="services">
+  <section id="services" class="services reveal">
     <div class="services-container">
       <h2>Powerful Features to Take Control of Your Finances</h2>
       <p>Payton provides intelligent tools to simplify expense tracking, payment monitoring, and AI-assisted insights for smarter financial decisions.</p>
@@ -195,7 +267,7 @@ section{min-height: 100vh;}
     </div>
   </section>
 
-  <section id="about" class="about">
+  <section id="about" class="about reveal">
     <div class="about-container">
       <div class="about-left">
         <div class="about-features">
@@ -248,7 +320,7 @@ section{min-height: 100vh;}
     </div>
   </section>
 
-  <section id="contact" class="contact">
+  <section id="contact" class="contact reveal">
     <div class="contact-container">
       <h2>CONTACT US</h2>
       <p>Meet the Payton team — the people behind the system who made this project possible:</p>
@@ -311,6 +383,49 @@ section{min-height: 100vh;}
       <p>© 2026 Payton. All Rights Reserved.</p>
     </div>
   </footer>
+
+  <script>
+    // Effect: Scroll Reveal Logic
+    function reveal() {
+      var reveals = document.querySelectorAll(".reveal");
+      for (var i = 0; i < reveals.length; i++) {
+        var windowHeight = window.innerHeight;
+        var elementTop = reveals[i].getBoundingClientRect().top;
+        var elementVisible = 150; 
+        if (elementTop < windowHeight - elementVisible) {
+          reveals[i].classList.add("active");
+        }
+      }
+    }
+    window.addEventListener("scroll", reveal);
+    reveal(); // Initial check
+
+    // Effect: Navbar Dynamic Scroll Effect
+    window.addEventListener('scroll', () => {
+        const nav = document.querySelector('.navbar');
+        if(window.scrollY > 50) {
+            nav.style.padding = "10px 60px";
+            nav.style.background = "rgba(255, 255, 255, 0.95)";
+        } else {
+            nav.style.padding = "18px 60px";
+            nav.style.background = "rgba(255, 255, 255, 0.8)";
+        }
+    });
+
+    // Effect: 3D Tilt for Team Members
+    const teamImgs = document.querySelectorAll('.team-img');
+    teamImgs.forEach(img => {
+      img.addEventListener('mousemove', (e) => {
+        const { left, top, width, height } = img.getBoundingClientRect();
+        const x = (e.clientX - left) / width - 0.5;
+        const y = (e.clientY - top) / height - 0.5;
+        img.style.transform = `perspective(500px) rotateY(${x * 30}deg) rotateX(${y * -30}deg) scale(1.1)`;
+      });
+      img.addEventListener('mouseleave', () => {
+        img.style.transform = `perspective(500px) rotateY(0deg) rotateX(0deg) scale(1)`;
+      });
+    });
+  </script>
 
 </body>
 </html>

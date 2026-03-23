@@ -56,7 +56,23 @@ foreach ($allStats as $s) {
 
 <style>
 body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f6f9; margin: 0; }
+/* --- Force Hide Scrollbar but allow scrolling --- */
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    /* Hide for IE, Edge and Firefox */
+    -ms-overflow-style: none;  
+    scrollbar-width: none;  
+}
 
+/* Hide for Chrome, Safari and Opera */
+html::-webkit-scrollbar, 
+body::-webkit-scrollbar {
+    display: none;
+    width: 0 !important;
+    height: 0 !important;
+}
 
 /* --- ANALYTICS --- */
 .analytics-row { display: flex; gap: 15px;  width: 100%;}

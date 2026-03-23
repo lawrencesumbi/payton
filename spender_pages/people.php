@@ -55,6 +55,24 @@ $people = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         body{background:#f9fafb; margin:0; }
+        /* --- Force Hide Scrollbar but allow scrolling --- */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            /* Hide for IE, Edge and Firefox */
+            -ms-overflow-style: none;  
+            scrollbar-width: none;  
+        }
+
+        /* Hide for Chrome, Safari and Opera */
+        html::-webkit-scrollbar, 
+        body::-webkit-scrollbar {
+            display: none;
+            width: 0 !important;
+            height: 0 !important;
+        }
+
         .container{ width: 100%; padding:20px; }
         .header{ display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
         .btn{ padding:10px 18px; border:none; border-radius:8px; cursor:pointer; font-weight:500; transition: 0.2s; }

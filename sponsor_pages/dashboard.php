@@ -79,6 +79,23 @@ $all_budgets = $stmt->fetchAll(PDO::FETCH_ASSOC);
     padding: 0;
     overflow: hidden; /* This kills the main page scrollbar */
 }
+/* --- Force Hide Scrollbar but allow scrolling --- */
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    /* Hide for IE, Edge and Firefox */
+    -ms-overflow-style: none;  
+    scrollbar-width: none;  
+}
+
+/* Hide for Chrome, Safari and Opera */
+html::-webkit-scrollbar, 
+body::-webkit-scrollbar {
+    display: none;
+    width: 0 !important;
+    height: 0 !important;
+}
         
         .stat-card {
             background: #fff; border-radius: 16px; border: 1px solid #e2e8f0;

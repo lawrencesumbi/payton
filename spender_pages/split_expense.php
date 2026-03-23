@@ -121,6 +121,23 @@ $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <style>
         :root { --primary: #6366f1; --primary-light: #e0e7ff; --bg: #f8fafc; --text-main: #1e293b; --text-muted: #64748b; --border: #e2e8f0; --danger: #ef4444; --success: #22c55e; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text-main); margin: 0; }
+        /* --- Force Hide Scrollbar but allow scrolling --- */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            /* Hide for IE, Edge and Firefox */
+            -ms-overflow-style: none;  
+            scrollbar-width: none;  
+        }
+
+        /* Hide for Chrome, Safari and Opera */
+        html::-webkit-scrollbar, 
+        body::-webkit-scrollbar {
+            display: none;
+            width: 0 !important;
+            height: 0 !important;
+        }
         .container { width:100%; padding: 0 24px; box-sizing: border-box;}
         .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; }
         .card { background: white; border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); overflow: hidden; }
