@@ -1,44 +1,12 @@
 <?php
 require_once "db.php";
 
-// Standard session check
+// LOGIN CHECK
 if(!isset($_SESSION['user_id'])){
     die("Please login first.");
 }
 
 $user_id = $_SESSION['user_id'];
-$message = "";
-
-/* =========================================
-   ADD NEW PERSON
-   ========================================= */
-if(isset($_POST['add_person'])){
-    $name = trim($_POST['person_name']);
-
-    if(!empty($name)){
-        $stmt = $conn->prepare("INSERT INTO people (user_id, name) VALUES (?, ?)");
-        if($stmt->execute([$user_id, $name])){
-            $message = "Person added successfully.";
-        } else {
-            $message = "Error adding person.";
-        }
-    } else {
-        $message = "Please enter a name.";
-    }
-}
-
-/* =========================================
-   DELETE PERSON
-   ========================================= */
-if(isset($_POST['delete_person'])){
-    $person_id = $_POST['person_id'];
-
-    // Ensure we only delete a person belonging to the logged-in user
-    $stmt = $conn->prepare("DELETE FROM people WHERE id = ? AND user_id = ?");
-    $stmt->execute([$person_id, $user_id]);
-
-    $message = "Person removed.";
-}
 
 /* =========================================
    FETCH PEOPLE LIST
@@ -53,56 +21,92 @@ $people = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <head>
     <title>Manage People</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    <style>
-        body{background:#f9fafb; margin:0; }
-        /* --- Force Hide Scrollbar but allow scrolling --- */
-        html, body {
-            height: 100%;
-            margin: 0;
-            padding: 0;
-            /* Hide for IE, Edge and Firefox */
-            -ms-overflow-style: none;  
-            scrollbar-width: none;  
-        }
 
-        /* Hide for Chrome, Safari and Opera */
-        html::-webkit-scrollbar, 
-        body::-webkit-scrollbar {
-            display: none;
-            width: 0 !important;
-            height: 0 !important;
-        }
+    <style>
+        body{background:#f9fafb; margin:0; font-family:'Inter', sans-serif;}
 
         .container{ width: 100%; padding:20px; }
         .header{ display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
-        .btn{ padding:10px 18px; border:none; border-radius:8px; cursor:pointer; font-weight:500; transition: 0.2s; }
+
+        .btn{ padding:10px 18px; border:none; border-radius:8px; cursor:pointer; font-weight:500; }
         .btn-primary{ background:#6f42c1; color:white; }
         .btn-danger{ background:#fef2f2; color:#dc2626; border: 1px solid #fee2e2; }
-        .btn-danger:hover{ background:#fee2e2; }
+
         .card{ background:white; border-radius:12px; border:1px solid #e5e7eb; overflow: hidden; }
+
         table{ width:100%; border-collapse:collapse; }
-        th{ padding:12px; text-align:left; background:#fafafa; font-size:12px; color:#6b7280; text-transform: uppercase; }
+        th{ padding:12px; text-align:left; background:#fafafa; font-size:12px; color:#6b7280; }
         td{ padding:14px; border-top:1px solid #eee; }
-        .alert{ padding:12px; background:#ecfdf5; color:#065f46; border-radius:8px; margin-bottom:20px; border: 1px solid #d1fae5; }
-        .modal {
-    display: none;
-    position: fixed;
-    /* Ensure it starts at the very top left of the browser */
-    top: 0;
-    left: 0;
-    /* Force it to be the full width/height of the window */
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.6);
-    /* Bring it to the very front of everything else */
-    z-index: 9999; 
-    justify-content: center;
-    align-items: center;
-}
-        .modal-card{ background:white; padding:25px; border-radius:12px; width:320px; }
-        .input-box{ width:100%; padding:12px; margin:15px 0; border:1px solid #ddd; border-radius:8px; box-sizing: border-box; }
+
+        /* MODAL */
+        .modal{
+            display:none;
+            position:fixed;
+            top:0; left:0;
+            width:100%; height:100%;
+            background:rgba(0,0,0,0.6);
+            z-index:9999;
+            justify-content:center;
+            align-items:center;
+        }
+
+        .modal-card{
+            background:white;
+            padding:25px;
+            border-radius:12px;
+            width:320px;
+        }
+
+        .input-box{
+            width:100%;
+            padding:12px;
+            margin:15px 0;
+            border:1px solid #ddd;
+            border-radius:8px;
+        }
+
+        /* TOAST */
+        .toast-container{
+            position:fixed;
+            top:20px;
+            right:20px;
+            z-index:9999;
+        }
+
+        .custom-toast{
+            display:flex;
+            align-items:flex-start;
+            gap:10px;
+            background:white;
+            padding:15px;
+            border-radius:10px;
+            margin-bottom:10px;
+            min-width:250px;
+            box-shadow:0 5px 15px rgba(0,0,0,0.1);
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn{
+            from{ transform: translateX(100%); opacity:0; }
+            to{ transform: translateX(0); opacity:1; }
+        }
+
+        .toast-success{ border-left:5px solid #22c55e; }
+        .toast-error{ border-left:5px solid #ef4444; }
+
+        .toast-title{ font-weight:700; }
+        .toast-message{ font-size:14px; color:#555; }
+
+        .toast-close{
+            margin-left:auto;
+            cursor:pointer;
+            border:none;
+            background:none;
+            font-size:16px;
+        }
     </style>
 </head>
+
 <body>
 
 <div class="container">
@@ -110,10 +114,6 @@ $people = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <h2>Manage People</h2>
         <button class="btn btn-primary" onclick="openModal()">+ Add Person</button>
     </div>
-
-    <?php if(!empty($message)): ?>
-        <div class="alert"><?php echo htmlspecialchars($message); ?></div>
-    <?php endif; ?>
 
     <div class="card">
         <table>
@@ -128,13 +128,11 @@ $people = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <?php if(!empty($people)): ?>
                     <?php foreach($people as $p): ?>
                     <tr>
-                        <td><?php echo htmlspecialchars($p['name']); ?></td>
-                        <td style="color:#6b7280; font-size: 0.9em;">
-                            <?php echo date("M d, Y", strtotime($p['created_at'])); ?>
-                        </td>
+                        <td><?= htmlspecialchars($p['name']) ?></td>
+                        <td><?= date("M d, Y", strtotime($p['created_at'])) ?></td>
                         <td style="text-align:right">
-                            <form method="POST" onsubmit="return confirm('Remove this person?');">
-                                <input type="hidden" name="person_id" value="<?php echo $p['id']; ?>">
+                            <form method="POST" action="add_delete_people.php" onsubmit="return confirm('Remove this person?');">
+                                <input type="hidden" name="person_id" value="<?= $p['id'] ?>">
                                 <button name="delete_person" class="btn btn-danger">Remove</button>
                             </form>
                         </td>
@@ -143,7 +141,7 @@ $people = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <?php else: ?>
                     <tr>
                         <td colspan="3" style="text-align:center; padding:40px; color:gray">
-                            No people found. Click "+ Add Person" to start.
+                            No people found.
                         </td>
                     </tr>
                 <?php endif; ?>
@@ -152,26 +150,59 @@ $people = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </div>
 </div>
 
+<!-- MODAL -->
 <div id="modal" class="modal">
     <div class="modal-card">
-        <h3 style="margin-top:0">Add New Person</h3>
-        <form method="POST">
-            <input type="text" name="person_name" placeholder="Full Name" class="input-box" required autofocus>
-            <div style="display:flex; gap:10px;">
-                <button name="add_person" class="btn btn-primary" style="flex:2">Save Person</button>
-                <button type="button" onclick="closeModal()" class="btn" style="flex:1">Cancel</button>
-            </div>
+        <h3>Add New Person</h3>
+        <form method="POST" action="add_delete_people.php">
+            <input type="text" name="person_name" placeholder="Full Name" class="input-box" required>
+            <button name="add_person" class="btn btn-primary">Save</button>
+            <button type="button" onclick="closeModal()" class="btn">Cancel</button>
         </form>
     </div>
 </div>
 
+<!-- TOAST -->
+<div class="toast-container">
+    <?php if(isset($_SESSION['success_msg'])): ?>
+        <div class="custom-toast toast-success">
+            <div>
+                <div class="toast-title">SUCCESS!</div>
+                <div class="toast-message"><?= $_SESSION['success_msg'] ?></div>
+            </div>
+            <button class="toast-close" onclick="this.parentElement.remove()">✖</button>
+        </div>
+        <?php unset($_SESSION['success_msg']); ?>
+    <?php endif; ?>
+
+    <?php if(isset($_SESSION['error_msg'])): ?>
+        <div class="custom-toast toast-error">
+            <div>
+                <div class="toast-title">ERROR</div>
+                <div class="toast-message"><?= $_SESSION['error_msg'] ?></div>
+            </div>
+            <button class="toast-close" onclick="this.parentElement.remove()">✖</button>
+        </div>
+        <?php unset($_SESSION['error_msg']); ?>
+    <?php endif; ?>
+</div>
+
 <script>
-    function openModal(){ document.getElementById("modal").style.display="flex"; }
-    function closeModal(){ document.getElementById("modal").style.display="none"; }
-    // Close modal if clicking outside the card
-    window.onclick = function(event) {
-        if (event.target == document.getElementById("modal")) closeModal();
-    }
+function openModal(){
+    document.getElementById("modal").style.display = "flex";
+}
+
+function closeModal(){
+    document.getElementById("modal").style.display = "none";
+}
+
+// Auto-hide toast
+setTimeout(() => {
+    document.querySelectorAll('.custom-toast').forEach(t => {
+        t.style.opacity = '0';
+        setTimeout(() => t.remove(), 300);
+    });
+}, 3000);
 </script>
 
 </body>
