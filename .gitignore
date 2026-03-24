@@ -1,0 +1,8 @@
+# Ayaw i-push ang tinuod nga keys
+.env
+
+# Ayaw i-push ang bug-at nga libraries
+/vendor/
+
+# Ayaw i-push ang local settings sa VS Code
+.vscode/
