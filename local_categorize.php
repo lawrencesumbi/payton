@@ -2,13 +2,15 @@
 require 'vendor/autoload.php';
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 $dotenv->load();
+
+
 header("Content-Type: application/json");
 
 /* =====================================================
    1. INPUT HANDLING
 ===================================================== */
 $description = $_POST['description'] ?? '';
-$descriptionLower = strtolower(trim($description));
+$descriptionLower = strtolower(trim($description)); 
 
 if (empty($descriptionLower)) {
     echo json_encode(["category_id" => 10, "category_name" => "Miscellaneous", "confidence" => 0]);
@@ -38,7 +40,7 @@ $keywordMap = [
 $foundCategoryId = 10;
 $confidence = 10;
 
-foreach ($keywordMap as $keyword => $catId) {
+foreach ($keywordMap as $keyword => $catId) {   
     if (strpos($descriptionLower, $keyword) !== false) {
         $foundCategoryId = $catId;
         $confidence = 99; // High confidence for direct matches
@@ -83,7 +85,18 @@ if ($confidence < 90) {
     }
 
     $response = curl_exec($ch);
+    if (curl_errno($ch)) {
+        echo json_encode(["error" => "CURL Error: " . curl_error($ch)]);
+        exit;
+    }
+
     $result = json_decode($response, true);
+
+    // MAO NI PAG-CHECK KUNG NAY ERROR GIKAN SA GEMINI (e.g. Invalid API Key)
+    if (isset($result['error'])) {
+        echo json_encode(["error" => "Gemini API Error", "details" => $result['error']]);
+        exit;
+    }
 
     if (isset($result['candidates'][0]['content']['parts'][0]['text'])) {
         $aiRaw = $result['candidates'][0]['content']['parts'][0]['text'];
