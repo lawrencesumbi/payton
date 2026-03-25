@@ -32,11 +32,11 @@ $people = $stmt->fetchAll(PDO::FETCH_ASSOC);
         .btn-primary{ background:#6f42c1; color:white; }
         .btn-danger{ background:#fef2f2; color:#dc2626; border: 1px solid #fee2e2; }
 
-        .card{ background:white; border-radius:12px; border:1px solid #e5e7eb; overflow: hidden; }
+        .card{ background: white; border-radius:12px; border:1px solid #e5e7eb; overflow: hidden; }
 
         table{ width:100%; border-collapse:collapse; }
-        th{ padding:12px; text-align:left; background:#fafafa; font-size:12px; color:#6b7280; }
-        td{ padding:14px; border-top:1px solid #eee; }
+        th{ padding:12px; text-align:left; background:#8c3bf6; font-size:14px; color:white; }
+        td{ padding:14px; border-top:1px solid #eeeeee; }
 
         /* MODAL */
         .modal{

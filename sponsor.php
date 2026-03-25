@@ -20,8 +20,14 @@ $allowed_pages = ['dashboard', 'manage_members', 'manage_allowance', 'monitoring
 
 if (!in_array($page, $allowed_pages)) { $page = 'dashboard'; }
 
-// Profile data
-$profilePath = $user['profile_pic'];
+// Profile data fallback logic
+$dbProfile = $user['profile_pic'];
+if (!empty($dbProfile) && file_exists($dbProfile)) {
+    $profilePath = $dbProfile;
+} else {
+    $profilePath = "profile/default.jpg"; 
+}
+
 $_SESSION['fullname'] = $user['fullname'];
 $_SESSION['email'] = $user['email'];
 ?>

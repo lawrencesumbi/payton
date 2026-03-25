@@ -20,7 +20,7 @@ $userData = $stmt->get_result()->fetch_assoc();
 $fullname = $userData['fullname'] ?? "Unknown User";
 $email    = $userData['email'] ?? "No email";
 $profile  = $userData['profile_pic'] ?? "";
-$profilePath = !empty($profile) && file_exists($profile) ? $profile : "profile/default.png";
+$profilePath = !empty($profile) && file_exists($profile) ? $profile : "profile/default.jpg";
 
 // Calculate Progress
 $progress = 10; 

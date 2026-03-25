@@ -1,28 +1,13 @@
 <?php
 require_once "db.php";
 
+if (session_status() === PHP_SESSION_NONE) { session_start(); }
+
 if(!isset($_SESSION['user_id'])){
     die("Please login first.");
 }
 
 $user_id = $_SESSION['user_id'];
-$message = "";
-
-// --- ACTION HANDLER: MARK AS PAID ---
-if (isset($_POST['mark_paid'])) {
-    $person_id = $_POST['person_id']; 
-    $target_expense_id = $_POST['expense_id'];
-
-    $update_stmt = $conn->prepare("
-        UPDATE expense_shares 
-        SET status = 'Paid' 
-        WHERE expense_id = ? AND people_id = ?
-    ");
-    
-    if($update_stmt->execute([$target_expense_id, $person_id])) {
-        $message = "Payment status updated!";
-    }
-}
 
 // 1. Fetch all expenses belonging to this user that have splits
 $stmt = $conn->prepare("
@@ -67,8 +52,6 @@ $stmt = $conn->prepare("
 $stmt->execute([$expense_id]);
 $participants = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// --- NEW CALCULATION FOR "YOUR" SHARE ---
-// Instead of dividing equally, we sum up what others owe and subtract it from the total.
 $total_others_owe = 0;
 foreach($participants as $p) {
     $total_others_owe += $p['amount_owed'];
@@ -89,24 +72,11 @@ $your_share = $expense['amount'] - $total_others_owe;
             --success: #22c55e; --danger: #ef4444; --border: #e2e8f0;
         }
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text-main); margin: 0; }
-        /* --- Force Hide Scrollbar but allow scrolling --- */
-        html, body {
-            height: 100%;
-            margin: 0;
-            padding: 0;
-            /* Hide for IE, Edge and Firefox */
-            -ms-overflow-style: none;  
-            scrollbar-width: none;  
-        }
+        
+        html, body { height: 100%; margin: 0; padding: 0; -ms-overflow-style: none; scrollbar-width: none; }
+        html::-webkit-scrollbar, body::-webkit-scrollbar { display: none; width: 0 !important; height: 0 !important; }
 
-        /* Hide for Chrome, Safari and Opera */
-        html::-webkit-scrollbar, 
-        body::-webkit-scrollbar {
-            display: none;
-            width: 0 !important;
-            height: 0 !important;
-        }
-        .container { width: 100%; padding: 0 20px; box-sizing: border-box; }
+        .container { width: 100%; padding: 0 20px; box-sizing: border-box; padding-top: 20px; }
         .selector { width: 100%; padding: 14px; border-radius: 12px; border: 2px solid var(--border); background: var(--card); font-weight: 600; font-family: inherit; cursor: pointer; margin-bottom: 24px; }
         .split-container { display: flex; background: var(--card); border-radius: 24px; border: 1px solid var(--border); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); overflow: hidden; min-height: 460px; }
         .left-col { flex: 1; padding: 40px; background: linear-gradient(145deg, #6366f1, #4f46e5); color: white; display: flex; flex-direction: column; justify-content: center; }
@@ -124,10 +94,49 @@ $your_share = $expense['amount'] - $total_others_owe;
         .badge-unpaid { background: #fee2e2; color: var(--danger); }
         .btn-pay { background: #fff; color: var(--primary); border: 1.5px solid var(--primary); padding: 6px 12px; border-radius: 8px; font-size: 0.7rem; font-weight: 700; cursor: pointer; text-transform: uppercase; transition: 0.2s; }
         .btn-pay:hover { background: var(--primary); color: white; }
+
+        /* TOAST STYLES */
+        .toast-container{ position:fixed; top:20px; right:20px; z-index:9999; }
+        .custom-toast{ 
+            display:flex; align-items:flex-start; gap:10px; background:white; padding:15px; 
+            border-radius:10px; margin-bottom:10px; min-width:280px; box-shadow:0 5px 15px rgba(0,0,0,0.1); 
+            animation: slideIn 0.3s ease; transition: opacity 0.3s ease;
+        }
+        @keyframes slideIn{ from{ transform: translateX(100%); opacity:0; } to{ transform: translateX(0); opacity:1; } }
+        .toast-success{ border-left:5px solid #22c55e; }
+        .toast-error{ border-left:5px solid #ef4444; }
+        .toast-title{ font-weight:700; }
+        .toast-message{ font-size:14px; color:#555; }
+        .toast-close{ margin-left:auto; cursor:pointer; border:none; background:none; font-size:16px; color:#999; }
+
         @media (max-width: 850px) { .split-container { flex-direction: column; } }
     </style>
 </head>
 <body>
+
+<div class="toast-container">
+    <?php if(isset($_SESSION['success_msg'])): ?>
+        <div class="custom-toast toast-success">
+            <div>
+                <div class="toast-title">SUCCESS!</div>
+                <div class="toast-message"><?= $_SESSION['success_msg'] ?></div>
+            </div>
+            <button class="toast-close" onclick="this.parentElement.remove()">✖</button>
+        </div>
+        <?php unset($_SESSION['success_msg']); ?>
+    <?php endif; ?>
+
+    <?php if(isset($_SESSION['error_msg'])): ?>
+        <div class="custom-toast toast-error">
+            <div>
+                <div class="toast-title">ERROR</div>
+                <div class="toast-message"><?= $_SESSION['error_msg'] ?></div>
+            </div>
+            <button class="toast-close" onclick="this.parentElement.remove()">✖</button>
+        </div>
+        <?php unset($_SESSION['error_msg']); ?>
+    <?php endif; ?>
+</div>
 
 <div class="container">
     <form method="GET">
@@ -192,7 +201,7 @@ $your_share = $expense['amount'] - $total_others_owe;
                         </td>
                         <td style="text-align: right;">
                             <?php if (strtolower($p['status']) === 'unpaid'): ?>
-                                <form method="POST" style="margin:0;">
+                                <form method="POST" action="process_split.php" style="margin:0;">
                                     <input type="hidden" name="person_id" value="<?= $p['person_id'] ?>">
                                     <input type="hidden" name="expense_id" value="<?= $expense_id ?>">
                                     <button type="submit" name="mark_paid" class="btn-pay">Settle</button>
@@ -208,6 +217,16 @@ $your_share = $expense['amount'] - $total_others_owe;
         </div>
     </div>
 </div>
+
+<script>
+    // Auto-hide toast logic
+    setTimeout(() => {
+        document.querySelectorAll('.custom-toast').forEach(t => {
+            t.style.opacity = '0';
+            setTimeout(() => t.remove(), 300);
+        });
+    }, 4000);
+</script>
 
 </body>
 </html>
