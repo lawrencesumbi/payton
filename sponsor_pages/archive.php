@@ -55,102 +55,101 @@ function getStatusBadge($status) {
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
 <style>
+    /* 1. THEME VARIABLES */
+    :host, body, .main-content, .container-fluid, .content-wrapper {
+        background-color: transparent !important;
+        background: transparent !important;
+    }
 
-:root {
-            --brand-purple: #6f42c1;
-            --brand-purple-light: #f3f0ff;
-            --brand-purple-dark: #59359a;
-            --bg-body: #f8f9fa;
-        }
+    /* 2. THEME VARIABLES */
+    :root {
+        --primary: #7f308f;
+        --card-bg: #ffffff;
+        --text-main: #334155;
+        --text-muted: #64748b;
+        --border-color: #e2e8f0;
+    }
 
-body{
-    background:#f8f9fa;
-    font-family:'Inter',sans-serif;
-}
-/* --- Force Hide Scrollbar but allow scrolling --- */
-html, body {
-    height: 100%;
-    margin: 0;
-    padding: 0;
-    /* Hide for IE, Edge and Firefox */
-    -ms-overflow-style: none;  
-    scrollbar-width: none;  
-}
+    [data-theme="dark"] {
+        --card-bg: #191c24; 
+        --text-main: #f8fafc;
+        --text-muted: #94a3b8;
+        --border-color: #2a2e39;
+    }
 
-/* Hide for Chrome, Safari and Opera */
-html::-webkit-scrollbar, 
-body::-webkit-scrollbar {
-    display: none;
-    width: 0 !important;
-    height: 0 !important;
-}
-.main-content{
-    width: 100%;
-    margin:auto;
-    
-}
+    /* 2. GLOBAL TRANSPARENCY FIX */
+    html, body, .main-content {
+        background-color: transparent !important;
+        background: transparent !important;
+        color: var(--text-main);
+        font-family: 'Inter', sans-serif;
+    }
 
-.header{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin-bottom:25px;
-}
+    /* 3. TABLE & CONTAINER FIXES */
+    .table-container {
+        background: var(--card-bg) !important;
+        border-radius: 20px;
+        padding: 25px;
+        border: 1px solid var(--border-color) !important;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        transition: background 0.3s ease;
+    }
 
-.table-container{
-    background:white;
-    border-radius:20px;
-    padding:25px;
-    box-shadow:0 10px 30px rgba(0,0,0,0.05);
-}
+    .table { color: var(--text-main) !important; }
 
-.table thead th{
-    font-size:12px;
-    text-transform:uppercase;
-    color:#64748b;
-    background:#f8fafc;
-    padding:15px;
-}
+    /* Target the white rows from your screenshot */
+    .table tbody tr, .table td {
+        background-color: transparent !important;
+        color: var(--text-main) !important;
+        border-bottom: 1px solid var(--border-color) !important;
+    }
 
-.table tbody td{
-    padding:18px;
-    vertical-align:middle;
-}
+    .table thead th {
+        background-color: var(--header-bg) !important;
+        color: var(--text-muted) !important;
+        border-bottom: 2px solid var(--border-color);
+        font-size: 12px;
+        text-transform: uppercase;
+    }
 
-.budget-name{
-    font-weight:700;
-}
+    /* 4. TEXT VISIBILITY FIXES */
+    .budget-name {
+        font-weight: 700;
+        color: var(--text-main) !important;
+    }
 
-.date-range{
-    font-size:12px;
-    color:#94a3b8;
-}
+    .date-range {
+        font-size: 12px;
+        color: var(--text-muted) !important;
+    }
 
-.amount{
-    font-weight:700;
-    color:#6f42c1;
-}
+    .amount {
+        font-weight: 700;
+        color: var(--primary);
+    }
 
+    .text-muted {
+        color: var(--text-muted) !important;
+    }
 
+    /* 5. ACTION BUTTONS */
+    .btn-action {
+        width: 36px;
+        height: 36px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+        border: 1px solid var(--border-color);
+        background: var(--card-bg);
+        color: var(--text-main);
+        transition: 0.2s;
+    }
 
-.btn-action {
-            width: 36px;
-            height: 36px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 10px;
-            border: 1px solid #edf2f7;
-            background: white;
-            transition: 0.2s;
-        }
-
-        .btn-action:hover {
-            background: var(--brand-purple-light);
-            color: var(--brand-purple);
-            border-color: var(--brand-purple);
-        }
-
+    .btn-action:hover {
+        background: var(--primary);
+        color: white !important;
+    }
 </style>
 </head>
 

@@ -72,170 +72,186 @@ $students = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <title>Manage Members</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --primary: #6366f1;
-            --primary-hover: #4f46e5;
-            --bg-body: #f9fafb;
-            --text-main: #111827;
-            --text-muted: #6b7280;
-            --border: #e5e7eb;
-            --white: #ffffff;
-        }
+    /* ===== 1. THEME VARIABLES ===== */
+    :root {
+        --primary: #6f42c1;
+        --primary-hover: #59359a;
+        --bg-body: #f8f9fa;
+        --card-bg: #ffffff;
+        --text-main: #111827;
+        --text-muted: #6b7280;
+        --border: #e5e7eb;
+        --white: #ffffff;
+        --table-hover: #fcfcfd;
+        --header-bg: #fafafa;
+    }
 
-        body { 
-            font-family: 'Inter', sans-serif; 
-            background: var(--bg-body); 
-            color: var(--text-main); 
-            margin: 0;
-            
-        }
-        /* --- Force Hide Scrollbar but allow scrolling --- */
-        html, body {
-            height: 100%;
-            margin: 0;
-            padding: 0;
-            /* Hide for IE, Edge and Firefox */
-            -ms-overflow-style: none;  
-            scrollbar-width: none;  
-        }
+    [data-theme="dark"] {
+        --bg-body: #0f111a;
+        --card-bg: #191c24;
+        --text-main: #f8fafc;
+        --text-muted: #cbd5e1;
+        --border: #2a2e39;
+        --white: #191c24;
+        --table-hover: #1e222d;
+        --header-bg: #242833;
+    }
 
-        /* Hide for Chrome, Safari and Opera */
-        html::-webkit-scrollbar, 
-        body::-webkit-scrollbar {
-            display: none;
-            width: 0 !important;
-            height: 0 !important;
-        }
-        .container { 
-            width: 100%;  
-            padding: 0 20px; 
-        }
+    /* ===== 2. GLOBAL STYLES ===== */
+    body { 
+        font-family: 'Inter', sans-serif; 
+        background: var(--bg-body); 
+        color: var(--text-main); 
+        margin: 0;
+        transition: background 0.3s ease, color 0.3s ease;
+    }
 
-        /* Header Section */
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-        }
+    /* Scrollbar Hide */
+    html, body {
+        height: 100%;
+        -ms-overflow-style: none;  
+        scrollbar-width: none;  
+    }
+    html::-webkit-scrollbar, body::-webkit-scrollbar { display: none; }
 
-        .header h1 { font-size: 1.5rem; font-weight: 600; margin: 0; }
+    .container { 
+        width: 100%;  
+        padding: 0 20px; 
+        box-sizing: border-box;
+    }
 
-        /* Table Card */
-        .card {
-            background: var(--white);
-            border-radius: 12px;
-            border: 1px solid var(--border);
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            overflow: hidden;
-        }
+    /* ===== 3. HEADER & ALERTS ===== */
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+        padding-top: 20px;
+    }
 
-        table { width: 100%; border-collapse: collapse; }
-        
-        th { 
-            background: #fafafa; 
-            padding: 12px 20px; 
-            text-align: left; 
-            font-size: 0.75rem; 
-            text-transform: uppercase; 
-            letter-spacing: 0.05em;
-            color: var(--text-muted);
-            border-bottom: 1px solid var(--border);
-        }
+    .header h1 { font-size: 1.5rem; font-weight: 600; margin: 0; color: var(--text-main); }
 
-        td { 
-            padding: 16px 20px; 
-            border-bottom: 1px solid var(--border); 
-            font-size: 0.9rem;
-        }
+    .alert {
+        padding: 12px 16px;
+        background: rgba(16, 185, 129, 0.1);
+        color: #10b981;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        font-size: 0.9rem;
+        border: 1px solid rgba(16, 185, 129, 0.2);
+    }
 
-        tr:last-child td { border-bottom: none; }
-        tr:hover { background: #fcfcfd; }
+    /* ===== 4. CARD & TABLE ===== */
+    .card {
+        background: var(--card-bg);
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
 
-        .member-name { font-weight: 500; color: var(--text-main); }
-        .member-email { color: var(--text-muted); }
+    table { width: 100%; border-collapse: collapse; }
+    
+    th { 
+        background: var(--header-bg); 
+        padding: 12px 20px; 
+        text-align: left; 
+        font-size: 0.75rem; 
+        text-transform: uppercase; 
+        letter-spacing: 0.05em;
+        color: var(--text-muted);
+        border-bottom: 1px solid var(--border);
+    }
 
-        /* Success Message */
-        .alert {
-            padding: 12px 16px;
-            background: #ecfdf5;
-            color: #065f46;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            font-size: 0.9rem;
-            border: 1px solid #a7f3d0;
-        }
+    td { 
+        padding: 16px 20px; 
+        border-bottom: 1px solid var(--border); 
+        font-size: 0.9rem;
+        color: var(--text-main);
+    }
 
-        /* Buttons */
-        .btn { 
-            padding: 10px 18px; 
-            border: 1px solid var(--border);
-            border-radius: 8px; 
-            cursor: pointer; 
-            font-weight: 500;
-            font-size: 0.875rem;
-            transition: all 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
+    tr:last-child td { border-bottom: none; }
+    tr:hover { background: var(--table-hover); }
 
-        .btn-primary { 
-            background: var(--primary); 
-            color: white; 
-            border: none;
-        }
-        
-        .btn-primary:hover { background: var(--primary-hover); transform: translateY(-1px); }
+    .member-name { font-weight: 600; color: var(--text-main); }
+    .member-email { color: var(--text-muted); }
 
-        /* Floating Button - Modernized */
-        .fab { 
-            position: fixed; bottom: 30px; right: 30px; 
-            background: var(--primary); color: white; 
-            width: 56px; height: 56px; border-radius: 50%; 
-            display: flex; align-items: center; justify-content: center; 
-            font-size: 24px; cursor: pointer; 
-            box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.4);
-            transition: transform 0.2s;
-        }
-        .fab:hover { transform: scale(1.1); }
+    /* ===== 5. BUTTONS ===== */
+    .btn { 
+        padding: 10px 18px; 
+        border: 1px solid var(--border);
+        border-radius: 8px; 
+        cursor: pointer; 
+        font-weight: 500;
+        font-size: 0.875rem;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
 
-        /* Modal Redesign */
-        #modalOverlay { 
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(17, 24, 39, 0.7); backdrop-filter: blur(4px);
-            justify-content: center; align-items: center; z-index: 1000;
-        }
+    .btn-primary { 
+        background: var(--primary); 
+        color: white; 
+        border: none;
+    }
+    
+    .btn-primary:hover { 
+        background: var(--primary-hover); 
+        transform: translateY(-1px); 
+        box-shadow: 0 4px 12px rgba(111, 66, 193, 0.2);
+    }
 
-        .modal-card { 
-            background: white; padding: 32px; border-radius: 16px; 
-            max-width: 400px; width: 90%; 
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-        }
+    .btn-danger {
+        background: rgba(220, 38, 38, 0.1);
+        color: #ef4444;
+        border: 1px solid rgba(220, 38, 38, 0.2);
+    }
 
-        .input-box { 
-            width: 100%; padding: 12px; margin: 16px 0; 
-            border: 1px solid var(--border); border-radius: 8px; 
-            box-sizing: border-box; font-size: 1rem;
-        }
-        
-        .input-box:focus { outline: 2px solid var(--primary); border-color: transparent; }
+    .btn-danger:hover {
+        background: #dc2626;
+        color: white;
+    }
 
-        .modal-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 8px; }
+    /* ===== 6. MODAL ===== */
+    #modalOverlay { 
+        display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+        background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px);
+        justify-content: center; align-items: center; z-index: 1000;
+    }
 
-        .empty-state { text-align: center; padding: 40px; color: var(--text-muted); }
+    .modal-card { 
+        background: var(--card-bg); 
+        padding: 32px; 
+        border-radius: 16px; 
+        max-width: 400px; width: 90%; 
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+        border: 1px solid var(--border);
+    }
 
-        .btn-danger {
-            background: #fef2f2;
-            color: #dc2626;
-            border: 1px solid #fee2e2;
-        }
-        .btn-danger:hover {
-            background: #fee2e2;
-            color: #b91c1c;
-        }
-        .actions-column { text-align: right; }
-    </style>
+    .modal-card h2 { color: var(--text-main); }
+
+    .input-box { 
+        width: 100%; padding: 12px; margin: 16px 0; 
+        background: var(--bg-body);
+        color: var(--text-main);
+        border: 1px solid var(--border); 
+        border-radius: 8px; 
+        box-sizing: border-box; 
+        font-size: 1rem;
+    }
+    
+    .input-box:focus { 
+        outline: none; 
+        border-color: var(--primary); 
+        box-shadow: 0 0 0 3px rgba(111, 66, 193, 0.1);
+    }
+
+    .modal-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 8px; }
+
+    .empty-state { text-align: center; padding: 40px; color: var(--text-muted); }
+    .actions-column { text-align: right; }
+</style>
 </head>
 <body>
 

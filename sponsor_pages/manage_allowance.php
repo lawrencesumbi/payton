@@ -50,155 +50,187 @@ function getStatusBadge($status) {
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        :root {
-            --brand-purple: #6f42c1;
-            --brand-purple-light: #f3f0ff;
-            --brand-purple-dark: #59359a;
-            --bg-body: #f8f9fa;
-        }
+<style>
+    /* ===== 1. THEME VARIABLES ===== */
+    :root {
+        --brand-purple: #6f42c1;
+        --brand-purple-light: #f3f0ff;
+        --brand-purple-dark: #59359a;
+        --bg-body: #f8f9fa;
+        --card-bg: #ffffff;
+        --text-main: #1a202c;
+        --text-muted: #64748b;
+        --border-color: #edf2f7;
+        --input-bg: #f8fafc;
+        --header-bg: #f8fafc;
+    }
 
-        body { 
-            background-color: var(--bg-body); 
-            font-family: 'Inter', sans-serif; 
-            color: #1a202c; 
-        }
-        /* --- Force Hide Scrollbar but allow scrolling --- */
-        html, body {
-            height: 100%;
-            margin: 0;
-            padding: 0;
-            /* Hide for IE, Edge and Firefox */
-            -ms-overflow-style: none;  
-            scrollbar-width: none;  
-        }
+    [data-theme="dark"] {
+        --bg-body: #0f111a;
+        --card-bg: #191c24;
+        --text-main: #f8fafc;
+        --text-muted: #cbd5e1; /* Lighter for visibility */
+        --border-color: #2a2e39;
+        --input-bg: #12141a;
+        --header-bg: #242833;
+        --brand-purple-light: rgba(111, 66, 193, 0.2);
+    }
 
-        /* Hide for Chrome, Safari and Opera */
-        html::-webkit-scrollbar, 
-        body::-webkit-scrollbar {
-            display: none;
-            width: 0 !important;
-            height: 0 !important;
-        }
-        .main-content {
-            padding-left: 20px;
-            padding-right: 20px;
-            width: 100%;
-            margin: 0 auto;
-        }
+    /* ===== 2. GLOBAL & SCROLLBAR ===== */
+    body { 
+        background-color: var(--bg-body); 
+        font-family: 'Inter', sans-serif; 
+        color: var(--text-main); 
+        transition: background 0.3s ease, color 0.3s ease;
+    }
 
-        .header-section {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-        }
+    html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        -ms-overflow-style: none;  
+        scrollbar-width: none;  
+    }
 
-        .header-section h1 {
-            font-weight: 800;
-            font-size: 1.75rem;
-            letter-spacing: -0.5px;
-            margin: 0;
-        }
+    html::-webkit-scrollbar, body::-webkit-scrollbar {
+        display: none;
+    }
 
-        .topbar-left h1{
-            font-weight: 600;
-        }
+    .main-content {
+        padding: 0 20px;
+        width: 100%;
+        margin: 0 auto;
+    }
 
-        /* --- TABLE STYLING --- */
-        .table-container {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
-            padding: 25px;
-            border: 1px solid rgba(0,0,0,0.05);
-        }
+    .header-section {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+    }
 
-        .table thead th {
-            background: #f8fafc;
-            color: #64748b;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            padding: 15px 20px;
-            border: none;
-        }
+    .header-section h1 {
+        font-weight: 800;
+        font-size: 1.75rem;
+        letter-spacing: -0.5px;
+        margin: 0;
+        color: var(--text-main);
+    }
 
-        .table tbody td {
-            padding: 18px 20px;
-            vertical-align: middle;
-            border-bottom: 1px solid #f1f5f9;
-        }
+    .header-section p {
+        font-size: 15px;
+        letter-spacing: -0.5px;
+        margin: 0;
+        color: var(--text-muted) !important;
+    }
 
-        .budget-name { font-weight: 700; color: #2d3748; display: block; }
-        .date-range { font-size: 0.8rem; color: #94a3b8; }
-        .amount-text { font-weight: 700; color: var(--brand-purple); }
+    /* ===== 3. TABLE & CONTAINERS ===== */
+    .table-container {
+        background: var(--card-bg) !important;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+        padding: 25px;
+        border: 1px solid var(--border-color);
+    }
 
-        /* --- BUTTONS & FAB --- */
-        .btn-action {
-            width: 36px;
-            height: 36px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 10px;
-            border: 1px solid #edf2f7;
-            background: white;
-            transition: 0.2s;
-        }
+    .table { color: var(--text-main) !important; margin-bottom: 0; }
 
-        .btn-action:hover {
-            background: var(--brand-purple-light);
-            color: var(--brand-purple);
-            border-color: var(--brand-purple);
-        }
+    .table thead th {
+        background: var(--header-bg) !important;
+        color: var(--text-muted) !important;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        padding: 15px 20px;
+        border: none;
+    }
 
-        .fab {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            background: var(--brand-purple);
-            color: white;
-            width: 60px;
-            height: 60px;
-            border-radius: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            box-shadow: 0 10px 20px rgba(111, 66, 193, 0.3);
-            border: none;
-            transition: 0.3s;
-            z-index: 1050;
-        }
+    .table tbody td {
+        padding: 18px 20px;
+        vertical-align: middle;
+        border-bottom: 1px solid var(--border-color) !important;
+        background: transparent !important;
+        color: var(--text-main) !important;
+    }
 
-        .fab:hover { transform: translateY(-5px); color: white; }
+    .budget-name { font-weight: 700; color: var(--text-main); display: block; }
+    .date-range { font-size: 0.8rem; color: var(--text-muted); }
+    .amount-text { font-weight: 700; color: var(--brand-purple); }
 
-        /* --- MODAL & FORM --- */
-        .custom-input {
-            background: #f8fafc;
-            border: 2px solid #edf2f7;
-            border-radius: 12px;
-            padding: 12px 15px;
-            font-weight: 500;
-        }
+    /* ===== 4. FORMS & MODALS ===== */
+    .modal-content {
+        background-color: var(--card-bg) !important;
+        color: var(--text-main) !important;
+        border: 1px solid var(--border-color) !important;
+        border-radius: 24px !important;
+    }
 
-        .custom-input:focus {
-            border-color: var(--brand-purple);
-            box-shadow: 0 0 0 4px rgba(111, 66, 193, 0.1);
-            outline: none;
-        }
+    .form-label, label {
+        color: var(--text-muted) !important;
+        font-weight: 700;
+        font-size: 0.75rem;
+        letter-spacing: 0.5px;
+    }
 
-        /* CALENDAR CUSTOMIZATION */
-        #calendar { padding: 10px; background: #fff; }
-        .calendar-header { font-weight: 700; margin-bottom: 10px; }
-        .weekdays, .days { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; }
-        .weekdays div { font-size: 11px; color: #94a3b8; padding: 5px 0; }
-        .day { height: 38px; line-height: 38px; margin: 2px; border-radius: 50%; cursor: pointer; font-size: 13px; }
-        .day:hover { background: #f1f5f9; }
-        .day.selected { background: var(--brand-purple); color: #fff; }
-        .day.in-range { background: var(--brand-purple-light); border-radius: 0; }
-    </style>
+    .custom-input, .form-select {
+        background: var(--input-bg) !important;
+        border: 2px solid var(--border-color) !important;
+        color: var(--text-main) !important;
+        border-radius: 12px;
+        padding: 12px 15px;
+    }
+
+    .custom-input:focus {
+        border-color: var(--brand-purple);
+        box-shadow: 0 0 0 4px rgba(111, 66, 193, 0.1);
+        outline: none;
+    }
+
+    /* ===== 5. CALENDAR FIXES ===== */
+    #calendar { padding: 10px; background: transparent; color: var(--text-main); }
+    
+    .weekdays, .days { 
+        display: grid !important; 
+        grid-template-columns: repeat(7, 1fr) !important; 
+        text-align: center; 
+    }
+
+    .day { 
+        height: 38px; 
+        line-height: 38px; 
+        margin: 2px auto; 
+        border-radius: 50%; 
+        cursor: pointer; 
+        font-size: 13px;
+        color: var(--text-main);
+        width: 38px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .day:hover { background: var(--header-bg); }
+    .day.selected { background: var(--brand-purple) !important; color: #fff !important; }
+    .day.in-range { background: var(--brand-purple-light) !important; border-radius: 0; color: var(--brand-purple); }
+
+    .bg-white { background-color: var(--card-bg) !important; }
+    .bg-light { background-color: var(--header-bg) !important; color: var(--text-main) !important; }
+
+    /* ===== 6. ACTIONS & FAB ===== */
+    .btn-action {
+        width: 36px; height: 36px;
+        display: inline-flex; align-items: center; justify-content: center;
+        border-radius: 10px; border: 1px solid var(--border-color);
+        background: var(--card-bg); color: var(--text-main);
+        transition: 0.2s;
+    }
+
+    .btn-action:hover {
+        background: var(--brand-purple);
+        color: white !important;
+        border-color: var(--brand-purple);
+    }
+</style>
 </head>
 <body>
 
@@ -206,7 +238,7 @@ function getStatusBadge($status) {
     <div class="header-section">
         <div>
             <h1>Allowance Overview</h1>
-            <p class="text-muted small m-0">Tracking all active allowance.</p>
+            <p>Tracking all active allowance.</p>
         </div>
        <button class="btn px-4 py-2" 
             style="border-radius: 10px; background-color: #6f42c1; color: white;"

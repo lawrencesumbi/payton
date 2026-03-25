@@ -71,47 +71,121 @@ $all_budgets = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <style>
-        :root { --primary: #7f308f; --bg: #f8fafc; }
-        html, body {
-    height: 100vh;
-    margin: 0;
-    padding: 0;
-    overflow: hidden; /* This kills the main page scrollbar */
-}
-/* --- Force Hide Scrollbar but allow scrolling --- */
-html, body {
-    height: 100%;
-    margin: 0;
-    padding: 0;
-    /* Hide for IE, Edge and Firefox */
-    -ms-overflow-style: none;  
-    scrollbar-width: none;  
+<style>
+    /* ===== 1. THEME VARIABLES ===== */
+    :root { 
+        --primary: #6f42c1; 
+        --bg-body: #f8fafc; 
+        --card-bg: #ffffff;
+        --text-main: #1a202c;
+        --text-muted: #64748b;
+        --border-color: #e2e8f0;
+        --radius: 20px; /* Restoring your soft edges */
+    }
+
+    [data-theme="dark"] {
+        --bg-body: #0f111a;
+        --card-bg: #191c24;
+        --text-main: #f8fafc;
+        --text-muted: #94a3b8;
+        --border-color: #2a2e39;
+    }
+
+    /* ===== 2. GLOBAL RESET ===== */
+    body { 
+        background-color: var(--bg-body) !important; 
+        color: var(--text-main);
+        font-family: 'Inter', sans-serif;
+        transition: 0.3s ease;
+    }
+
+    /* ===== 3. CONTAINER & CARD FIXES ===== */
+    .stat-card, .chart-container {
+        background: var(--card-bg) !important;
+        border: 1px solid var(--border-color) !important;
+        border-radius: var(--radius) !important; /* Soft edges restored */
+        padding: 24px !important; /* Proper padding restored */
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        overflow: hidden; /* Ensures table doesn't bleed over rounded corners */
+        height: 100%;
+    }
+
+    /* ===== 4. TABLE VISIBILITY FIXES ===== */
+    /* This target prevents the "white background" issue from your screenshots */
+    [data-theme="dark"] .table {
+        --bs-table-bg: transparent !important;
+        --bs-table-color: var(--text-main) !important;
+        background-color: transparent !important;
+        margin-bottom: 0;
+    }
+
+    /* Fix for the white strips in archive.PNG */
+    [data-theme="dark"] .table tr, 
+    [data-theme="dark"] .table td {
+        background-color: transparent !important; 
+        color: var(--text-main) !important;
+        border-bottom: 1px solid var(--border-color) !important;
+        padding: 16px 12px !important; /* Vertical spacing for table rows */
+    }
+
+    /* Header styling that stays dark */
+    [data-theme="dark"] thead th,
+    [data-theme="dark"] .table-light th {
+        background-color: var(--bg-body) !important;
+        color: var(--text-muted) !important;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.05em;
+        border-bottom: 2px solid var(--border-color) !important;
+    }
+
+    /* ===== 5. INPUTS & LABELS (Fix for newAllowance.PNG) ===== */
+    [data-theme="dark"] .modal-content,
+    [data-theme="dark"] .modal-card {
+        background-color: var(--card-bg) !important;
+        border: 1px solid var(--border-color) !important;
+        border-radius: 24px !important;
+    }
+
+    [data-theme="dark"] .form-label, 
+    [data-theme="dark"] label {
+        color: var(--text-main) !important; /* Making labels bright enough to read */
+        font-weight: 600;
+    }
+
+    /* ===== 6. SCROLLBAR HIDE ===== */
+    html, body { scrollbar-width: none; -ms-overflow-style: none; }
+    html::-webkit-scrollbar, body::-webkit-scrollbar { display: none; }
+    /* --- Fix for Stat Card Text Visibility --- */
+[data-theme="dark"] .stat-card h3 {
+    color: #ffffff !important; /* Forces the large numbers (₱11,900.00) to white */
 }
 
-/* Hide for Chrome, Safari and Opera */
-html::-webkit-scrollbar, 
-body::-webkit-scrollbar {
-    display: none;
-    width: 0 !important;
-    height: 0 !important;
+[data-theme="dark"] .stat-card .text-muted {
+    color: #94a3b8 !important; /* Ensures "Total Capital Allocated" is readable */
 }
-        
-        .stat-card {
-            background: #fff; border-radius: 16px; border: 1px solid #e2e8f0;
-            padding: 10px; transition: transform 0.2s;
-        }
-        .stat-card:hover { transform: translateY(-5px); }
-        .icon-shape {
-            width: 48px; height: 48px; background: #f3e8ff; color: var(--primary);
-            border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px;
-        }
-        .chart-container {
-            background: #fff; border-radius: 16px; padding: 24px; border: 1px solid #e2e8f0; height: 100%;
-        }
-        .status-badge { font-size: 0.75rem; padding: 4px 12px; border-radius: 20px; font-weight: 600; }
-        
-    </style>
+
+[data-theme="dark"] .stat-card p {
+    color: #cbd5e1 !important;
+}
+
+/* --- Ensuring Icon Shapes remain visible but subtle --- */
+[data-theme="dark"] .icon-shape {
+    background: rgba(111, 66, 193, 0.2) !important; /* Subtle purple glow for icons */
+    color: #a855f7 !important;
+}
+
+/* --- Success/Info Icon variants (Managed Spenders & Active Allowances) --- */
+[data-theme="dark"] .icon-shape[style*="background:#e0f2fe"] {
+    background: rgba(3, 105, 161, 0.2) !important;
+    color: #38bdf8 !important;
+}
+
+[data-theme="dark"] .icon-shape[style*="background:#dcfce7"] {
+    background: rgba(21, 128, 61, 0.2) !important;
+    color: #4ade80 !important;
+}
+</style>
 </head>
 <body>
 

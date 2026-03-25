@@ -48,24 +48,22 @@ $_SESSION['email'] = $user['email'];
     }
 
     [data-theme="dark"] {
-        /* Backgrounds */
-        --bg-body: #12141a;       /* Deep slate/black */
-        --bg-sidebar: #191c24;    /* Slightly lighter for elevation */
+        --bg-body: #12141a;
+        --bg-sidebar: #191c24;
         --bg-topbar: #191c24;
-        --bg-card: #191c24;       /* Uniform card and sidebar color */
-        
-        /* Text */
-        --text-main: #f8fafc;     /* Bright off-white */
-        --text-muted: #94a3b8;    /* Muted blue-grey */
-        
-        /* Borders & Accents */
-        --border-color: #2a2e39;  /* Subtle dark border */
+        --bg-card: #191c24;
+        --text-main: #f8fafc;
+        --text-muted: #94a3b8;
+        --border-color: #2a2e39;
         --hover-bg: #242833;
         --sidebar-active: #242833;
-        
-        /* Neon Accents from the image */
-        --accent-purple: #a855f7; /* Vibrant Purple */
-        --accent-cyan: #22d3ee;   /* Bright Cyan */
+        --accent-purple: #a855f7;
+    }
+
+    /* ADD THIS RIGHT BELOW IT */
+    [data-theme="dark"] .content {
+        background-color: var(--bg-body); /* Forces the 'white block' to be dark slate */
+        min-height: calc(100vh - 64px);  /* Ensures it covers the whole screen */
     }
 
     /* ===== BASIC RESET ===== */
@@ -152,7 +150,10 @@ $_SESSION['email'] = $user['email'];
     .menu-divider { height: 1px; background: var(--border-color); margin: 6px 0; }
     .profile-menu a.danger { color: #ef4444; }
 
-    .content { padding: 30px; }
+    .content {
+        padding: 30px;
+        transition: background 0.3s ease; /* Smooth transition when toggling */
+    }
 
     /* ===== SIDEBAR FOOTER ===== */
     .sidebar-footer { padding: 20px; border-top: 1px solid var(--border-color); margin-top: auto; display: flex; flex-direction: column; gap: 4px; }
