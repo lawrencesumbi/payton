@@ -1,18 +1,27 @@
 <?php
-
 require_once "db.php";
 
 if(!isset($_SESSION['user_id'])){
     die("Please login first.");
 }
 
-$spender_id = $_SESSION['user_id'];
+$spender_id = $_SESSION['user_id']; 
 
-// Handle Accept Invite
+// --- 1. HANDLE MARK ALL AS READ ---
+if (isset($_GET['action']) && $_GET['action'] === 'mark_all_read') {
+    $stmt = $conn->prepare("UPDATE notifications SET status = 'read' WHERE user_id = ?");
+    $stmt->execute([$spender_id]);
+    
+    // Redirect using JS to avoid "headers already sent" error
+    echo "<script>window.location.href='?page=notifications';</script>";
+    exit;
+}
+
+// --- 2. HANDLE ACCEPT INVITE ---
 if(isset($_POST['accept_invite'])){
     $notification_id = $_POST['notification_id'];
 
-    // Fetch the notification from DB
+    // 1. Get the original notification to find the Sponsor ID
     $stmt = $conn->prepare("SELECT parent_id FROM notifications WHERE id = ? AND user_id = ? AND type='invite'");
     $stmt->execute([$notification_id, $spender_id]);
     $notif = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -20,17 +29,33 @@ if(isset($_POST['accept_invite'])){
     if($notif && !empty($notif['parent_id'])){
         $sponsor_id = $notif['parent_id'];
 
-        // Insert into sponsor_spender table
+        // 2. Link them in the sponsor_spender table
         $stmt = $conn->prepare("INSERT INTO sponsor_spender (sponsor_id, spender_id) VALUES (?, ?)");
         $stmt->execute([$sponsor_id, $spender_id]);
 
-        // Mark notification as read
+        // 3. Get Spender's name to build the message
+        $stmtName = $conn->prepare("SELECT fullname FROM users WHERE id = ?");
+        $stmtName->execute([$spender_id]);
+        $spender = $stmtName->fetch(PDO::FETCH_ASSOC);
+        $spender_name = $spender['fullname'] ?? 'A user';
+
+        // 4. NOTIFY THE SPONSOR (Fixing the Foreign Key Error)
+        $accept_message = "{$spender_name} has accepted your invitation and is now linked to your account.";
+        
+        // We pass $spender_id as the 4th parameter to satisfy the 'parent_id' foreign key
+        $stmtNotif = $conn->prepare("INSERT INTO notifications (user_id, type, message, status, parent_id) VALUES (?, 'accept_alert', ?, 'unread', ?)");
+        $stmtNotif->execute([$sponsor_id, $accept_message, $spender_id]);
+
+        // 5. Mark the original invite as read
         $stmt = $conn->prepare("UPDATE notifications SET status='read' WHERE id=?");
         $stmt->execute([$notification_id]);
+        
+        echo "<script>window.location.href='?page=notifications';</script>";
+        exit;
     }
 }
 
-// Fetch all notifications for this spender
+// --- 3. FETCH NOTIFICATIONS ---
 $stmt = $conn->prepare("SELECT id, message, status, created_at FROM notifications WHERE user_id=? ORDER BY created_at DESC");
 $stmt->execute([$spender_id]);
 $notifications = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -60,26 +85,10 @@ $notifications = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         * { margin:0; padding:0; box-sizing:border-box; font-family: 'Inter', sans-serif; }
         body { background: var(--bg-body); color: var(--text-main); }
-        /* --- Force Hide Scrollbar but allow scrolling --- */
-        html, body {
-            height: 100%;
-            margin: 0;
-            padding: 0;
-            /* Hide for IE, Edge and Firefox */
-            -ms-overflow-style: none;  
-            scrollbar-width: none;  
-        }
+        
+        /* Scoped to container to avoid interfering with dashboard layout */
+        .notif-container { max-width: 700px; margin: 20px auto; padding: 0 20px; }
 
-        /* Hide for Chrome, Safari and Opera */
-        html::-webkit-scrollbar, 
-        body::-webkit-scrollbar {
-            display: none;
-            width: 0 !important;
-            height: 0 !important;
-        }
-        .container { max-width: 700px; margin: 40px auto; padding: 0 20px; }
-
-        /* --- HEADER SECTION --- */
         .page-header {
             display: flex;
             justify-content: space-between;
@@ -91,8 +100,8 @@ $notifications = $stmt->fetchAll(PDO::FETCH_ASSOC);
             font-size: 0.85rem; color: var(--primary); font-weight: 600; 
             text-decoration: none; cursor: pointer;
         }
+        .mark-read:hover { text-decoration: underline; }
 
-        /* --- NOTIFICATION CARD --- */
         .notification-card {
             background: var(--white);
             padding: 20px;
@@ -105,7 +114,6 @@ $notifications = $stmt->fetchAll(PDO::FETCH_ASSOC);
             position: relative;
         }
 
-        /* Unread State: Subtle blue tint and a dot */
         .notification-card.unread {
             background: var(--unread-bg);
             border-color: #dbeafe;
@@ -138,7 +146,6 @@ $notifications = $stmt->fetchAll(PDO::FETCH_ASSOC);
         .message { font-size: 0.95rem; font-weight: 500; margin-bottom: 4px; color: #374151; }
         .time { font-size: 0.8rem; color: var(--text-muted); font-weight: 400; }
 
-        /* --- ACTIONS --- */
         .action-row { margin-top: 14px; display: flex; gap: 8px; }
         
         .btn {
@@ -156,7 +163,6 @@ $notifications = $stmt->fetchAll(PDO::FETCH_ASSOC);
         .btn-ghost { background: #e5e7eb; color: #4b5563; }
         .btn-ghost:hover { background: #d1d5db; }
 
-        /* --- EMPTY STATE --- */
         .empty-state {
             text-align: center;
             padding: 60px 20px;
@@ -167,11 +173,18 @@ $notifications = $stmt->fetchAll(PDO::FETCH_ASSOC);
 </head>
 <body>
 
-<div class="container">
+<div class="notif-container">
     <div class="page-header">
         <h1>Notifications</h1>
-        <?php if(count($notifications) > 0): ?>
-            <a href="#" class="mark-read">Mark all as read</a>
+        <?php 
+        // Only show "Mark all as read" if there are actually unread notifications
+        $hasUnread = false;
+        foreach($notifications as $notifCheck) {
+            if($notifCheck['status'] == 'unread') { $hasUnread = true; break; }
+        }
+        if($hasUnread): 
+        ?>
+            <a href="?page=notifications&action=mark_all_read" class="mark-read">Mark all as read</a>
         <?php endif; ?>
     </div>
 

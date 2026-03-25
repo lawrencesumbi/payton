@@ -16,7 +16,7 @@ $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
 // Page routing
 $page = $_GET['page'] ?? 'dashboard';
-$allowed_pages = ['dashboard', 'manage_members', 'manage_allowance', 'monitoring_page', 'my_account', 'archive'];
+$allowed_pages = ['dashboard', 'manage_members', 'manage_allowance', 'monitoring_page', 'my_account', 'archive', 'notifications'];
 
 if (!in_array($page, $allowed_pages)) { $page = 'dashboard'; }
 
@@ -219,7 +219,9 @@ $_SESSION['email'] = $user['email'];
         <div class="header-icons">
           <i class="fa-solid fa-magnifying-glass"></i>
           <i class="fa-solid fa-sun" id="themeToggle" style="cursor: pointer;"></i>
-          <i class="fa-solid fa-bell"></i>
+          <a href="?page=notifications" style="color: inherit; text-decoration: none;">
+            <i class="fa-solid fa-bell"></i>
+          </a>
         </div>
 
         <div class="profile-dropdown">

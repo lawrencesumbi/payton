@@ -45,7 +45,7 @@ body {min-height:100vh; background:linear-gradient(135deg, #6f47fd, #f7f7f7); di
 .desc{font-size:14px;color:#666;}
 .error-msg{font-size:12px;color:#e74c3c;margin-top:5px; display:none;}
 .input-error{border-bottom:2px solid #e74c3c !important;}
-.show-hide{position:absolute; top:37px; right:10px; cursor:pointer; color:#777;}
+.show-hide{position:absolute; top:30px; right:10px; cursor:pointer; color:#777;}
 .success-popup{display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%);  color:#fff; padding:20px 30px; border-radius:10px; font-weight:700; font-size:16px; box-shadow:0 4px 15px rgba(0,0,0,0.3); z-index:999;}
 .session-error{display:block; color:#e74c3c; font-size:14px; margin-bottom:15px;}
 @media(max-width:900px){.register-container{flex-direction:column;}}

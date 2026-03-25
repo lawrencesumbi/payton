@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 17, 2026 at 03:42 AM
+-- Generation Time: Mar 25, 2026 at 03:52 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -45,9 +45,9 @@ CREATE TABLE `budget` (
 --
 
 INSERT INTO `budget` (`id`, `budget_name`, `budget_amount`, `start_date`, `end_date`, `user_id`, `sponsor_id`, `status`, `created_at`, `updated_at`) VALUES
-(35, 'March 10-20', 1000.00, '2026-03-10', '2026-03-20', 1, 2, 'Active', '2026-03-11 10:07:19', '2026-03-12 04:42:36'),
+(35, 'March 10-20', 1000.00, '2026-03-10', '2026-03-20', 1, 2, 'Inactive', '2026-03-11 10:07:19', '2026-03-12 04:42:36'),
 (38, 'March 1-31', 10000.00, '2026-03-01', '2026-03-31', 5, 2, 'Active', '2026-03-12 05:39:40', '2026-03-12 05:39:40'),
-(39, 'March 25-30', 500.00, '2026-03-25', '2026-03-30', 1, 2, 'Inactive', '2026-03-20 17:08:26', '2026-03-20 17:08:26'),
+(39, 'March 25-30', 500.00, '2026-03-25', '2026-03-30', 1, 2, 'Active', '2026-03-20 17:08:26', '2026-03-20 17:08:26'),
 (41, 'February 1 - 15', 400.00, '2026-02-01', '2026-02-15', 1, 2, 'Inactive', '2026-02-14 02:14:43', '2026-02-14 02:14:43');
 
 -- --------------------------------------------------------
@@ -137,7 +137,9 @@ INSERT INTO `expenses` (`id`, `user_id`, `budget_id`, `category_id`, `descriptio
 (79, 1, 35, 1, 'Softdrink', 25.00, 1, NULL, '2026-03-15', '2026-03-15 13:51:26', '2026-03-15 13:51:26'),
 (83, 1, 35, 1, 'Jollibee', 10.00, 1, NULL, '2026-03-16', '2026-03-16 04:39:29', '2026-03-16 04:39:29'),
 (84, 1, 41, 1, 'Chicken Joy', 99.00, 1, NULL, '2026-02-11', '2026-02-11 02:15:22', '2026-02-11 02:15:22'),
-(85, 1, 41, 1, 'Taxi', 200.00, 1, NULL, '2026-02-11', '2026-02-11 02:15:43', '2026-02-11 02:15:43');
+(85, 1, 41, 1, 'Taxi', 200.00, 1, NULL, '2026-02-11', '2026-02-11 02:15:43', '2026-02-11 02:15:43'),
+(86, 1, 35, 8, 'Purchased items from SM Department Store', 20.00, 1, NULL, '2026-03-19', '2026-03-18 16:24:35', '2026-03-18 16:24:35'),
+(87, 5, 38, 2, 'Nagpa Gas ko sa Shell sa akong motor', 86.00, 1, NULL, '2026-03-24', '2026-03-24 06:55:59', '2026-03-24 06:55:59');
 
 -- --------------------------------------------------------
 
@@ -191,7 +193,16 @@ CREATE TABLE `notifications` (
 INSERT INTO `notifications` (`id`, `user_id`, `parent_id`, `type`, `message`, `status`, `created_at`) VALUES
 (5, 1, 2, 'invite', 'You have been invited by Patricia Ann Mae Obaob. Click accept to join.', 'read', '2026-03-08 14:40:39'),
 (6, 5, 2, 'invite', 'You have been invited by Patricia Ann Mae Obaob. Click accept to join.', 'read', '2026-03-11 09:36:00'),
-(7, 4, 2, 'invite', 'You have been invited by Patricia Ann Mae Obaob. Click accept to join.', 'read', '2026-03-14 04:31:29');
+(7, 4, 2, 'invite', 'You have been invited by Patricia Ann Mae Obaob. Click accept to join.', 'read', '2026-03-14 04:31:29'),
+(8, 6, 10, 'invite', 'You have been invited by sample4. Click accept to join.', 'read', '2026-03-25 01:03:21'),
+(9, 6, 10, 'invite', 'You have been invited by sample4. Click accept to join.', 'read', '2026-03-25 01:08:11'),
+(10, 6, 10, 'invite', 'You have been invited by sample4. Click accept to join.', 'read', '2026-03-25 01:36:09'),
+(11, 6, 10, 'invite', 'You have been invited by sample4. Click accept to join.', 'read', '2026-03-25 02:16:24'),
+(12, 6, 10, 'invite', 'You have been invited by sample4. Click accept to join.', 'read', '2026-03-25 02:40:03'),
+(14, 6, 10, 'invite', 'You have been invited by sample4. Click accept to join.', 'read', '2026-03-25 02:41:15'),
+(16, 6, 10, 'invite', 'You have been invited by sample4. Click accept to join.', 'read', '2026-03-25 02:45:46'),
+(17, 6, 10, 'invite', 'You have been invited by sample4. Click accept to join.', 'read', '2026-03-25 02:46:13'),
+(18, 10, 6, '', 'sample1 has accepted your invitation and is now linked to your account.', 'read', '2026-03-25 02:46:18');
 
 -- --------------------------------------------------------
 
@@ -240,7 +251,9 @@ INSERT INTO `people` (`id`, `user_id`, `name`, `created_at`) VALUES
 (2, 1, 'Jaylon Mantillas', '2026-03-15 12:39:38'),
 (3, 1, 'Jaymaica Narvasa', '2026-03-15 12:59:43'),
 (4, 1, 'Jay Cabatuan', '2026-03-15 13:23:43'),
-(5, 1, 'Ivan Laluna', '2026-03-15 13:23:50');
+(5, 1, 'Ivan Laluna', '2026-03-15 13:23:50'),
+(7, 1, 'Sample', '2026-03-24 05:00:58'),
+(8, 1, 'Sample2', '2026-03-24 06:59:13');
 
 -- --------------------------------------------------------
 
@@ -300,7 +313,8 @@ CREATE TABLE `sponsor_spender` (
 
 INSERT INTO `sponsor_spender` (`id`, `sponsor_id`, `spender_id`, `created_at`) VALUES
 (4, 2, 1, '2026-03-08 14:40:51'),
-(5, 2, 5, '2026-03-11 09:37:00');
+(5, 2, 5, '2026-03-11 09:37:00'),
+(12, 10, 6, '2026-03-25 02:46:18');
 
 -- --------------------------------------------------------
 
@@ -329,7 +343,11 @@ INSERT INTO `users` (`id`, `fullname`, `email`, `password`, `role`, `profile_pic
 (4, 'Aljon Paragoso', 'aljon@gmail.com', '$2y$10$Wt8Xf9aFRGG6zRdmdsfP1.bzpQS9xPfN/20Rsf.l7gb5ivx7H.t8u', 'spender', '', '2026-02-10 02:32:42'),
 (5, 'King James', 'king@gmail.com', '$2y$10$gEXzRZe1Yx1W/lVHDmk8ju/S//8ksu6iLCjJaJyxXhy3lWOLBBTw6', 'spender', '', '2026-02-23 08:07:35'),
 (6, 'sample1', 'sample1@gmail.com', '$2y$10$XkOSorJMOiPKBmZhqqGwWuRJKdGV5PzCQo3XrueMu3cK8GnHfyOJy', 'spender', 'profile/1773497217_69b56b816f5b2.jpg', '2026-03-14 13:30:53'),
-(7, 'Sponsor User', 'sponsor@gmail.com', '$2y$10$Lr9hm92Iha4J2va9tH7XYOhEiGgscf6qmvHn8oZ16WKrGTBtrsEI6', 'sponsor', '', '2026-03-14 16:24:13');
+(7, 'Sponsor User', 'sponsor@gmail.com', '$2y$10$Lr9hm92Iha4J2va9tH7XYOhEiGgscf6qmvHn8oZ16WKrGTBtrsEI6', 'sponsor', '', '2026-03-14 16:24:13'),
+(8, 'sample', 'sample2@gmail.com', '$2y$10$COoyyUVfJ8VQcPRk6Kf78eXV1YMs./Xs2zIct38PqfacTCewGRKoe', 'spender', '', '2026-03-24 01:27:28'),
+(9, 'sample3', 'sample3@gmail.com', '$2y$10$W.Q5X/WGz2KLXTv.c59FxeAwfrhvKU4PQbZTPXP/AMkx8r9Icv1qS', '', '', '2026-03-25 00:05:13'),
+(10, 'sample4', 'sample4@gmail.com', '$2y$10$kVcs8DgHEugTzGtvsaRiSOi7ZgTxkEE7qHPOGQD/1WYc5FOrpObru', 'sponsor', '', '2026-03-25 00:20:48'),
+(11, 'sample5', 'sample5@gmail.com', '$2y$10$JqvDRqR2nlCJsG1IZqvclO444PsfqvzEuUmD8P8CCKzJLZD9asD9W', '', '', '2026-03-25 00:22:06');
 
 --
 -- Indexes for dumped tables
@@ -446,7 +464,7 @@ ALTER TABLE `due_status`
 -- AUTO_INCREMENT for table `expenses`
 --
 ALTER TABLE `expenses`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=86;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=88;
 
 --
 -- AUTO_INCREMENT for table `expense_shares`
@@ -458,7 +476,7 @@ ALTER TABLE `expense_shares`
 -- AUTO_INCREMENT for table `notifications`
 --
 ALTER TABLE `notifications`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT for table `payment_method`
@@ -470,7 +488,7 @@ ALTER TABLE `payment_method`
 -- AUTO_INCREMENT for table `people`
 --
 ALTER TABLE `people`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `scheduled_payments`
@@ -482,13 +500,13 @@ ALTER TABLE `scheduled_payments`
 -- AUTO_INCREMENT for table `sponsor_spender`
 --
 ALTER TABLE `sponsor_spender`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- Constraints for dumped tables
