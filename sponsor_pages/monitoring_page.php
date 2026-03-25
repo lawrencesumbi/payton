@@ -219,22 +219,25 @@ if ($selected_spender && $selected_allowance) {
         background-color: rgba(255, 255, 255, 0.03) !important;
     }
 
-    /* 6. INPUTS & SELECT DROPDOWNS */
+    /* 6. INPUTS & SELECT DROPDOWNS - Now Theme-Aware */
     .form-select {
-        background-color: var(--input-bg);
-        border-color: var(--border-color);
-        color: var(--text-main);
-        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23f8fafc' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e") !important;
+        background-color: var(--card-bg) !important; /* Uses white in light, dark in dark */
+        border-color: var(--border-color) !important;
+        color: var(--text-main) !important;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%237f308f' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e") !important;
     }
 
+    /* This is the part that was staying dark */
     .form-select option {
-        background-color: #191c24 !important;
-        color: #f8fafc !important;
+        background-color: var(--card-bg) !important; /* Follows the theme variable */
+        color: var(--text-main) !important;
     }
 
+    /* Focus state that adapts */
     .form-select:focus {
-        background-color: #242833 !important;
+        background-color: var(--card-bg) !important;
         border-color: var(--primary) !important;
+        color: var(--text-main) !important;
         box-shadow: 0 0 0 0.25rem rgba(127, 48, 143, 0.25);
     }
 
