@@ -17,7 +17,43 @@ $stmt->execute([$sponsor_id]);
 $notifications = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
-<div class="notif-container" style="max-width: 800px; margin: 0 auto;">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+
+<style>
+    /* Scoped to container to avoid interfering with dashboard layout */
+        .notif-container { 
+    max-width: 700px; 
+    margin: 20px auto; 
+    padding: 0 20px;
+    
+    /* --- ADD THESE LINES --- */
+    height: 75vh; /* Limits height to 80% of the screen height */
+    overflow-y: auto; /* Adds a scrollbar only when content overflows */
+    padding-right: 10px; /* Space for the scrollbar */
+}
+
+/* Optional: Make the scrollbar look cleaner and modern */
+.notif-container::-webkit-scrollbar {
+    width: 6px;
+}
+.notif-container::-webkit-scrollbar-thumb {
+    background: #e5e7eb;
+    border-radius: 10px;
+}
+.notif-container::-webkit-scrollbar-thumb:hover {
+    background: var(--primary);
+}
+</style>
+    
+
+<div class="notif-container">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
         <h2 style="font-weight: 800;">Notifications</h2>
         <?php if(count($notifications) > 0): ?>
@@ -44,3 +80,6 @@ $notifications = $stmt->fetchAll(PDO::FETCH_ASSOC);
         </div>
     <?php endif; ?>
 </div>
+
+</body>
+</html>

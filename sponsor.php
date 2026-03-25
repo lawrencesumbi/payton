@@ -44,19 +44,28 @@ $_SESSION['email'] = $user['email'];
         --border-color: #eeeeee;
         --hover-bg: #f9f9f9;
         --sidebar-active: #ebe0f7;
-        --accent-purple: #7f308f;
+        --accent-purple: #9f3abe;
     }
 
     [data-theme="dark"] {
-        --bg-body: #0f1115;
-        --bg-sidebar: #161a21;
-        --bg-topbar: #161a21;
-        --bg-card: #1c222d;
-        --text-main: #f3f4f6;
-        --text-muted: #9ca3af;
-        --border-color: #2d343f;
-        --hover-bg: #212835;
-        --sidebar-active: #2d1b3d;
+        /* Backgrounds */
+        --bg-body: #12141a;       /* Deep slate/black */
+        --bg-sidebar: #191c24;    /* Slightly lighter for elevation */
+        --bg-topbar: #191c24;
+        --bg-card: #191c24;       /* Uniform card and sidebar color */
+        
+        /* Text */
+        --text-main: #f8fafc;     /* Bright off-white */
+        --text-muted: #94a3b8;    /* Muted blue-grey */
+        
+        /* Borders & Accents */
+        --border-color: #2a2e39;  /* Subtle dark border */
+        --hover-bg: #242833;
+        --sidebar-active: #242833;
+        
+        /* Neon Accents from the image */
+        --accent-purple: #a855f7; /* Vibrant Purple */
+        --accent-cyan: #22d3ee;   /* Bright Cyan */
     }
 
     /* ===== BASIC RESET ===== */

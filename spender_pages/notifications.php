@@ -87,9 +87,30 @@ $notifications = $stmt->fetchAll(PDO::FETCH_ASSOC);
         body { background: var(--bg-body); color: var(--text-main); }
         
         /* Scoped to container to avoid interfering with dashboard layout */
-        .notif-container { max-width: 700px; margin: 20px auto; padding: 0 20px; }
+        .notif-container { 
+    max-width: 700px; 
+    margin: 20px auto; 
+    padding: 0 20px;
+    
+    /* --- ADD THESE LINES --- */
+    height: 75vh; /* Limits height to 80% of the screen height */
+    overflow-y: auto; /* Adds a scrollbar only when content overflows */
+    padding-right: 10px; /* Space for the scrollbar */
+}
 
-        .page-header {
+/* Optional: Make the scrollbar look cleaner and modern */
+.notif-container::-webkit-scrollbar {
+    width: 6px;
+}
+.notif-container::-webkit-scrollbar-thumb {
+    background: #e5e7eb;
+    border-radius: 10px;
+}
+.notif-container::-webkit-scrollbar-thumb:hover {
+    background: var(--primary);
+}
+
+        .page-header {  
             display: flex;
             justify-content: space-between;
             align-items: center;

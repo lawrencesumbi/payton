@@ -78,163 +78,196 @@ if ($selected_spender && $selected_allowance) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     
-    <style>
-        :root {
-            --primary: #7f308f;
-            --bg-body: #f8fafc;
-            --border-color: #e2e8f0;
-        }
+<style>
+    /* 1. ROOT & THEME VARIABLES */
+    :root {
+        background-color: transparent !important;
+        --primary: #7f308f;
+        --card-bg: #ffffff;
+        --text-main: #334155;
+        --text-muted: #64748b;
+        --border-color: #e2e8f0;
+        --header-bg: #f1f5f9;
+        --input-bg: #ffffff;
+    }
 
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-body);
-            color: #334155;
-        }
-        /* --- Force Hide Scrollbar but allow scrolling --- */
-        html, body {
-            height: 100%;
-            margin: 0;
-            padding: 0;
-            /* Hide for IE, Edge and Firefox */
-            -ms-overflow-style: none;  
-            scrollbar-width: none;  
-        }
+    [data-theme="dark"] {
+        --card-bg: #191c24; 
+        --text-main: #f8fafc;
+        --text-muted: #94a3b8;
+        --border-color: #2a2e39;
+        --header-bg: #242833;
+        --input-bg: #242833;
+    }
 
-        /* Hide for Chrome, Safari and Opera */
-        html::-webkit-scrollbar, 
-        body::-webkit-scrollbar {
-            display: none;
-            width: 0 !important;
-            height: 0 !important;
-        }
-        .main-wrapper {
-            width: 100%;
-            margin: 0 auto;
-        }
+    /* 2. GLOBAL RESET & BASE STYLES */
+    html, body, .main-wrapper, .content-wrapper, #main-content {
+        background-color: transparent !important;
+        background: transparent !important;
+    }   
 
-        .top-row {
-            display: flex;
-            gap: 20px;
-            margin-bottom: 25px;
-            align-items: stretch;
-            flex-wrap: wrap;
-        }
+    body {
+        font-family: 'Inter', sans-serif;
+        color: var(--text-main);
+        margin: 0;
+        padding: 0;
+        transition: all 0.3s ease;
+    }
 
-        .selection-container {
-            flex: 2;
-            min-width: 400px;
-        }
+    html::-webkit-scrollbar, 
+    body::-webkit-scrollbar {
+        display: none;
+        width: 0 !important;
+    }
 
-        .selection-form {
-            display: flex;
-            gap: 15px;
-            height: 100%;
-        }
+    .main-wrapper {
+        padding: 20px;
+        width: 100%;
+    }
 
-        .select-box {
-            flex: 1;
-            background: #fff;
-            padding: 20px;
-            border-radius: 16px;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
-        }
+    /* 3. LAYOUT CONTAINERS */
+    .top-row {
+        display: flex;
+        gap: 20px;
+        margin-bottom: 25px;
+        align-items: stretch;
+        flex-wrap: wrap;
+    }
 
-        .stats-container {
-            flex: 3;
-            display: flex;
-            gap: 15px;
-        }
+    .selection-container { flex: 2; min-width: 400px; }
+    .selection-form { display: flex; gap: 15px; height: 100%; }
+    .stats-container { flex: 3; display: flex; gap: 15px; }
 
-        .stat-card {
-            flex: 1;
-            background: #fff;
-            padding: 20px;
-            border-radius: 16px;
-            border: 1px solid var(--border-color);
-            border-left: 5px solid var(--primary);
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
+    /* 4. CARD COMPONENTS (STAT, SELECT, ACTIVITY) */
+    .activity-card, .stat-card, .select-box {
+        background-color: var(--card-bg) !important;
+        border: 1px solid var(--border-color) !important;
+        color: var(--text-main) !important;
+        border-radius: 16px;
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+    }
 
-        .stat-label {
-            font-size: 11px;
-            font-weight: 700;
-            color: #64748b;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 5px;
-        }
+    .select-box, .stat-card {
+        flex: 1;
+        padding: 20px;
+    }
 
-        .stat-value {
-            font-size: 1.25rem;
-            font-weight: 700;
-            margin: 0;
-        }
+    .stat-card {
+        border-left: 5px solid var(--primary) !important;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
 
-        /* --- SCROLLABLE TABLE UPDATES --- */
-        .activity-card {
-            background: #fff;
-            border-radius: 16px;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
-            overflow: hidden;
-        }
+    .stat-label {
+        font-size: 11px;
+        font-weight: 700;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 5px;
+    }
 
-        /* 1. Fix the height and enable vertical scroll */
-        .table-scroll-container {
-            max-height: 400px; /* Adjust this value as needed */
-            overflow-y: auto;
-            position: relative;
-        }
+    .stat-value {
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin: 0;
+        color: var(--text-main);
+    }
 
-        /* 2. Make the header sticky */
-        .table-scroll-container thead th {
-            position: sticky;
-            top: 0;
-            background-color: #f1f5f9 !important; /* Forces color even during scroll */
-            z-index: 10;
-            box-shadow: inset 0 -1px 0 var(--border-color); /* Bottom border replacement */
-        }
+    /* 5. TABLE STYLES & DARK MODE FIXES */
+    .table-scroll-container {
+        max-height: 400px;
+        overflow-y: auto;
+        position: relative;
+    }
 
-        /* 3. Custom scrollbar for better UI */
-        .table-scroll-container::-webkit-scrollbar {
-            width: 8px;
-        }
-        .table-scroll-container::-webkit-scrollbar-track {
-            background: #f1f5f9;
-        }
-        .table-scroll-container::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 10px;
-        }
-        .table-scroll-container::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
-        }
+    .table { 
+        color: var(--text-main); 
+        border-color: var(--border-color); 
+    }
 
-        .table thead th {
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            color: #64748b;
-            padding: 15px 20px;
-            border: none;
-        }
+    /* Sticky Header */
+    .table-scroll-container thead th {
+        position: sticky;
+        top: 0;
+        background-color: var(--header-bg) !important;
+        color: var(--text-muted);
+        z-index: 10;
+        box-shadow: inset 0 -1px 0 var(--border-color);
+    }
 
-        .badge-category {
-            background-color: #f1f5f9;
-            color: #475569;
-            font-weight: 600;
-        }
+    [data-theme="dark"] {
+        background-color: #12141b !important;
+    }
 
-        @media (max-width: 992px) {
-            .top-row { flex-direction: column; }
-            .selection-form { flex-direction: column; }
-            .stats-container { flex-direction: row; flex-wrap: wrap; }
-            .stat-card { min-width: 150px; }
-        }
-    </style>
+    [data-theme="dark"] .table,
+    [data-theme="dark"] .table tbody tr,
+    [data-theme="dark"] .table td {
+        background-color: transparent !important;
+        color: #cbd5e1 !important;
+        border-bottom-color: var(--border-color) !important;
+    }
+
+    [data-theme="dark"] .table td.fw-semibold,
+    [data-theme="dark"] .fw-bold {
+        color: #f8fafc !important;
+    }
+
+    [data-theme="dark"] .table-striped>tbody>tr:nth-of-type(odd),
+    [data-theme="dark"] .table-hover>tbody>tr:hover {
+        background-color: rgba(255, 255, 255, 0.03) !important;
+    }
+
+    /* 6. INPUTS & SELECT DROPDOWNS */
+    .form-select {
+        background-color: var(--input-bg);
+        border-color: var(--border-color);
+        color: var(--text-main);
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23f8fafc' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e") !important;
+    }
+
+    .form-select option {
+        background-color: #191c24 !important;
+        color: #f8fafc !important;
+    }
+
+    .form-select:focus {
+        background-color: #242833 !important;
+        border-color: var(--primary) !important;
+        box-shadow: 0 0 0 0.25rem rgba(127, 48, 143, 0.25);
+    }
+
+    /* 7. UTILITIES & ICONS */
+    .badge-category {
+        background-color: var(--header-bg);
+        color: var(--text-muted);
+        font-weight: 600;
+    }
+
+    .text-muted, .small { 
+        color: var(--text-muted) !important; 
+    }
+
+    .bi-wallet2, .bi-list-ul {
+        color: var(--primary) !important;
+    }
+
+    /* 8. CUSTOM SCROLLBAR */
+    .table-scroll-container::-webkit-scrollbar { width: 8px; }
+    .table-scroll-container::-webkit-scrollbar-track { background: var(--header-bg); }
+    .table-scroll-container::-webkit-scrollbar-thumb {
+        background: var(--border-color);
+        border-radius: 10px;
+    }
+
+    /* 9. RESPONSIVE DESIGN */
+    @media (max-width: 992px) {
+        .top-row, .selection-form { flex-direction: column; }
+        .stats-container { flex-direction: row; flex-wrap: wrap; }
+        .stat-card { min-width: 150px; }
+    }
+</style>
 </head>
 <body>
 
@@ -290,7 +323,7 @@ if ($selected_spender && $selected_allowance) {
 
     <?php if($selected_spender && $selected_allowance): ?>
         <div class="activity-card">
-            <div class="p-4 border-bottom">
+            <div class="p-4 border-bottom" style="border-color: var(--border-color) !important;">
                 <h6 class="mb-0 fw-bold"><i class="bi bi-list-ul me-2 text-primary"></i>Transactions</h6>
             </div>
             <div class="table-responsive table-scroll-container">
