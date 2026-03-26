@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 25, 2026 at 03:52 AM
+-- Generation Time: Mar 26, 2026 at 02:51 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -139,7 +139,8 @@ INSERT INTO `expenses` (`id`, `user_id`, `budget_id`, `category_id`, `descriptio
 (84, 1, 41, 1, 'Chicken Joy', 99.00, 1, NULL, '2026-02-11', '2026-02-11 02:15:22', '2026-02-11 02:15:22'),
 (85, 1, 41, 1, 'Taxi', 200.00, 1, NULL, '2026-02-11', '2026-02-11 02:15:43', '2026-02-11 02:15:43'),
 (86, 1, 35, 8, 'Purchased items from SM Department Store', 20.00, 1, NULL, '2026-03-19', '2026-03-18 16:24:35', '2026-03-18 16:24:35'),
-(87, 5, 38, 2, 'Nagpa Gas ko sa Shell sa akong motor', 86.00, 1, NULL, '2026-03-24', '2026-03-24 06:55:59', '2026-03-24 06:55:59');
+(87, 5, 38, 2, 'Nagpa Gas ko sa Shell sa akong motor', 86.00, 1, NULL, '2026-03-24', '2026-03-24 06:55:59', '2026-03-24 06:55:59'),
+(90, 5, 38, 1, 'Chowking', 300.00, 1, NULL, '2026-03-25', '2026-03-25 14:23:17', '2026-03-25 14:23:17');
 
 -- --------------------------------------------------------
 
@@ -168,7 +169,9 @@ INSERT INTO `expense_shares` (`id`, `expense_id`, `user_id`, `people_id`, `amoun
 (14, 77, 1, 5, 16.67, 'unpaid', '2026-03-15 13:24:15'),
 (15, 77, 1, 4, 16.67, 'paid', '2026-03-15 13:24:15'),
 (18, 79, 1, 1, 10.00, 'unpaid', '2026-03-15 13:51:26'),
-(19, 79, 1, 4, 10.00, 'unpaid', '2026-03-15 13:51:26');
+(19, 79, 1, 4, 10.00, 'unpaid', '2026-03-15 13:51:26'),
+(29, 90, 5, 14, 50.00, 'paid', '2026-03-25 14:23:17'),
+(30, 90, 5, 16, 150.00, 'unpaid', '2026-03-25 14:23:17');
 
 -- --------------------------------------------------------
 
@@ -202,7 +205,8 @@ INSERT INTO `notifications` (`id`, `user_id`, `parent_id`, `type`, `message`, `s
 (14, 6, 10, 'invite', 'You have been invited by sample4. Click accept to join.', 'read', '2026-03-25 02:41:15'),
 (16, 6, 10, 'invite', 'You have been invited by sample4. Click accept to join.', 'read', '2026-03-25 02:45:46'),
 (17, 6, 10, 'invite', 'You have been invited by sample4. Click accept to join.', 'read', '2026-03-25 02:46:13'),
-(18, 10, 6, '', 'sample1 has accepted your invitation and is now linked to your account.', 'read', '2026-03-25 02:46:18');
+(18, 10, 6, '', 'sample1 has accepted your invitation and is now linked to your account.', 'read', '2026-03-25 02:46:18'),
+(19, 4, 2, 'invite', 'You have been invited by Patricia Ann Mae Obaob. Click accept to join.', 'unread', '2026-03-26 09:58:08');
 
 -- --------------------------------------------------------
 
@@ -253,7 +257,12 @@ INSERT INTO `people` (`id`, `user_id`, `name`, `created_at`) VALUES
 (4, 1, 'Jay Cabatuan', '2026-03-15 13:23:43'),
 (5, 1, 'Ivan Laluna', '2026-03-15 13:23:50'),
 (7, 1, 'Sample', '2026-03-24 05:00:58'),
-(8, 1, 'Sample2', '2026-03-24 06:59:13');
+(8, 1, 'Sample2', '2026-03-24 06:59:13'),
+(9, 1, 'Sample3', '2026-03-25 13:54:22'),
+(13, 5, 'Emman', '2026-03-25 14:19:40'),
+(14, 5, 'Lenzey', '2026-03-25 14:19:45'),
+(15, 5, 'Mary Divine', '2026-03-25 14:19:52'),
+(16, 5, 'Lloyd Junrex', '2026-03-25 14:22:48');
 
 -- --------------------------------------------------------
 
@@ -329,6 +338,10 @@ CREATE TABLE `users` (
   `password` varchar(255) NOT NULL,
   `role` varchar(20) NOT NULL,
   `profile_pic` varchar(255) NOT NULL,
+  `verification_code` varchar(6) DEFAULT NULL,
+  `is_verified` tinyint(1) NOT NULL DEFAULT 0,
+  `reset_token` varchar(255) DEFAULT NULL,
+  `reset_expiry` datetime DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -336,18 +349,19 @@ CREATE TABLE `users` (
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `fullname`, `email`, `password`, `role`, `profile_pic`, `created_at`) VALUES
-(1, 'Lawrence Sumbi', 'guiansumbi@gmail.com', '$2y$10$cKIACjgglVTrRjDZaKSZjulwkdA0CIDUwOBkU12h2PPGKK03U0aT6', 'spender', 'profile/1773301216_69b26de0c5031.jpg', '2026-02-07 17:08:23'),
-(2, 'Patricia Ann Mae Obaob', 'patriciaannmaeobaob721@gmail.com', '$2y$10$gVokRQej23KaxSKKUZPiSOn/mL5IE0kvfoGyPRTZfN1in/ZpNAQku', 'sponsor', 'profile/1773380531_69b3a3b3f074d.jpg', '2026-02-08 11:52:14'),
-(3, 'Dranreb Misa', 'draymisa@gmail.com', '$2y$10$Gw3YeLEMfsCIOPV3xFs5h.jClSQLC9rilddvuzZ063CceY9/IVgue', 'spender', '', '2026-02-09 00:03:22'),
-(4, 'Aljon Paragoso', 'aljon@gmail.com', '$2y$10$Wt8Xf9aFRGG6zRdmdsfP1.bzpQS9xPfN/20Rsf.l7gb5ivx7H.t8u', 'spender', '', '2026-02-10 02:32:42'),
-(5, 'King James', 'king@gmail.com', '$2y$10$gEXzRZe1Yx1W/lVHDmk8ju/S//8ksu6iLCjJaJyxXhy3lWOLBBTw6', 'spender', '', '2026-02-23 08:07:35'),
-(6, 'sample1', 'sample1@gmail.com', '$2y$10$XkOSorJMOiPKBmZhqqGwWuRJKdGV5PzCQo3XrueMu3cK8GnHfyOJy', 'spender', 'profile/1773497217_69b56b816f5b2.jpg', '2026-03-14 13:30:53'),
-(7, 'Sponsor User', 'sponsor@gmail.com', '$2y$10$Lr9hm92Iha4J2va9tH7XYOhEiGgscf6qmvHn8oZ16WKrGTBtrsEI6', 'sponsor', '', '2026-03-14 16:24:13'),
-(8, 'sample', 'sample2@gmail.com', '$2y$10$COoyyUVfJ8VQcPRk6Kf78eXV1YMs./Xs2zIct38PqfacTCewGRKoe', 'spender', '', '2026-03-24 01:27:28'),
-(9, 'sample3', 'sample3@gmail.com', '$2y$10$W.Q5X/WGz2KLXTv.c59FxeAwfrhvKU4PQbZTPXP/AMkx8r9Icv1qS', '', '', '2026-03-25 00:05:13'),
-(10, 'sample4', 'sample4@gmail.com', '$2y$10$kVcs8DgHEugTzGtvsaRiSOi7ZgTxkEE7qHPOGQD/1WYc5FOrpObru', 'sponsor', '', '2026-03-25 00:20:48'),
-(11, 'sample5', 'sample5@gmail.com', '$2y$10$JqvDRqR2nlCJsG1IZqvclO444PsfqvzEuUmD8P8CCKzJLZD9asD9W', '', '', '2026-03-25 00:22:06');
+INSERT INTO `users` (`id`, `fullname`, `email`, `password`, `role`, `profile_pic`, `verification_code`, `is_verified`, `reset_token`, `reset_expiry`, `created_at`) VALUES
+(1, 'Lawrence Sumbi', 'guiansumbi@gmail.com', '$2y$10$cKIACjgglVTrRjDZaKSZjulwkdA0CIDUwOBkU12h2PPGKK03U0aT6', 'spender', 'profile/1773301216_69b26de0c5031.jpg', NULL, 1, NULL, NULL, '2026-02-07 17:08:23'),
+(2, 'Patricia Ann Mae Obaob', 'patriciaannmaeobaob721@gmail.com', '$2y$10$gVokRQej23KaxSKKUZPiSOn/mL5IE0kvfoGyPRTZfN1in/ZpNAQku', 'sponsor', 'profile/1773380531_69b3a3b3f074d.jpg', NULL, 1, NULL, NULL, '2026-02-08 11:52:14'),
+(3, 'Dranreb Misa', 'draymisa@gmail.com', '$2y$10$Gw3YeLEMfsCIOPV3xFs5h.jClSQLC9rilddvuzZ063CceY9/IVgue', 'spender', '', NULL, 1, NULL, NULL, '2026-02-09 00:03:22'),
+(4, 'Aljon Paragoso', 'aljon@gmail.com', '$2y$10$Wt8Xf9aFRGG6zRdmdsfP1.bzpQS9xPfN/20Rsf.l7gb5ivx7H.t8u', 'spender', '', NULL, 1, NULL, NULL, '2026-02-10 02:32:42'),
+(5, 'King James', 'king@gmail.com', '$2y$10$gEXzRZe1Yx1W/lVHDmk8ju/S//8ksu6iLCjJaJyxXhy3lWOLBBTw6', 'spender', '', NULL, 1, NULL, NULL, '2026-02-23 08:07:35'),
+(6, 'sample1', 'sample1@gmail.com', '$2y$10$XkOSorJMOiPKBmZhqqGwWuRJKdGV5PzCQo3XrueMu3cK8GnHfyOJy', 'spender', 'profile/1773497217_69b56b816f5b2.jpg', NULL, 1, NULL, NULL, '2026-03-14 13:30:53'),
+(7, 'Sponsor User', 'sponsor@gmail.com', '$2y$10$Lr9hm92Iha4J2va9tH7XYOhEiGgscf6qmvHn8oZ16WKrGTBtrsEI6', 'sponsor', '', NULL, 1, NULL, NULL, '2026-03-14 16:24:13'),
+(8, 'sample', 'sample2@gmail.com', '$2y$10$COoyyUVfJ8VQcPRk6Kf78eXV1YMs./Xs2zIct38PqfacTCewGRKoe', 'spender', '', NULL, 1, NULL, NULL, '2026-03-24 01:27:28'),
+(9, 'sample3', 'sample3@gmail.com', '$2y$10$W.Q5X/WGz2KLXTv.c59FxeAwfrhvKU4PQbZTPXP/AMkx8r9Icv1qS', '', '', NULL, 1, NULL, NULL, '2026-03-25 00:05:13'),
+(10, 'sample4', 'sample4@gmail.com', '$2y$10$kVcs8DgHEugTzGtvsaRiSOi7ZgTxkEE7qHPOGQD/1WYc5FOrpObru', 'sponsor', 'profile/1774416092_69c370dcc7ae4.jpg', NULL, 1, NULL, NULL, '2026-03-25 00:20:48'),
+(11, 'sample5', 'sample5@gmail.com', '$2y$10$JqvDRqR2nlCJsG1IZqvclO444PsfqvzEuUmD8P8CCKzJLZD9asD9W', '', '', NULL, 1, NULL, NULL, '2026-03-25 00:22:06'),
+(22, 'Rowena Sumbi', 'rowenasumbi5@gmail.com', '$2y$10$tz.XeuMiVTzrEkxx4NAk6uLFePdLZdIKjccl9dYi7vK78x3F99s1e', 'sponsor', '', NULL, 1, NULL, NULL, '2026-03-26 13:08:52');
 
 --
 -- Indexes for dumped tables
@@ -446,7 +460,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `budget`
 --
 ALTER TABLE `budget`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
 
 --
 -- AUTO_INCREMENT for table `category`
@@ -464,19 +478,19 @@ ALTER TABLE `due_status`
 -- AUTO_INCREMENT for table `expenses`
 --
 ALTER TABLE `expenses`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=88;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=91;
 
 --
 -- AUTO_INCREMENT for table `expense_shares`
 --
 ALTER TABLE `expense_shares`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
 
 --
 -- AUTO_INCREMENT for table `notifications`
 --
 ALTER TABLE `notifications`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- AUTO_INCREMENT for table `payment_method`
@@ -488,7 +502,7 @@ ALTER TABLE `payment_method`
 -- AUTO_INCREMENT for table `people`
 --
 ALTER TABLE `people`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT for table `scheduled_payments`
@@ -506,7 +520,7 @@ ALTER TABLE `sponsor_spender`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- Constraints for dumped tables

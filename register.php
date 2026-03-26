@@ -49,6 +49,56 @@ body {min-height:100vh; background:linear-gradient(135deg, #6f47fd, #f7f7f7); di
 .success-popup{display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%);  color:#fff; padding:20px 30px; border-radius:10px; font-weight:700; font-size:16px; box-shadow:0 4px 15px rgba(0,0,0,0.3); z-index:999;}
 .session-error{display:block; color:#e74c3c; font-size:14px; margin-bottom:15px;}
 @media(max-width:900px){.register-container{flex-direction:column;}}
+/* Modal Overlay */
+.modal-overlay {
+    display: none; /* Hidden by default */
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(5px);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Modal Box */
+.verify-modal {
+    background: #fff;
+    padding: 40px;
+    border-radius: 20px;
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+
+.verify-modal h2 { color: #7f308f; margin-bottom: 15px; font-weight: 800; }
+.verify-modal p { font-size: 14px; color: #666; margin-bottom: 20px; }
+
+.otp-input {
+    width: 100%;
+    padding: 15px;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    font-size: 20px;
+    text-align: center;
+    letter-spacing: 5px;
+    margin-bottom: 20px;
+    outline: none;
+}
+
+.otp-input:focus { border-color: #7f308f; }
+
+.verify-btn {
+    width: 100%;
+    padding: 12px;
+    background: #7f308f;
+    color: #fff;
+    border: none;
+    border-radius: 20px;
+    font-weight: 700;
+    cursor: pointer;
+}
 </style>
 </head>
 <body>
@@ -80,7 +130,13 @@ body {min-height:100vh; background:linear-gradient(135deg, #6f47fd, #f7f7f7); di
 
   <div class="form-group">
     <label>Password</label>
-    <input type="password" name="password" id="password">
+    <input 
+        type="password" 
+        name="password" 
+        id="password" 
+        pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&.]).{8,}"
+        title="Must contain at least one uppercase, one lowercase, one number, and one special character."
+    >
     <i class="fa-solid fa-eye show-hide" id="togglePassword"></i>
     <div class="error-msg" id="passwordError">Password must be at least 8 characters</div>
   </div>
@@ -106,9 +162,30 @@ body {min-height:100vh; background:linear-gradient(135deg, #6f47fd, #f7f7f7); di
 <script>
   const popup = document.getElementById('successPopup');
   popup.style.display = 'block';
-  setTimeout(()=>{ window.location.href = 'login.php'; }, 2000);
+
 </script>
 <?php endif; ?>
+
+<div class="modal-overlay" id="verifyModal" style="<?= isset($_SESSION['pending_email']) ? 'display:flex;' : '' ?>">
+    <div class="verify-modal">
+        <h2>Verify Email</h2>
+        <p>We sent a 6-digit code to <br><strong><?= htmlspecialchars($_SESSION['pending_email'] ?? '') ?></strong></p>
+        
+        <?php if($error): ?>
+        <div class="session-error"><?= htmlspecialchars($error) ?></div>
+        <?php endif; ?>
+
+        <form action="verify_logic.php" method="POST">
+            <input type="text" name="otp" class="otp-input" placeholder="000000" maxlength="6" required>
+            <button type="submit" class="verify-btn">Verify Account</button>
+        </form>
+        
+        <p style="margin-top: 20px; font-size: 12px;">
+            Didn't get a code? 
+            <a href="resend_code.php" style="color: #7f308f; font-weight: 700;">Resend Code</a>
+        </p>
+    </div>
+</div>
 
 <script>
 // Show/hide password
@@ -152,6 +229,35 @@ registerForm.addEventListener("submit", function(e){
 });
 
 function showError(input,errorEl){ input.classList.add("input-error"); errorEl.style.display="block"; }
+
+const resendBtn = document.querySelector('a[href="resend_code.php"]');
+if (resendBtn) {
+    resendBtn.addEventListener('click', function(e) {
+        // Simple visual feedback that it's working
+        this.innerText = "Sending...";
+        this.style.pointerEvents = "none";
+        this.style.color = "#ccc";
+    });
+}
+
+const passwordInput = document.getElementById('password');
+const passMsg = document.getElementById('pass-msg');
+
+// Updated regex to include (?=.*[a-z]) for lowercase
+const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[\W_]).{8,}$/;
+
+passwordInput.addEventListener('input', () => {
+    if (passwordInput.value === "") {
+        passMsg.innerText = "Use 8+ chars with Uppercase, Lowercase, Number, and Symbol.";
+        passMsg.style.color = "#777";
+    } else if (regex.test(passwordInput.value)) {
+        passMsg.innerText = "Strong password! Meets all requirements.";
+        passMsg.style.color = "#27ae60"; // Green
+    } else {
+        passMsg.innerText = "Weak: Need Uppercase, Lowercase, Number, and Symbol.";
+        passMsg.style.color = "#e74c3c"; // Red
+    }
+});
 </script>
 
 </body>

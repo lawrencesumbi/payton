@@ -7,6 +7,27 @@ unset($_SESSION['error']);
 
 $success = $_SESSION['success'] ?? '';
 unset($_SESSION['success']);
+
+if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
+    $token = $_COOKIE['remember_me'];
+
+    // Search for a user with this token
+    $stmt = $pdo->prepare("SELECT * FROM users WHERE remember_token = ?");
+    $stmt->execute([$token]);
+    $user = $stmt->fetch();
+
+    if ($user) {
+        // Log them in automatically
+        $_SESSION['user_id'] = $user['id'];
+        $_SESSION['fullname'] = $user['fullname'];
+        $_SESSION['role'] = $user['role'];
+
+        // Redirect to their dashboard
+        header("Location: " . ($user['role'] ?: 'option.php'));
+        exit();
+    }
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -104,19 +125,24 @@ unset($_SESSION['success']);
     <!-- LOGIN FORM -->
     <form action="login_process.php" method="POST">
       <div class="form-group">
-        <label for="email">Email</label>
-        <input type="text" name="email" id="email" required>
+          <label for="email">Email</label>
+          <input type="text" name="email" id="email" 
+                value="<?= $_COOKIE['user_email'] ?? '' ?>" required>
       </div>
 
       <div class="form-group">
-        <label for="password">Password</label>
-        <input type="password" name="password" id="password" required>
-        <i class="fa-solid fa-eye show-hide" id="togglePassword"></i>
+          <label for="password">Password</label>
+          <input type="password" name="password" id="password" 
+                value="<?= $_COOKIE['user_password'] ?? '' ?>" required>
+          <i class="fa-solid fa-eye show-hide" id="togglePassword"></i>
       </div>
 
       <div class="form-forgot">
-        <label><input type="checkbox" name="remember_me"> Remember me</label>
-        <p><a href="forgotpassword.php">Forgot Password?</a></p>
+          <label>
+              <input type="checkbox" name="remember_me" <?= isset($_COOKIE['user_email']) ? 'checked' : '' ?>> 
+              Remember me
+          </label>
+          <p><a href="forgotpassword.php">Forgot Password?</a></p>
       </div>
 
       <button type="submit" class="login-btn">Login</button>

@@ -42,6 +42,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["role"])) {
     ":id"   => $user_id
   ]);
 
+  $_SESSION["role"] = $role;
+
   // Redirect based on role
   if ($role === "spender") {
     header("Location: spender.php");

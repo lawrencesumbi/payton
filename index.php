@@ -266,15 +266,15 @@
             <div class="flex flex-col gap-4">
                 <h4 class="text-white font-bold mb-4">Follow Us</h4>
                 <div class="flex gap-4">
-                    <a href="#" class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center hover:bg-brand-light transition duration-300 text-white shadow-lg">
+                    <a href="https://www.facebook.com/lawrence.sumbi.2024/" class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center hover:bg-brand-light transition duration-300 text-white shadow-lg">
                         <i class="fab fa-facebook-f text-lg"></i>
                     </a>
                     
-                    <a href="mailto:payton@gmail.com" class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center hover:bg-brand-light transition duration-300 text-white shadow-lg">
+                    <a href="https://mail.google.com/mail/u/1/#inbox?compose=DmwnWsLWPlCZdcDjcPnhzLnHLMsPfKsrwvskHjZNRrlWQghrFfPKSMgWwQxzqKHhzCLDTqtlTxLG" class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center hover:bg-brand-light transition duration-300 text-white shadow-lg">
                         <i class="fas fa-envelope text-lg"></i>
                     </a>
                     
-                    <a href="#" class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center hover:bg-brand-light transition duration-300 text-white shadow-lg">
+                    <a href="https://www.youtube.com/@sumbilawrenceguianp.9254" class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center hover:bg-brand-light transition duration-300 text-white shadow-lg">
                         <i class="fab fa-youtube text-lg"></i>
                     </a>
                 </div>
