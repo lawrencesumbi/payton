@@ -24,12 +24,20 @@ if (!in_array($page, $allowed_pages)) { $page = 'dashboard'; }
 $profilePath = $user['profile_pic'];
 $_SESSION['fullname'] = $user['fullname'];
 $_SESSION['email'] = $user['email'];
+
+// Fetch Unread Notification Count
+$stmtCount = $conn->prepare("SELECT COUNT(*) FROM notifications WHERE user_id = ? AND status = 'unread'");
+$stmtCount->execute([$id]);
+$unreadCount = $stmtCount->fetchColumn();
+
+// Get current search term for persistence
+$searchTerm = $_GET['search'] ?? '';
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Spender Dashboard</title>
+  <title>Spender Dashboard - Payton</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
@@ -67,7 +75,7 @@ $_SESSION['email'] = $user['email'];
     .menu a.active { background: #ebe0f7; color: #7f308f !important; }
     .menu a:hover:not(.active) { background: #f9f9f9; color: #7f308f; }
 
-    /* ===== NO-FLICKER COLLAPSED LOGIC ===== */
+    /* ===== SIDEBAR COLLAPSED LOGIC ===== */
     .sidebar-is-collapsed .sidebar { width: 80px; }
     .sidebar-is-collapsed .sidebar .left-nav h3, 
     .sidebar-is-collapsed .sidebar .menu a span,
@@ -96,9 +104,42 @@ $_SESSION['email'] = $user['email'];
 
     .topbar-right { display: flex; align-items: center; gap: 24px; }
     .header-icons { display: flex; align-items: center; gap: 18px; color: #6b7280; font-size: 16px; }
+
+    /* ===== SEARCH BAR STYLES ===== */
+    .search-wrapper {
+      display: flex;
+      align-items: center;
+      background: #f3f4f6;
+      padding: 6px 15px;
+      border-radius: 20px;
+      border: 1px solid transparent;
+      transition: all 0.3s ease;
+    }
+    .search-wrapper:focus-within {
+      background: #fff;
+      border-color: #7f308f;
+      box-shadow: 0 0 0 3px rgba(127, 48, 143, 0.1);
+    }
+    .search-wrapper input {
+      border: none;
+      background: transparent;
+      outline: none;
+      font-size: 14px;
+      color: #374151;
+      width: 140px;
+      transition: width 0.3s ease;
+    }
+    .search-wrapper input:focus { width: 220px; }
+    .search-wrapper button {
+      background: none; border: none; padding: 0; cursor: pointer;
+      color: #9ca3af; display: flex; align-items: center;
+    }
+    .search-wrapper button:hover { color: #7f308f; }
+
     .header-icons i { cursor: pointer; transition: 0.2s; }
     .header-icons i:hover { color: #7f308f; }
 
+    /* ===== PROFILE DROPDOWN ===== */
     .profile-dropdown { position: relative; }
     .profile-btn {
       background: none; border: none; padding: 0; cursor: pointer;
@@ -133,13 +174,36 @@ $_SESSION['email'] = $user['email'];
         .sidebar .left-nav h3, .sidebar .menu a span, .sidebar-footer span { display: none; }
         .sidebar .menu a { justify-content: center; padding: 15px; border-radius: 10px; margin: 0 10px; }
         .footer-avatar { display: block; }
+        .search-wrapper input { width: 80px; }
     }
+
+    /* Notification Badge */
+.notif-wrapper {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+}
+.notif-badge {
+    position: absolute;
+    top: -5px;
+    right: -8px;
+    background: #ef4444; /* Red */
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 5px;
+    border-radius: 10px;
+    border: 2px solid #fff;
+    min-width: 18px;
+    text-align: center;
+}
+
   </style>
 </head>
 <body>
 
 <script>
-    // PRE-LOAD FIX: This prevents the sidebar from flashing/expanding during page loads
+    // PRE-LOAD FIX
     if (localStorage.getItem("sidebarStatus") === "collapsed") {
         document.documentElement.classList.add('sidebar-is-collapsed');
     }
@@ -190,8 +254,8 @@ $_SESSION['email'] = $user['email'];
       <div class="topbar-left">
         <i class="fa-solid fa-bars" id="sidebarToggle" style="cursor: pointer;"></i>
         <span class="sep">/</span>
-        <a href="?page=dashboard" class="<?= $page=='dashboard'?'active':'' ?>">
-        <i class="fa-solid fa-house"></i>
+        <a href="?page=dashboard" style="color: inherit; text-decoration: none;">
+          <i class="fa-solid fa-house"></i>
         </a>
         <span class="sep">/</span>
         <span class="current-page"><?= ucwords(str_replace('_',' ', $page)) ?></span>
@@ -199,10 +263,20 @@ $_SESSION['email'] = $user['email'];
 
       <div class="topbar-right">
         <div class="header-icons">
-          <i class="fa-solid fa-magnifying-glass"></i>
+          <form action="" method="GET" class="search-wrapper" id="searchForm">
+            <input type="hidden" name="page" value="<?= htmlspecialchars($page) ?>">
+            <input type="text" name="search" id="globalSearch" placeholder="Search <?= str_replace('_',' ', $page) ?>..." value="<?= htmlspecialchars($searchTerm) ?>">
+            <button type="submit">
+              <i class="fa-solid fa-magnifying-glass"></i>
+            </button>
+          </form>
+
           <i class="fa-solid fa-sun"></i>
-          <a href="?page=notifications" style="color: inherit; text-decoration: none;">
-            <i class="fa-solid fa-bell"></i>
+          <a href="?page=notifications" class="notif-wrapper" style="color: inherit; text-decoration: none;">
+              <i class="fa-solid fa-bell"></i>
+              <?php if ($unreadCount > 0): ?>
+                  <span class="notif-badge"><?= $unreadCount > 99 ? '99+' : $unreadCount ?></span>
+              <?php endif; ?>
           </a>
         </div>
 
@@ -236,24 +310,18 @@ $_SESSION['email'] = $user['email'];
 </div>
 
 <script>
-  // DOM Selections
   const profileBtn = document.getElementById("profileBtn");
   const profileMenu = document.getElementById("profileMenu");
   const sidebarToggle = document.getElementById("sidebarToggle");
+  const globalSearch = document.getElementById("globalSearch");
 
-  // --- Sidebar Persistent Toggle Logic ---
+  // --- Sidebar Toggle ---
   sidebarToggle.addEventListener("click", function() {
     document.documentElement.classList.toggle("sidebar-is-collapsed");
-    
-    // Save state to LocalStorage
-    if (document.documentElement.classList.contains("sidebar-is-collapsed")) {
-        localStorage.setItem("sidebarStatus", "collapsed");
-    } else {
-        localStorage.setItem("sidebarStatus", "expanded");
-    }
+    localStorage.setItem("sidebarStatus", document.documentElement.classList.contains("sidebar-is-collapsed") ? "collapsed" : "expanded");
   });
 
-  // --- Profile Dropdown Logic ---
+  // --- Profile Dropdown ---
   profileBtn.addEventListener("click", function(e){
     e.stopPropagation();
     profileMenu.classList.toggle("show");
@@ -261,6 +329,18 @@ $_SESSION['email'] = $user['email'];
 
   document.addEventListener("click", function(){
     profileMenu.classList.remove("show");
+  });
+
+  // --- Live Table Filter (Optional) ---
+  // This automatically hides table rows as you type, even before pressing Enter
+  globalSearch.addEventListener("keyup", function() {
+    let filter = this.value.toLowerCase();
+    let tableRows = document.querySelectorAll(".content table tbody tr");
+    
+    tableRows.forEach(row => {
+      let text = row.textContent.toLowerCase();
+      row.style.display = text.includes(filter) ? "" : "none";
+    });
   });
 </script>
 

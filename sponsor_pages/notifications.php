@@ -11,6 +11,15 @@ if (isset($_GET['action']) && $_GET['action'] === 'mark_all_read') {
     exit;
 }
 
+// Handle Single Notification Deletion
+if (isset($_POST['delete_notification'])) {
+    $del_id = $_POST['delete_notif_id'];
+    $stmt = $conn->prepare("DELETE FROM notifications WHERE id = ? AND user_id = ?");
+    $stmt->execute([$del_id, $id]);
+    echo "<script>window.location.href='?page=notifications';</script>";
+    exit;
+}
+
 // Fetch all notifications
 $stmt = $conn->prepare("SELECT id, message, status, created_at FROM notifications WHERE user_id=? ORDER BY created_at DESC");
 $stmt->execute([$sponsor_id]);

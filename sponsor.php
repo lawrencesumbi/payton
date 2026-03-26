@@ -20,16 +20,16 @@ $allowed_pages = ['dashboard', 'manage_members', 'manage_allowance', 'monitoring
 
 if (!in_array($page, $allowed_pages)) { $page = 'dashboard'; }
 
-// Profile data fallback logic
-$dbProfile = $user['profile_pic'];
-if (!empty($dbProfile) && file_exists($dbProfile)) {
-    $profilePath = $dbProfile;
-} else {
-    $profilePath = "profile/default.jpg"; 
-}
-
+// Profile data
+$profilePath = $user['profile_pic'];
 $_SESSION['fullname'] = $user['fullname'];
 $_SESSION['email'] = $user['email'];
+
+// Fetch Unread Notification Count
+$stmtCount = $conn->prepare("SELECT COUNT(*) FROM notifications WHERE user_id = ? AND status = 'unread'");
+$stmtCount->execute([$id]);
+$unreadCount = $stmtCount->fetchColumn();
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -174,6 +174,29 @@ $_SESSION['email'] = $user['email'];
         .sidebar .menu a { justify-content: center; padding: 15px; border-radius: 10px; margin: 0 10px; }
         .footer-avatar { display: block; }
     }
+
+    /* Notification Badge */
+.notif-wrapper {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+}
+.notif-badge {
+    position: absolute;
+    top: -6px;
+    right: -10px;
+    background: #ef4444; /* Bright Red */
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 5px;
+    border-radius: 10px;
+    border: 2px solid var(--bg-topbar); /* Matches theme background */
+    min-width: 18px;
+    text-align: center;
+    line-height: 1;
+}
+
   </style>
 </head>
 <body>
@@ -235,8 +258,11 @@ $_SESSION['email'] = $user['email'];
         <div class="header-icons">
           <i class="fa-solid fa-magnifying-glass"></i>
           <i class="fa-solid fa-sun" id="themeToggle" style="cursor: pointer;"></i>
-          <a href="?page=notifications" style="color: inherit; text-decoration: none;">
-            <i class="fa-solid fa-bell"></i>
+          <a href="?page=notifications" class="notif-wrapper" style="color: inherit; text-decoration: none;">
+              <i class="fa-solid fa-bell"></i>
+              <?php if ($unreadCount > 0): ?>
+                  <span class="notif-badge"><?= $unreadCount > 99 ? '99+' : $unreadCount ?></span>
+              <?php endif; ?>
           </a>
         </div>
 

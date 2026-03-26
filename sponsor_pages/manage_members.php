@@ -1,58 +1,14 @@
 <?php
-
 require_once "db.php"; 
+if (session_status() === PHP_SESSION_NONE) { session_start(); }
 
 if(!isset($_SESSION['user_id'])){
     die("Please login first.");
 }
 
 $sponsor_id = $_SESSION['user_id'];
-$message = "";
 
-// Handle sending an invitation
-if(isset($_POST['send_invite'])){
-    $student_email = trim($_POST['student_email']);
-
-    // Check if student exists
-    $stmt = $conn->prepare("SELECT id, fullname FROM users WHERE email = ? AND role = 'spender'");
-    $stmt->execute([$student_email]);
-    $student = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    if(!$student){
-        $message = "No spender with that email exists.";
-    } else {
-        // Check if already invited or linked
-        $stmt = $conn->prepare("
-            SELECT * 
-            FROM notifications 
-            WHERE user_id = ? AND type='invite' AND message LIKE ?
-        ");
-        $stmt->execute([$student['id'], "%{$sponsor_id}%"]);
-        if($stmt->rowCount() > 0){
-            $message = "An invitation has already been sent to {$student['fullname']}.";
-        } else {
-            $stmt = $conn->prepare("SELECT fullname FROM users WHERE id = ?");
-            $stmt->execute([$sponsor_id]);
-            $parent = $stmt->fetch(PDO::FETCH_ASSOC);
-
-            $invite_message = "You have been invited by {$parent['fullname']}. Click accept to join.";
-            $stmt = $conn->prepare("INSERT INTO notifications (user_id, type, message, status, parent_id) VALUES (?, 'invite', ?, 'unread', ?)");
-            $stmt->execute([$student['id'], $invite_message, $sponsor_id]);
-            $message = "Invitation sent to {$student['fullname']}.";
-        }
-    }
-}
-
-// Handle deleting/unlinking a member
-if(isset($_POST['delete_member'])){
-    $delete_id = $_POST['spender_id'];
-    $stmt = $conn->prepare("DELETE FROM sponsor_spender WHERE sponsor_id = ? AND spender_id = ?");
-    if($stmt->execute([$sponsor_id, $delete_id])){
-        $message = "Member removed successfully.";
-    }
-}
-
-// Fetch students already linked to this parent
+// Fetch linked members for display
 $stmt = $conn->prepare("
     SELECT u.id, u.fullname, u.email
     FROM users u
@@ -68,206 +24,96 @@ $students = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage Members</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
-    /* ===== 1. THEME VARIABLES ===== */
-    :root {
-        --primary: #6f42c1;
-        --primary-hover: #59359a;
-        --bg-body: #f8f9fa;
-        --card-bg: #ffffff;
-        --text-main: #111827;
-        --text-muted: #6b7280;
-        --border: #e5e7eb;
-        --white: #ffffff;
-        --table-hover: #fcfcfd;
-        --header-bg: #fafafa;
-    }
+        /* [KEEPING ALL YOUR ORIGINAL CSS VARIABLES AND DARK MODE LOGIC UNTOUCHED] */
+        :root {
+            --primary: #6f42c1; --primary-hover: #59359a; --bg-body: #f8f9fa;
+            --card-bg: #ffffff; --text-main: #111827; --text-muted: #6b7280;
+            --border: #e5e7eb; --white: #ffffff; --table-hover: #fcfcfd;
+            --header-bg: #fafafa; --success: #22c55e; --danger: #ef4444;
+        }
+        [data-theme="dark"] {
+            --bg-body: #0f111a; --card-bg: #191c24; --text-main: #f8fafc;
+            --text-muted: #cbd5e1; --border: #2a2e39; --white: #191c24;
+            --table-hover: #1e222d; --header-bg: #242833;
+        }
 
-    [data-theme="dark"] {
-        --bg-body: #0f111a;
-        --card-bg: #191c24;
-        --text-main: #f8fafc;
-        --text-muted: #cbd5e1;
-        --border: #2a2e39;
-        --white: #191c24;
-        --table-hover: #1e222d;
-        --header-bg: #242833;
-    }
+        body { font-family: 'Inter', sans-serif; background: var(--bg-body); color: var(--text-main); margin: 0; transition: background 0.3s ease, color 0.3s ease;}
+        
+        /* Scrollbar Hide */
+        html, body { height: 100%; -ms-overflow-style: none; scrollbar-width: none; }
+        html::-webkit-scrollbar, body::-webkit-scrollbar { display: none; }
 
-    /* ===== 2. GLOBAL STYLES ===== */
-    body { 
-        font-family: 'Inter', sans-serif; 
-        background: var(--bg-body); 
-        color: var(--text-main); 
-        margin: 0;
-        transition: background 0.3s ease, color 0.3s ease;
-    }
+        .container { width: 100%; padding: 0 20px; box-sizing: border-box; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding-top: 20px; }
+        
+        /* TOAST STYLES */
+        .toast-container { position:fixed; top:20px; right:20px; z-index:9999; }
+        .custom-toast { 
+            display:flex; align-items:flex-start; gap:10px; background:var(--card-bg); padding:15px; 
+            border-radius:10px; margin-bottom:10px; min-width:280px; box-shadow:0 10px 25px rgba(0,0,0,0.2); 
+            animation: slideIn 0.3s ease; transition: opacity 0.3s ease; border: 1px solid var(--border);
+        }
+        @keyframes slideIn { from{ transform: translateX(100%); opacity:0; } to{ transform: translateX(0); opacity:1; } }
+        .toast-success { border-left:5px solid var(--success); }
+        .toast-error { border-left:5px solid var(--danger); }
+        .toast-title { font-weight:700; font-size: 14px; color: var(--text-main); }
+        .toast-message { font-size:13px; color: var(--text-muted); }
+        .toast-close { margin-left:auto; cursor:pointer; border:none; background:none; font-size:16px; color: var(--text-muted); }
 
-    /* Scrollbar Hide */
-    html, body {
-        height: 100%;
-        -ms-overflow-style: none;  
-        scrollbar-width: none;  
-    }
-    html::-webkit-scrollbar, body::-webkit-scrollbar { display: none; }
+        /* TABLE & CARD */
+        .card { background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 1px 3px rgba(0,0,0,0.1); overflow: hidden; }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: var(--header-bg); padding: 12px 20px; text-align: left; font-size: 0.75rem; color: var(--text-muted); border-bottom: 1px solid var(--border); text-transform: uppercase; }
+        td { padding: 16px 20px; border-bottom: 1px solid var(--border); font-size: 0.9rem; color: var(--text-main); }
+        tr:hover { background: var(--table-hover); }
 
-    .container { 
-        width: 100%;  
-        padding: 0 20px; 
-        box-sizing: border-box;
-    }
+        /* BUTTONS */
+        .btn { padding: 10px 18px; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; font-weight: 500; font-size: 0.875rem; display: inline-flex; align-items: center; gap: 8px; background: var(--card-bg); color: var(--text-main); transition: 0.2s; }
+        .btn-primary { background: var(--primary); color: white; border: none; }
+        .btn-primary:hover { background: var(--primary-hover); }
+        .btn-danger { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); }
+        .btn-danger:hover { background: #ef4444; color: white; }
 
-    /* ===== 3. HEADER & ALERTS ===== */
-    .header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 24px;
-        padding-top: 20px;
-    }
-
-    .header h1 { font-size: 1.5rem; font-weight: 600; margin: 0; color: var(--text-main); }
-
-    .alert {
-        padding: 12px 16px;
-        background: rgba(16, 185, 129, 0.1);
-        color: #10b981;
-        border-radius: 8px;
-        margin-bottom: 20px;
-        font-size: 0.9rem;
-        border: 1px solid rgba(16, 185, 129, 0.2);
-    }
-
-    /* ===== 4. CARD & TABLE ===== */
-    .card {
-        background: var(--card-bg);
-        border-radius: 12px;
-        border: 1px solid var(--border);
-        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        overflow: hidden;
-    }
-
-    table { width: 100%; border-collapse: collapse; }
-    
-    th { 
-        background: var(--header-bg); 
-        padding: 12px 20px; 
-        text-align: left; 
-        font-size: 0.75rem; 
-        text-transform: uppercase; 
-        letter-spacing: 0.05em;
-        color: var(--text-muted);
-        border-bottom: 1px solid var(--border);
-    }
-
-    td { 
-        padding: 16px 20px; 
-        border-bottom: 1px solid var(--border); 
-        font-size: 0.9rem;
-        color: var(--text-main);
-    }
-
-    tr:last-child td { border-bottom: none; }
-    tr:hover { background: var(--table-hover); }
-
-    .member-name { font-weight: 600; color: var(--text-main); }
-    .member-email { color: var(--text-muted); }
-
-    /* ===== 5. BUTTONS ===== */
-    .btn { 
-        padding: 10px 18px; 
-        border: 1px solid var(--border);
-        border-radius: 8px; 
-        cursor: pointer; 
-        font-weight: 500;
-        font-size: 0.875rem;
-        transition: all 0.2s;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-    }
-
-    .btn-primary { 
-        background: var(--primary); 
-        color: white; 
-        border: none;
-    }
-    
-    .btn-primary:hover { 
-        background: var(--primary-hover); 
-        transform: translateY(-1px); 
-        box-shadow: 0 4px 12px rgba(111, 66, 193, 0.2);
-    }
-
-    .btn-danger {
-        background: rgba(220, 38, 38, 0.1);
-        color: #ef4444;
-        border: 1px solid rgba(220, 38, 38, 0.2);
-    }
-
-    .btn-danger:hover {
-        background: #dc2626;
-        color: white;
-    }
-
-    /* ===== 6. MODAL ===== */
-    #modalOverlay { 
-        display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-        background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px);
-        justify-content: center; align-items: center; z-index: 1000;
-    }
-
-    .modal-card { 
-        background: var(--card-bg); 
-        padding: 32px; 
-        border-radius: 16px; 
-        max-width: 400px; width: 90%; 
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
-        border: 1px solid var(--border);
-    }
-
-    .modal-card h2 { color: var(--text-main); }
-
-    .input-box { 
-        width: 100%; padding: 12px; margin: 16px 0; 
-        background: var(--bg-body);
-        color: var(--text-main);
-        border: 1px solid var(--border); 
-        border-radius: 8px; 
-        box-sizing: border-box; 
-        font-size: 1rem;
-    }
-    
-    .input-box:focus { 
-        outline: none; 
-        border-color: var(--primary); 
-        box-shadow: 0 0 0 3px rgba(111, 66, 193, 0.1);
-    }
-
-    .modal-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 8px; }
-
-    .empty-state { text-align: center; padding: 40px; color: var(--text-muted); }
-    .actions-column { text-align: right; }
-</style>
+        /* MODALS */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px); justify-content: center; align-items: center; z-index: 1000; }
+        .modal-card { background: var(--card-bg); padding: 32px; border-radius: 16px; max-width: 400px; width: 90%; border: 1px solid var(--border); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3); }
+        .input-box { width: 100%; padding: 12px; margin: 16px 0; border: 1px solid var(--border); border-radius: 8px; box-sizing: border-box; background: var(--bg-body); color: var(--text-main); }
+    </style>
 </head>
 <body>
 
-<div class="container">
-        <div class="header d-flex justify-content-between align-items-center">
-            <h1>Manage Members</h1>
-            <button class="btn" style="background-color:#6f42c1; color:white; border-radius:8px;" onclick="openModal()">
-                + Add Member
-            </button>
+<div class="toast-container">
+    <?php if(isset($_SESSION['success_msg'])): ?>
+        <div class="custom-toast toast-success">
+            <div>
+                <div class="toast-title">SUCCESS</div>
+                <div class="toast-message"><?= $_SESSION['success_msg'] ?></div>
+            </div>
+            <button class="toast-close" onclick="this.parentElement.remove()">✖</button>
         </div>
-
-    <?php if(!empty($message)): ?>
-        <div class="alert">
-            ✓ <?php echo htmlspecialchars($message); ?>
-        </div>
+        <?php unset($_SESSION['success_msg']); ?>
     <?php endif; ?>
+
+    <?php if(isset($_SESSION['error_msg'])): ?>
+        <div class="custom-toast toast-error">
+            <div>
+                <div class="toast-title">ERROR</div>
+                <div class="toast-message"><?= $_SESSION['error_msg'] ?></div>
+            </div>
+            <button class="toast-close" onclick="this.parentElement.remove()">✖</button>
+        </div>
+        <?php unset($_SESSION['error_msg']); ?>
+    <?php endif; ?>
+</div>
+
+<div class="container">
+    <div class="header">
+        <h1>Manage Members</h1>
+        <button class="btn btn-primary" onclick="openInviteModal()">+ Add Member</button>
+    </div>
 
     <div class="card">
         <table>
@@ -275,33 +121,26 @@ $students = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <tr>
                     <th>Member Details</th>
                     <th>Email Address</th>
-                    <th class="actions-column">Actions</th>
+                    <th style="text-align: right;">Actions</th>
                 </tr>
             </thead>
             <tbody>
                 <?php if(!empty($students)): ?>
                     <?php foreach($students as $s): ?>
                         <tr>
-                            <td>
-                                <div class="member-name"><?php echo htmlspecialchars($s['fullname'] ?? 'Pending Invite'); ?></div>
-                            </td>
-                            <td>
-                                <div class="member-email"><?php echo htmlspecialchars($s['email']); ?></div>
-                            </td>
-                            <td class="actions-column">
-                                <form method="POST" onsubmit="return confirmDelete();" style="display:inline;">
-                                    <input type="hidden" name="spender_id" value="<?php echo $s['id']; ?>">
-                                    <button type="submit" name="delete_member" class="btn btn-danger">
-                                        Remove
-                                    </button>
-                                </form>
+                            <td><div style="font-weight:600;"><?= htmlspecialchars($s['fullname']); ?></div></td>
+                            <td><div style="color:var(--text-muted);"><?= htmlspecialchars($s['email']); ?></div></td>
+                            <td style="text-align: right;">
+                                <button type="button" class="btn btn-danger" onclick="confirmDelete(<?= $s['id']; ?>, '<?= htmlspecialchars($s['fullname'], ENT_QUOTES); ?>')">
+                                    Remove
+                                </button>
                             </td>
                         </tr>
                     <?php endforeach; ?>
                 <?php else: ?>
                     <tr>
-                        <td colspan="2" class="empty-state">
-                            No members found. Click the button to invite someone.
+                        <td colspan="3" style="text-align:center; padding: 40px; color: var(--text-muted);">
+                            No members found. Invite someone to get started.
                         </td>
                     </tr>
                 <?php endif; ?>
@@ -310,29 +149,61 @@ $students = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </div>
 </div>
 
-
-<div id="modalOverlay">
+<div id="inviteModal" class="modal-overlay">
     <div class="modal-card">
         <h2 style="margin:0 0 8px 0;">Invite Member</h2>
-        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 24px;">Enter an email address to send a workspace invitation.</p>
-        
-        <form method="POST">
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 24px;">Send an invitation to a spender.</p>
+        <form method="POST" action="members_handling.php">
             <label style="font-size: 0.8rem; font-weight: 600;">Email Address</label>
-            <input type="email" name="student_email" placeholder="e.g. name@company.com" class="input-box" required>
-            
-            <div class="modal-actions">
-                <button type="button" onclick="closeModal()" class="btn">Cancel</button>
+            <input type="email" name="student_email" placeholder="spender@email.com" class="input-box" required>
+            <div style="display: flex; justify-content: flex-end; gap: 12px;">
+                <button type="button" onclick="closeModal('inviteModal')" class="btn">Cancel</button>
                 <button type="submit" name="send_invite" class="btn btn-primary">Send Invite</button>
             </div>
         </form>
     </div>
 </div>
 
+<div id="deleteModal" class="modal-overlay">
+    <div class="modal-card">
+        <h2 style="margin:0 0 8px 0;">Remove Member?</h2>
+        <p id="deleteModalText" style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 24px;">
+            Are you sure you want to remove this member? They will lose access to your split expenses.
+        </p>
+        <form method="POST" action="members_handling.php">
+            <input type="hidden" name="spender_id" id="deleteSpenderId">
+            <div style="display: flex; justify-content: flex-end; gap: 12px;">
+                <button type="button" onclick="closeModal('deleteModal')" class="btn">Cancel</button>
+                <button type="submit" name="delete_member" class="btn btn-danger">Confirm Remove</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <script>
-    function openModal() { document.getElementById('modalOverlay').style.display = 'flex'; }
-    function closeModal() { document.getElementById('modalOverlay').style.display = 'none'; }
-    window.onclick = function(event){
-        if(event.target == document.getElementById('modalOverlay')) closeModal();
+    function openInviteModal() { document.getElementById('inviteModal').style.display = 'flex'; }
+    
+    function confirmDelete(id, name) {
+        document.getElementById('deleteSpenderId').value = id;
+        document.getElementById('deleteModalText').innerText = "Are you sure you want to remove " + name + " from your members list?";
+        document.getElementById('deleteModal').style.display = 'flex';
+    }
+
+    function closeModal(modalId) { document.getElementById(modalId).style.display = 'none'; }
+    
+    // Auto-hide toast logic
+    setTimeout(() => {
+        document.querySelectorAll('.custom-toast').forEach(t => {
+            t.style.opacity = '0';
+            setTimeout(() => t.remove(), 300);
+        });
+    }, 4000);
+
+    // Close on click outside
+    window.onclick = function(event) {
+        if (event.target.classList.contains('modal-overlay')) {
+            event.target.style.display = 'none';
+        }
     }
 </script>
 
