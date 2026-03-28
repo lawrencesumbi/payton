@@ -1,6 +1,7 @@
 <?php 
 require 'db.php';
 session_start();
+include 'log_helper.php';
 
 if (!isset($_SESSION['user_id'])) {
     exit;
@@ -43,6 +44,9 @@ if (empty($id)) {
         $due_status_id
     ]);
 
+    $logAction = "$user_name Scheduled a Payment: $name - ₱" . number_format($amount, 2);
+    addLog($conn, $user_id, $logAction);
+
     $_SESSION['success_msg'] = "Payment for '$name' scheduled successfully!";
 }
 
@@ -71,6 +75,9 @@ else {
         $id,
         $user_id
     ]);
+
+    $logAction = "$user_name Updated a Scheduled Payment: $name - ₱" . number_format($amount, 2);
+    addLog($conn, $user_id, $logAction);
 
     $_SESSION['success_msg'] = "Payment details updated successfully!";
 }

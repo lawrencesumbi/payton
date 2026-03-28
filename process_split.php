@@ -1,6 +1,7 @@
 <?php
 require_once "db.php";
 session_start();
+include "log_helper.php";
 
 if (!isset($_SESSION['user_id'])) {
     die("Unauthorized");
@@ -22,6 +23,10 @@ if (isset($_GET['delete_id'])) {
         $conn->rollBack();
         $_SESSION['error_msg'] = "Error deleting: " . $e->getMessage();
     }
+
+    $logAction = $_SESSION['fullname'] . " Deleted an Expense: $description - ₱" . number_format($amount, 2);
+    addLog($conn, $user_id, $logAction);
+
     header("Location: spender.php?page=split_expense");
     exit();
 }
@@ -76,6 +81,10 @@ if (isset($_POST['save_expense'])) {
         $conn->rollBack();
         $_SESSION['error_msg'] = "Error: " . $e->getMessage();
     }
+
+    $logAction = $_SESSION['fullname'] . " Added or Updated an Expense: $description - ₱" . number_format($total_amount, 2);
+    addLog($conn, $user_id, $logAction);
+
     header("Location: spender.php?page=split_expense");
     exit();
 }
@@ -97,6 +106,9 @@ if (isset($_POST['mark_paid'])) {
         $_SESSION['error_msg'] = "Failed to update payment status.";
     }
     
+     $logAction = $_SESSION['fullname'] . " Marked an Owe Expense as Paid/Settled: $description - ₱" . number_format($amount, 2);
+    addLog($conn, $user_id, $logAction);
+
     // Redirect back to the view page
     header("Location: spender.php?page=view_split_expense&expense_id=" . $target_expense_id);
     exit();

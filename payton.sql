@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 26, 2026 at 02:51 PM
+-- Generation Time: Mar 28, 2026 at 05:07 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -47,7 +47,7 @@ CREATE TABLE `budget` (
 INSERT INTO `budget` (`id`, `budget_name`, `budget_amount`, `start_date`, `end_date`, `user_id`, `sponsor_id`, `status`, `created_at`, `updated_at`) VALUES
 (35, 'March 10-20', 1000.00, '2026-03-10', '2026-03-20', 1, 2, 'Inactive', '2026-03-11 10:07:19', '2026-03-12 04:42:36'),
 (38, 'March 1-31', 10000.00, '2026-03-01', '2026-03-31', 5, 2, 'Active', '2026-03-12 05:39:40', '2026-03-12 05:39:40'),
-(39, 'March 25-30', 500.00, '2026-03-25', '2026-03-30', 1, 2, 'Active', '2026-03-20 17:08:26', '2026-03-20 17:08:26'),
+(39, 'March 25-30', 501.00, '2026-03-25', '2026-03-30', 1, 2, 'Active', '2026-03-20 17:08:26', '2026-03-20 17:08:26'),
 (41, 'February 1 - 15', 400.00, '2026-02-01', '2026-02-15', 1, 2, 'Inactive', '2026-02-14 02:14:43', '2026-02-14 02:14:43');
 
 -- --------------------------------------------------------
@@ -131,7 +131,7 @@ INSERT INTO `expenses` (`id`, `user_id`, `budget_id`, `category_id`, `descriptio
 (64, 1, 35, 4, 'Internet Bill', 199.00, 7, NULL, '2026-03-12', '2026-03-12 06:10:50', '2026-03-12 14:41:35'),
 (65, 1, 35, 10, 'Sample', 10.00, 1, NULL, '2026-03-12', '2026-03-12 14:42:26', '2026-03-12 14:42:26'),
 (66, 1, 35, 10, 'Sample 2', 10.00, 1, NULL, '2026-03-12', '2026-03-12 14:42:42', '2026-03-12 14:42:42'),
-(67, 1, 39, 1, 'Mang Inasal', 125.00, 1, NULL, '2026-03-25', '2026-03-24 17:09:54', '2026-03-24 17:09:54'),
+(67, 1, 39, 1, 'Mang Inasal', 126.00, 1, NULL, '2026-03-25', '2026-03-24 17:09:54', '2026-03-28 15:08:52'),
 (76, 1, 35, 1, 'Mang Inasal', 100.00, 1, NULL, '2026-03-15', '2026-03-15 13:19:24', '2026-03-15 13:19:24'),
 (77, 1, 35, 1, 'Snack', 50.00, 1, NULL, '2026-03-15', '2026-03-15 13:24:15', '2026-03-15 13:24:15'),
 (79, 1, 35, 1, 'Softdrink', 25.00, 1, NULL, '2026-03-15', '2026-03-15 13:51:26', '2026-03-15 13:51:26'),
@@ -176,6 +176,33 @@ INSERT INTO `expense_shares` (`id`, `expense_id`, `user_id`, `people_id`, `amoun
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `logs`
+--
+
+CREATE TABLE `logs` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `action` varchar(255) NOT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+
+--
+-- Dumping data for table `logs`
+--
+
+INSERT INTO `logs` (`id`, `user_id`, `action`, `created_at`) VALUES
+(10, 1, 'Lawrence Sumbi Logged in As Spender', '2026-03-28 22:53:45'),
+(11, 1, 'Lawrence Sumbi Updated the Expense: Mang Inasal to ?126.00', '2026-03-28 23:08:52'),
+(12, 1, 'Lawrence Sumbi Logged in As Spender', '2026-03-28 23:28:55'),
+(13, 1, 'Lawrence Sumbi Deleted a Scheduled Payment: ', '2026-03-28 23:29:10'),
+(14, 2, 'Patricia Ann Mae Obaob Logged in As Sponsor', '2026-03-28 23:49:01'),
+(15, 2, 'Patricia Ann Mae Obaob Added or Updated an Allowance: March 25-30', '2026-03-28 23:50:27'),
+(16, 2, 'Patricia Ann Mae Obaob Logged in As Sponsor', '2026-03-29 00:01:58'),
+(17, 1, 'Lawrence Sumbi Logged in As Spender', '2026-03-29 00:02:14');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `notifications`
 --
 
@@ -206,7 +233,9 @@ INSERT INTO `notifications` (`id`, `user_id`, `parent_id`, `type`, `message`, `s
 (16, 6, 10, 'invite', 'You have been invited by sample4. Click accept to join.', 'read', '2026-03-25 02:45:46'),
 (17, 6, 10, 'invite', 'You have been invited by sample4. Click accept to join.', 'read', '2026-03-25 02:46:13'),
 (18, 10, 6, '', 'sample1 has accepted your invitation and is now linked to your account.', 'read', '2026-03-25 02:46:18'),
-(19, 4, 2, 'invite', 'You have been invited by Patricia Ann Mae Obaob. Click accept to join.', 'unread', '2026-03-26 09:58:08');
+(19, 4, 2, 'invite', 'You have been invited by Patricia Ann Mae Obaob. Click accept to join.', 'unread', '2026-03-26 09:58:08'),
+(20, 1, 2, 'invite', 'You have been invited by Patricia Ann Mae Obaob. Click accept to join.', 'read', '2026-03-27 13:55:32'),
+(21, 2, 1, '', 'Lawrence Sumbi has accepted your invitation and is now linked to your account.', 'read', '2026-03-27 13:55:55');
 
 -- --------------------------------------------------------
 
@@ -298,10 +327,8 @@ INSERT INTO `scheduled_payments` (`id`, `user_id`, `payment_name`, `amount`, `du
 (22, 1, '4', 4.00, '2026-02-04', NULL, NULL, 3, '2026-02-22 04:45:24', '2026-02-22 04:45:24'),
 (24, 1, 'sample', 100.00, '2026-03-01', '2026-02-22', 1, 2, '2026-02-22 08:09:48', '2026-02-22 08:09:48'),
 (29, 1, 'Water Bill', 143.00, '2026-03-28', NULL, NULL, 1, '2026-03-11 10:09:32', '2026-03-11 10:09:32'),
-(30, 1, 'Sample', 10.00, '2026-03-21', '2026-03-13', 2, 2, '2026-03-12 15:17:24', '2026-03-12 15:17:24'),
 (31, 1, 'Sample', 10.00, '2026-03-25', NULL, NULL, 1, '2026-03-12 15:25:57', '2026-03-12 15:25:57'),
-(32, 1, '16', 160.00, '2026-03-16', NULL, NULL, 1, '2026-03-14 18:17:45', '2026-03-14 18:17:45'),
-(33, 1, 'Sample', 100.00, '2026-03-11', NULL, NULL, 1, '2026-03-16 02:42:41', '2026-03-16 02:42:41');
+(32, 1, '16', 160.00, '2026-03-16', NULL, NULL, 1, '2026-03-14 18:17:45', '2026-03-14 18:17:45');
 
 -- --------------------------------------------------------
 
@@ -321,9 +348,9 @@ CREATE TABLE `sponsor_spender` (
 --
 
 INSERT INTO `sponsor_spender` (`id`, `sponsor_id`, `spender_id`, `created_at`) VALUES
-(4, 2, 1, '2026-03-08 14:40:51'),
 (5, 2, 5, '2026-03-11 09:37:00'),
-(12, 10, 6, '2026-03-25 02:46:18');
+(12, 10, 6, '2026-03-25 02:46:18'),
+(13, 2, 1, '2026-03-27 13:55:55');
 
 -- --------------------------------------------------------
 
@@ -408,6 +435,13 @@ ALTER TABLE `expense_shares`
   ADD KEY `people_id` (`people_id`);
 
 --
+-- Indexes for table `logs`
+--
+ALTER TABLE `logs`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `user_id` (`user_id`);
+
+--
 -- Indexes for table `notifications`
 --
 ALTER TABLE `notifications`
@@ -487,10 +521,16 @@ ALTER TABLE `expense_shares`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
 
 --
+-- AUTO_INCREMENT for table `logs`
+--
+ALTER TABLE `logs`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+
+--
 -- AUTO_INCREMENT for table `notifications`
 --
 ALTER TABLE `notifications`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- AUTO_INCREMENT for table `payment_method`
@@ -514,7 +554,7 @@ ALTER TABLE `scheduled_payments`
 -- AUTO_INCREMENT for table `sponsor_spender`
 --
 ALTER TABLE `sponsor_spender`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT for table `users`
@@ -549,6 +589,12 @@ ALTER TABLE `expense_shares`
   ADD CONSTRAINT `expense_shares_expense_id_fr` FOREIGN KEY (`expense_id`) REFERENCES `expenses` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `expense_shares_people_id_fr` FOREIGN KEY (`people_id`) REFERENCES `people` (`id`),
   ADD CONSTRAINT `expense_shares_user_id_fr` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
+
+--
+-- Constraints for table `logs`
+--
+ALTER TABLE `logs`
+  ADD CONSTRAINT `logs_user_id_fr` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
 
 --
 -- Constraints for table `notifications`

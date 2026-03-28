@@ -1,6 +1,7 @@
 <?php
 session_start();
 require_once "db.php";
+include "log_helper.php";
 
 if(!isset($_SESSION['user_id'])){
     die("Please login first.");
@@ -24,6 +25,9 @@ if(isset($_POST['add_person'])){
     } else {
         $_SESSION['error_msg'] = "Please enter a name.";
     }
+
+    $logAction = $_SESSION['fullname'] . " Added a Person: $name";
+    addLog($conn, $user_id, $logAction);
 }
 
 
@@ -35,6 +39,9 @@ if(isset($_POST['delete_person'])){
     $stmt->execute([$person_id, $user_id]);
 
     $_SESSION['success_msg'] = "Person removed.";
+
+    $logAction = $_SESSION['fullname'] . " Deleted a Person: $name";
+    addLog($conn, $user_id, $logAction);
 }
 
 

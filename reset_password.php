@@ -43,6 +43,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         header("Location: login.php");
         exit();
     }
+
+    $logAction = $user["fullname"] . " Reset Password " . ucfirst($user["role"]);
+    addLog($conn, $user["id"], $logAction);
+
     header("Location: reset_password.php?token=" . $token);
     exit();
 }

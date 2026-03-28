@@ -1,6 +1,7 @@
 <?php
 session_start();
-
+include 'db.php';
+include 'log_helper.php';
 /* ===== DATABASE CONNECTION ===== */
 $host = "localhost";
 $dbname = "payton";
@@ -65,6 +66,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $_SESSION["fullname"] = $user["fullname"];
         $_SESSION["email"] = $user["email"];
         $_SESSION["role"] = $user["role"];
+
+        // We pass $pdo (the connection) and the user details
+        $logAction = $user["fullname"] . " Logged in As " . ucfirst($user["role"]);
+        addLog($pdo, $user["id"], $logAction);
 
         // Redirect based on role
         if (!empty($user["role"])) {

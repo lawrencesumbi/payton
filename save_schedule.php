@@ -1,6 +1,8 @@
 <?php
 session_start();
 require 'db.php';
+include 'log_helper.php';
+
 
 if (!isset($_SESSION['user_id'])) {
     exit;
@@ -28,6 +30,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } catch (Exception $e) {
         $_SESSION['error_msg'] = "Database error: " . $e->getMessage();
     }
+
+
+    $logAction = $user["fullname"] . " Scheduled a Payment: $name " . ucfirst($user["role"]);
+    addLog($conn, $user["id"], $logAction);
 
     // Redirect back to the calendar page
     header("Location: spender.php?page=scheduler");

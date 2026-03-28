@@ -16,7 +16,7 @@ $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
 // Page routing
 $page = $_GET['page'] ?? 'dashboard';
-$allowed_pages = ['dashboard', 'manage_groups', 'manage_expenses', 'manage_payments', 'scheduler', 'manage_reminders', 'notifications', 'my_account', 'split_expense', 'view_split_expense', 'people', 'archive'];
+$allowed_pages = ['dashboard', 'manage_groups', 'manage_expenses', 'manage_payments', 'scheduler', 'manage_reminders', 'notifications', 'my_account', 'split_expense', 'view_split_expense', 'people', 'archive', 'activity_logs'];
 
 if (!in_array($page, $allowed_pages)) { $page = 'dashboard'; }
 
@@ -286,7 +286,7 @@ $searchTerm = $_GET['search'] ?? '';
           </button>
           <div class="profile-menu" id="profileMenu">
             <a href="?page=my_account"><i class="fa-solid fa-user"></i> My Account</a>
-            <a href="activity_logs.php"><i class="fa-solid fa-clock-rotate-left"></i> Activity Logs</a>
+            <a href="?page=activity_logs"><i class="fa-solid fa-clock-rotate-left"></i> Activity Logs</a>
             <div class="menu-divider"></div>
             <a href="logout.php" class="danger" onclick="return confirm('Logout?');">
               <i class="fa-solid fa-right-from-bracket"></i> Logout

@@ -1,5 +1,7 @@
 <?php
 require_once "db.php";
+include 'log_helper.php';
+
 
 if(!isset($_SESSION['user_id']) || !isset($_GET['id'])){
     header("Location: splits.php");
@@ -70,6 +72,10 @@ if(isset($_POST['update_expense'])){
         $conn->rollBack();
         $message = "Error: " . $e->getMessage();
     }
+
+    $logAction = $user["fullname"] . " Edited an Expense Share " . ucfirst($user["role"]);
+    addLog($conn, $user["id"], $logAction);
+
 }
 
 /* =====================================================

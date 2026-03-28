@@ -1,7 +1,7 @@
 <?php
 require 'db.php';
 session_start();
-
+include 'log_helper.php';
 if (!isset($_SESSION['user_id'])) {
     exit;
 }
@@ -33,6 +33,9 @@ try {
 } catch (Exception $e) {
     $_SESSION['error_msg'] = "Could not update expense.";
 }
+
+$logAction = $_SESSION['fullname'] . " Updated the Expense: $desc to ₱" . number_format($amount, 2);
+addLog($conn, $user_id, $logAction);
 
 header("Location: spender.php?page=manage_expenses");
 exit;

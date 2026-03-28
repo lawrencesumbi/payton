@@ -1,6 +1,7 @@
 <?php
 session_start();
 require 'db.php';
+include 'log_helper.php';
 
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
@@ -39,6 +40,9 @@ try {
 } catch (Exception $e) {
     $_SESSION['error_msg'] = "An error occurred while deleting.";
 }
+
+    $logAction = $_SESSION['fullname'] . " Deleted the Expense: $oldDesc";
+    addLog($conn, $user_id, $logAction);
 
 header("Location: spender.php?page=manage_expenses");
 exit;

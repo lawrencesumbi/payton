@@ -1,5 +1,7 @@
 <?php
 require 'db.php';
+include 'log_helper.php';
+
 
 if(isset($_POST['update_budget'])){
 
@@ -29,6 +31,9 @@ if(isset($_POST['update_budget'])){
         $spender,
         $id
     ]);
+
+    $logAction = $user["fullname"] . " Updated a Budget: $name " . ucfirst($user["role"]);
+    addLog($conn, $user["id"], $logAction);
 
     header("Location: http://localhost/payton/sponsor.php?page=manage_allowance");
     exit;

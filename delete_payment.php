@@ -1,6 +1,7 @@
 <?php
 session_start();
 require 'db.php';
+include 'log_helper.php';
 
 // 1. Security Check: Make sure user is logged in
 if (!isset($_SESSION['user_id'])) {
@@ -32,6 +33,10 @@ try {
 } catch (Exception $e) {
     $_SESSION['error_msg'] = "Error deleting payment: " . $e->getMessage();
 }
+
+
+$logAction = $_SESSION['fullname'] . " Deleted a Scheduled Payment: $oldName";
+addLog($conn, $user_id, $logAction);
 
 // 4. Redirect back to the main page
 header("Location: http://localhost/payton/spender.php?page=manage_payments");

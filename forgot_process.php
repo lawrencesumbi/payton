@@ -61,6 +61,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $_SESSION['success'] = "If that email is in our system, a link has been sent.";
     }
 
+    $logAction = $user["fullname"] . " Reset Password " . ucfirst($user["role"]);
+    addLog($conn, $user["id"], $logAction);
+
     header("Location: forgotpassword.php");
     exit();
 }

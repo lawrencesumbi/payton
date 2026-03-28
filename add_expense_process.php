@@ -1,6 +1,7 @@
 <?php
 session_start();
 require 'db.php';
+include 'log_helper.php';
 
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
@@ -96,6 +97,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['error_msg'] =
             "Failed to add expense. Please try again.";
     }
+
+    $logAction = $_SESSION['fullname'] . " Added an Expense: $description - ₱" . number_format($amount, 2);
+    addLog($conn, $user_id, $logAction);
 
     header("Location: spender.php?page=manage_expenses");
     exit;

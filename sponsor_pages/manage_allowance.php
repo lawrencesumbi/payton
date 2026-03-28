@@ -9,7 +9,7 @@ if (!isset($_SESSION['user_id'])) {
 $user_id = $_SESSION['user_id'];
 
 /* =====================================================
-   AUTO UPDATE BUDGET STATUS BASED ON DATE
+    AUTO UPDATE BUDGET STATUS BASED ON DATE (FIXED)
 ===================================================== */
 $updateStatus = $conn->prepare("
     UPDATE budget
@@ -69,7 +69,7 @@ function getStatusBadge($status) {
         --bg-body: #0f111a;
         --card-bg: #191c24;
         --text-main: #f8fafc;
-        --text-muted: #cbd5e1; /* Lighter for visibility */
+        --text-muted: #cbd5e1; 
         --border-color: #2a2e39;
         --input-bg: #12141a;
         --header-bg: #242833;
@@ -223,6 +223,7 @@ function getStatusBadge($status) {
         border-radius: 10px; border: 1px solid var(--border-color);
         background: var(--card-bg); color: var(--text-main);
         transition: 0.2s;
+        cursor: pointer;
     }
 
     .btn-action:hover {
@@ -230,17 +231,90 @@ function getStatusBadge($status) {
         color: white !important;
         border-color: var(--brand-purple);
     }
+
+    /* ===== 7. CUSTOM TOAST DESIGN ===== */
+    .toast-container {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+    }
+
+    .custom-toast {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        background: var(--card-bg);
+        padding: 16px;
+        border-radius: 12px;
+        margin-bottom: 10px;
+        min-width: 280px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        animation: slideInToast 0.3s ease forwards;
+        border: 1px solid var(--border-color);
+    }
+
+    @keyframes slideInToast {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+
+    .toast-success { border-left: 5px solid #22c55e; }
+    .toast-error { border-left: 5px solid #ef4444; }
+
+    .toast-title { font-weight: 800; font-size: 12px; letter-spacing: 0.5px; margin-bottom: 2px; }
+    .toast-message { font-size: 14px; color: var(--text-muted); }
+
+    .toast-close {
+        margin-left: auto;
+        cursor: pointer;
+        border: none;
+        background: none;
+        color: var(--text-muted);
+        font-size: 16px;
+        padding: 0;
+        line-height: 1;
+    }
 </style>
 </head>
 <body>
 
+<div class="toast-container">
+    <?php 
+    $success = $_SESSION['success_msg'] ?? $_SESSION['toast_success'] ?? null;
+    $error = $_SESSION['error_msg'] ?? $_SESSION['toast_error'] ?? null;
+    ?>
+
+    <?php if($success): ?>
+        <div class="custom-toast toast-success">
+            <div>
+                <div class="toast-title text-success">SUCCESS!</div>
+                <div class="toast-message"><?= htmlspecialchars($success) ?></div>
+            </div>
+            <button class="toast-close" onclick="this.parentElement.remove()">✖</button>
+        </div>
+        <?php unset($_SESSION['success_msg'], $_SESSION['toast_success']); ?>
+    <?php endif; ?>
+
+    <?php if($error): ?>
+        <div class="custom-toast toast-error">
+            <div>
+                <div class="toast-title text-danger">ERROR</div>
+                <div class="toast-message"><?= htmlspecialchars($error) ?></div>
+            </div>
+            <button class="toast-close" onclick="this.parentElement.remove()">✖</button>
+        </div>
+        <?php unset($_SESSION['error_msg'], $_SESSION['toast_error']); ?>
+    <?php endif; ?>
+</div>
+
 <div class="main-content">
-    <div class="header-section">
+    <div class="header-section mt-4">
         <div>
             <h1>Allowance Overview</h1>
             <p>Tracking all active allowance.</p>
         </div>
-       <button class="btn px-4 py-2" 
+        <button class="btn px-4 py-2" 
             style="border-radius: 10px; background-color: #6f42c1; color: white;"
             data-bs-toggle="modal" 
             data-bs-target="#createBudgetModal">
@@ -270,7 +344,7 @@ function getStatusBadge($status) {
                         <td>
                             <div class="d-flex align-items-center">
                                 <div class="bg-light rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px; font-size: 0.7rem; font-weight: 800; color: var(--brand-purple);">
-                                    <?= strtoupper(substr($budget['spender_name'], 0, 2)) ?>
+                                    <?= strtoupper(substr($budget['spender_name'] ?? 'NA', 0, 2)) ?>
                                 </div>
                                 <span class="fw-medium"><?= htmlspecialchars($budget['spender_name'] ?? 'N/A') ?></span>
                             </div>
@@ -278,23 +352,25 @@ function getStatusBadge($status) {
                         <td><?= getStatusBadge($budget['status']) ?></td>
                         <td><span class="amount-text">₱<?= number_format($budget['budget_amount'], 2) ?></span></td>
                         <td class="text-end">
-                        <a href="sponsor.php?page=monitoring_page&spender_id=<?= $budget['user_id'] ?>&allowance_id=<?= $budget['id'] ?>" class="btn-action">
-                            <i class="bi bi-eye"></i>
-                        </a>                    
+                            <a href="sponsor.php?page=monitoring_page&spender_id=<?= $budget['user_id'] ?>&allowance_id=<?= $budget['id'] ?>" class="btn-action">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                            
                             <button class="btn-action" onclick="editBudget(
-                            <?= $budget['id'] ?>,
-                            '<?= addslashes($budget['budget_name']) ?>',
-                            <?= $budget['budget_amount'] ?>,
-                            '<?= $budget['start_date'] ?>',
-                            '<?= $budget['end_date'] ?>',
-                            <?= $budget['user_id'] ?>
+                                <?= $budget['id'] ?>,
+                                '<?= addslashes($budget['budget_name']) ?>',
+                                <?= $budget['budget_amount'] ?>,
+                                '<?= $budget['start_date'] ?>',
+                                '<?= $budget['end_date'] ?>',
+                                <?= $budget['user_id'] ?>
                             )"><i class="bi bi-pencil"></i></button>
-                                <form method="POST" action="delete_budget.php" style="display:inline;">
-                                    <input type="hidden" name="budget_id" value="<?= $budget['id'] ?>">
-                                    <button type="submit" class="btn-action" onclick="return confirm('Delete this allowance?');">
-                                        <i class="bi bi-trash text-danger"></i>
-                                    </button>
-                                </form>
+
+                            <form method="POST" action="allowance_process.php" style="display:inline;">
+                                <input type="hidden" name="budget_id" value="<?= $budget['id'] ?>">
+                                <button type="submit" name="delete_budget" class="btn-action" onclick="return confirm('Delete this allowance?');">
+                                    <i class="bi bi-trash text-danger"></i>
+                                </button>
+                            </form>
                         </td>
                     </tr>
                     <?php endforeach; else: ?>
@@ -306,8 +382,6 @@ function getStatusBadge($status) {
     </div>
 </div>
 
-
-
 <div class="modal fade" id="createBudgetModal" tabindex="-1">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content" style="border-radius:24px; border:none; overflow:hidden;">
@@ -316,7 +390,7 @@ function getStatusBadge($status) {
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body px-4 pb-4">
-                <form action="add_budget.php" method="POST" id="budgetForm">
+                <form action="allowance_process.php" method="POST" id="budgetForm">
                     <input type="hidden" name="budget_id" id="budget_id">
                     <div class="row g-3">
                         <div class="col-12">
@@ -349,7 +423,7 @@ function getStatusBadge($status) {
                     </div>
                     <input type="hidden" name="start_date" id="start_date">
                     <input type="hidden" name="end_date" id="end_date">
-                    <button type="submit" id="budgetSubmitBtn" name="add_budget" class="btn btn-dark w-100 py-3 mt-4 fw-700" style="border-radius:14px; background: var(--brand-purple);">Create Budget Record</button>
+                    <button type="submit" id="budgetSubmitBtn" name="add_budget" class="btn w-100 py-3 mt-4 fw-700" style="border-radius:14px; background: var(--brand-purple); color: white;">Create Budget Record</button>
                 </form>
             </div>
         </div>
@@ -358,6 +432,16 @@ function getStatusBadge($status) {
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+// Auto-hide custom toast logic
+setTimeout(() => {
+    document.querySelectorAll('.custom-toast').forEach(t => {
+        t.style.opacity = '0';
+        t.style.transform = 'translateX(20px)';
+        t.style.transition = 'all 0.3s ease';
+        setTimeout(() => t.remove(), 300);
+    });
+}, 3000);
+
 let startDate = null, endDate = null;
 let current = new Date(), year = current.getFullYear(), month = current.getMonth();
 const calendar = document.getElementById("calendar"), preview = document.getElementById("range-preview");
@@ -398,7 +482,6 @@ function renderCalendar() {
 }
 
 function changeMonth(dir) { month += dir; if(month<0){month=11; year--;} if(month>11){month=0; year++;} renderCalendar(); }
-
 function highlightDays() {
     document.querySelectorAll(".day").forEach(el => {
         const d = new Date(year, month, parseInt(el.textContent));
@@ -408,62 +491,51 @@ function highlightDays() {
         if(startDate && endDate && d > startDate && d < endDate) el.classList.add("in-range");
     });
 }
-
 function formatLocalDate(date){
     const y = date.getFullYear();
     const m = String(date.getMonth() + 1).padStart(2,'0');
     const d = String(date.getDate()).padStart(2,'0');
     return `${y}-${m}-${d}`;
 }
-
 function updateRange() {
     highlightDays();
-
     if(startDate && endDate) {
-
         startInput.value = formatLocalDate(startDate);
         endInput.value = formatLocalDate(endDate);
-
-        preview.textContent =
-            startDate.toDateString() + " - " + endDate.toDateString();
+        preview.textContent = startDate.toDateString() + " - " + endDate.toDateString();
     }
 }
 
 document.getElementById("clear-date-btn").onclick = () => { startDate = null; endDate = null; preview.textContent = "No dates selected"; renderCalendar(); };
-
 function parseLocalDate(dateString) {
     const parts = dateString.split("-");
     return new Date(parts[0], parts[1]-1, parts[2]);
 }
 
 function editBudget(id, name, amount, start, end, spender_id) {
-
     const modal = new bootstrap.Modal(document.getElementById('createBudgetModal'));
-
-    document.getElementById('budgetForm').action = 'update_budget.php';
-
     document.getElementById('budget_id').value = id;
     document.getElementById('budget_name').value = name;
     document.getElementById('budget_amount').value = amount;
     document.getElementById('spender_id').value = spender_id;
-
     startDate = parseLocalDate(start);
     endDate = parseLocalDate(end);
-
     updateRange();
     renderCalendar();
-
+    document.getElementById('modalTitle').textContent = "Update Allowance Record";
     document.getElementById('budgetSubmitBtn').textContent = "Update Budget";
     document.getElementById('budgetSubmitBtn').name = "update_budget";
-
     modal.show();
 }
 
 document.getElementById('createBudgetModal').addEventListener('shown.bs.modal', renderCalendar);
 document.getElementById('createBudgetModal').addEventListener('hidden.bs.modal', () => {
     document.getElementById('budgetForm').reset();
-    document.getElementById('budgetForm').action = 'add_budget.php';
+    document.getElementById('modalTitle').textContent = "Create New Allowance";
     document.getElementById('budgetSubmitBtn').textContent = "Create Budget Record";
+    document.getElementById('budgetSubmitBtn').name = "add_budget";
+    startDate = null; endDate = null;
+    updateRange();
 });
 
 renderCalendar();

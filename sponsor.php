@@ -16,7 +16,7 @@ $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
 // Page routing
 $page = $_GET['page'] ?? 'dashboard';
-$allowed_pages = ['dashboard', 'manage_members', 'manage_allowance', 'monitoring_page', 'my_account', 'archive', 'notifications'];
+$allowed_pages = ['dashboard', 'manage_members', 'manage_allowance', 'monitoring_page', 'my_account', 'archive', 'notifications', 'activity_logs'];
 
 if (!in_array($page, $allowed_pages)) { $page = 'dashboard'; }
 
@@ -278,7 +278,7 @@ $unreadCount = $stmtCount->fetchColumn();
           </button>
           <div class="profile-menu" id="profileMenu">
             <a href="?page=my_account"><i class="fa-solid fa-gears"></i> My Account</a>
-            <a href="activity_logs.php"><i class="fa-solid fa-clock-rotate-left"></i> Activity Logs</a>
+            <a href="?page=activity_logs"><i class="fa-solid fa-clock-rotate-left"></i> Activity Logs</a>
             <div class="menu-divider"></div>
             <a href="logout.php" class="danger" onclick="return confirm('Logout?');">
               <i class="fa-solid fa-right-from-bracket"></i> Logout
