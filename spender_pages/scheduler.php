@@ -35,11 +35,46 @@ foreach ($payments as $payment) {
 <title>Payment Calendar</title>
 
 <style>
+/* ===== THEME VARIABLES ===== */
+:root {
+    --bg-body: #f4f6f9;
+    --bg-card: #ffffff;
+    --bg-day: #f1f1f1;
+    --bg-day-hover: #dbeafe;
+    --text-main: #333333;
+    --text-muted: #666666;
+    --border-color: #e0e0e0;
+    --accent-purple: #8c15ec;
+    --accent-purple-light: #aa6af3;
+    --success: #22c55e;
+    --error: #ef4444;
+    --shadow: rgba(0,0,0,0.1);
+    --modal-overlay: rgba(15, 23, 42, 0.6);
+}
+
+[data-theme="dark"] {
+    --bg-body: #12141a;
+    --bg-card: #191c24;
+    --bg-day: #2a2e39;
+    --bg-day-hover: #373250;
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --border-color: #4b5563;
+    --accent-purple: #a855f7;
+    --accent-purple-light: #c084fc;
+    --success: #22c55e;
+    --error: #ef4444;
+    --shadow: rgba(0,0,0,0.2);
+    --modal-overlay: rgba(0,0,0,0.7);
+}
+
 body {
     font-family: Arial, sans-serif;
-    background: #f4f6f9;
+    background: var(--bg-body);
     height: 100%; 
     margin: 0;
+    color: var(--text-main);
+    transition: background 0.3s ease;
 }
 /* --- Force Hide Scrollbar but allow scrolling --- */
 html, body {
@@ -68,7 +103,7 @@ body::-webkit-scrollbar {
         }
 
 .calendar {
-    background-color: white;
+    background-color: var(--bg-card);
     flex: 1;
     
     overflow-y: auto;
@@ -77,6 +112,7 @@ body::-webkit-scrollbar {
     
     padding: 20px;
     border-radius: 10px;
+    transition: background 0.3s ease;
     
 }
 
@@ -90,7 +126,7 @@ body::-webkit-scrollbar {
 }
 
 .header button {
-    background: #8c15ec;
+    background: var(--accent-purple);
     border: none;
     color: white;
     padding: 6px 12px;
@@ -99,7 +135,7 @@ body::-webkit-scrollbar {
 }
 
 .header button:hover {
-    background: #aa6af3;
+    background: var(--accent-purple-light);
 }
 
 
@@ -110,7 +146,7 @@ body::-webkit-scrollbar {
 }
 
 .day {
-    background: #f1f1f1;
+    background: var(--bg-day);
     height: 100px;
     border-radius: 8px;
     padding: 8px;
@@ -121,7 +157,7 @@ body::-webkit-scrollbar {
 
 
 .day:hover {
-    background: #dbeafe;
+    background: var(--bg-day-hover);
 }
 
 .date-number {
@@ -137,7 +173,7 @@ body::-webkit-scrollbar {
     z-index: 1000;
     top: 0; left: 0;
     width: 100%; height: 100%;
-    background: rgba(15, 23, 42, 0.6); /* Modern slate overlay */
+    background: var(--modal-overlay); /* Modern slate overlay */
     backdrop-filter: blur(4px); /* Blurs the background content */
     transition: opacity 0.3s ease;
 }
@@ -153,20 +189,22 @@ body::-webkit-scrollbar {
 
 /* Modal Box */
 .modal-content {
-    background: #ffffff;
+    background: var(--bg-card);
     width: 90%;
     max-width: 420px;
     margin: 10vh auto;
     padding: 32px;
     border-radius: 16px;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 20px 25px -5px var(--shadow), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
     font-family: 'Inter', system-ui, sans-serif;
+    border: 1px solid var(--border-color);
+    transition: background 0.3s ease;
 }
 
 /* Typography & Inputs */
 .modal-content h2 {
     margin-top: 0;
-    color: #1e293b;
+    color: var(--text-main);
     font-size: 1.5rem;
 }
 
@@ -174,17 +212,19 @@ body::-webkit-scrollbar {
     width: 100%;
     padding: 12px;
     margin-top: 12px;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--border-color);
     border-radius: 8px;
     box-sizing: border-box; /* Prevents padding from breaking width */
     font-size: 1rem;
+    background: var(--bg-card);
+    color: var(--text-main);
     transition: border-color 0.2s;
 }
 
 .modal-content input:focus {
     outline: none;
-    border-color: #b23bf6;
-    ring: 2px solid #bfdbfe;
+    border-color: var(--accent-purple);
+    box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.1);
 }
 
 /* The Button */
@@ -192,7 +232,7 @@ body::-webkit-scrollbar {
     width: 100%;
     padding: 12px;
     margin-top: 20px;
-    background: #992cff; /* Modern Blue */
+    background: var(--accent-purple); /* Modern Blue */
     color: white;
     border: none;
     border-radius: 8px;
@@ -202,41 +242,44 @@ body::-webkit-scrollbar {
 }
 
 .modal-content button:hover {
-    background: #a967ff;
+    background: var(--accent-purple-light);
 }
 
 .today {
-    background: #ab81ff !important;
+    background: var(--accent-purple) !important;
     color: white;
     
 }
 
 .today strong {
-    color: #fff;
+    color: white;
 }
 
 .weekday {
     text-align: center;
     font-weight: bold;
     padding: 8px;
-    background: #e7e5eb;
+    background: var(--bg-card);
     border-radius: 6px;
+    color: var(--text-main);
+    border: 1px solid var(--border-color);
 }
 
 .reminders-section {
             flex: 0.15;
-            background: #fde5e5;
-            border-left: 1px solid #eee;
+            background: var(--bg-card);
+            border-left: 1px solid var(--border-color);
             padding: 25px 25px;
             display: flex;
             flex-direction: column;
             gap: 20px;
             border-radius: 6px;
+            transition: background 0.3s ease;
         }
 
  /* Right Panel UI */
         .reminder-card {
-            background: #b96eff;
+            background: var(--accent-purple);
             padding: 20px;
             border-radius: 20px;
             color: white;
@@ -247,13 +290,15 @@ body::-webkit-scrollbar {
         .reminder-card h3 { margin: 0 0 10px 0; font-size: 16px; }
 
         .info-box {
-            background: white;
+            background: var(--bg-card);
             border-radius: 15px;
             padding: 15px;
-            color: var(--text-dark);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            transition: background 0.3s ease;
         }
 
-        .info-box h4 { margin: 0 0 10px 0; font-size: 14px; color: var(--primary-purple); }
+        .info-box h4 { margin: 0 0 10px 0; font-size: 14px; color: var(--accent-purple); }
         .info-item { font-size: 13px; margin-bottom: 5px; display: flex; justify-content: space-between; }
 
 /* TOAST STYLES */
@@ -269,16 +314,18 @@ body::-webkit-scrollbar {
 .custom-toast {
     display: flex;
     align-items: center;
-    background: #fff;
+    background: var(--bg-card);
     width: 350px;
     padding: 15px;
     border-radius: 12px;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    box-shadow: 0 8px 25px var(--shadow);
     gap: 15px;
     animation: slideIn 0.3s ease-out;
+    border: 1px solid var(--border-color);
+    transition: background 0.3s ease;
 }
-.toast-success { border-left: 5px solid #62C976; }
-.toast-error { border-left: 5px solid #EB786C; }
+.toast-success { border-left: 5px solid var(--accent-green); }
+.toast-error { border-left: 5px solid var(--accent-red); }
 @keyframes slideIn {
     from { transform: translateX(100%); opacity: 0; }
     to { transform: translateX(0); opacity: 1; }
@@ -292,10 +339,10 @@ body::-webkit-scrollbar {
     <?php if (isset($_SESSION['success_msg'])): ?>
         <div class="custom-toast toast-success">
             <div style="flex: 1;">
-                <div style="font-weight: 800; color: #62C976;">SUCCESS</div>
-                <div style="color: #666; font-size: 13px;"><?= $_SESSION['success_msg'] ?></div>
+                <div style="font-weight: 800; color: var(--success);">SUCCESS</div>
+                <div style="color: var(--text-muted); font-size: 13px;"><?= $_SESSION['success_msg'] ?></div>
             </div>
-            <button onclick="this.parentElement.remove()" style="border:none; background:none; cursor:pointer; color: #999;">✕</button>
+            <button onclick="this.parentElement.remove()" style="border:none; background:none; cursor:pointer; color: var(--text-muted);">✕</button>
         </div>
         <?php unset($_SESSION['success_msg']); ?>
     <?php endif; ?>
@@ -303,10 +350,10 @@ body::-webkit-scrollbar {
     <?php if (isset($_SESSION['error_msg'])): ?>
         <div class="custom-toast toast-error">
             <div style="flex: 1;">
-                <div style="font-weight: 800; color: #EB786C; font-size: 11px;">ERROR</div>
-                <div style="color: #666; font-size: 13px;"><?= $_SESSION['error_msg'] ?></div>
+                <div style="font-weight: 800; color: var(--error); font-size: 11px;">ERROR</div>
+                <div style="color: var(--text-muted); font-size: 13px;"><?= $_SESSION['error_msg'] ?></div>
             </div>
-            <button onclick="this.parentElement.remove()" style="border:none; background:none; cursor:pointer; color: #999;">✕</button>
+            <button onclick="this.parentElement.remove()" style="border:none; background:none; cursor:pointer; color: var(--text-muted);">✕</button>
         </div>
         <?php unset($_SESSION['error_msg']); ?>
     <?php endif; ?>

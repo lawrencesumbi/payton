@@ -25,15 +25,33 @@ $updateStatus->execute();
 /* =====================================================
     FETCH ALL BUDGETS (Unified Table Query)
 ===================================================== */
-$stmt = $conn->prepare("
+// Get search term from URL
+$searchTerm = $_GET['search'] ?? '';
+
+$query = "
     SELECT b.*, u.fullname as spender_name 
     FROM budget b
     LEFT JOIN users u ON b.user_id = u.id
     WHERE (b.user_id = ? OR b.sponsor_id = ?) 
     AND b.status = 'Active'
-    ORDER BY b.created_at DESC
-");
-$stmt->execute([$user_id, $user_id]);
+";
+
+if (!empty($searchTerm)) {
+    $query .= " AND (b.budget_name LIKE ? OR u.fullname LIKE ?)";
+}
+
+$query .= " ORDER BY b.created_at DESC";
+
+$stmt = $conn->prepare($query);
+$params = [$user_id, $user_id];
+
+if (!empty($searchTerm)) {
+    $searchWildcard = "%{$searchTerm}%";
+    $params[] = $searchWildcard;
+    $params[] = $searchWildcard;
+}
+
+$stmt->execute($params);
 $allBudgets = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 function getStatusBadge($status) {

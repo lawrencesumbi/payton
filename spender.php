@@ -41,9 +41,38 @@ $searchTerm = $_GET['search'] ?? '';
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
+    /* ===== THEME VARIABLES ===== */
+    :root {
+      --bg-body: #fcfcfc;
+      --bg-sidebar: #ffffff;
+      --bg-topbar: #ffffff;
+      --bg-card: #ffffff;
+      --bg-input: #f3f4f6;
+      --text-main: #111827;
+      --text-muted: #6b7280;
+      --border-color: #eeeeee;
+      --hover-bg: #f9f9f9;
+      --sidebar-active: #ebe0f7;
+      --accent-purple: #7f308f;
+    }
+
+    [data-theme="dark"] {
+      --bg-body: #12141a;
+      --bg-sidebar: #191c24;
+      --bg-topbar: #191c24;
+      --bg-card: #191c24;
+      --bg-input: #1f2431;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --border-color: #2a2e39;
+      --hover-bg: #242833;
+      --sidebar-active: #242833;
+      --accent-purple: #a855f7;
+    }
+
     /* ===== BASIC RESET ===== */
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', Arial, sans-serif; }
-    body { background: #fcfcfc; min-height: 100vh; line-height: 1.5; }
+    body { background: var(--bg-body); color: var(--text-main); min-height: 100vh; line-height: 1.5; transition: background 0.3s ease, color 0.3s ease; }
     .app { display: flex; min-height: 100vh; }
 
     /* ===== SIDEBAR ===== */
@@ -198,6 +227,34 @@ $searchTerm = $_GET['search'] ?? '';
     text-align: center;
 }
 
+    /* ===== THEME-AWARE OVERRIDES (KEEP EXISTING LAYOUT) ===== */
+    .sidebar { background: var(--bg-sidebar); border-right: 1px solid var(--border-color); }
+    .left-nav h3 { color: var(--text-main); }
+    .menu a { color: var(--text-muted); }
+    .menu a.active { background: var(--sidebar-active); color: var(--accent-purple) !important; }
+    .menu a:hover:not(.active) { background: var(--hover-bg); color: var(--accent-purple); }
+    .topbar { background: var(--bg-topbar); border-bottom: 1px solid var(--border-color); }
+    .topbar-left { color: var(--text-muted); }
+    .topbar-left span.current-page { color: var(--text-main); }
+    .header-icons { color: var(--text-muted); }
+    .search-wrapper { background: var(--bg-input); }
+    .search-wrapper:focus-within { background: var(--bg-topbar); border-color: var(--accent-purple); box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.1); }
+    .search-wrapper input { color: var(--text-main); }
+    .search-wrapper button { color: var(--text-muted); }
+    .search-wrapper button:hover { color: var(--accent-purple); }
+    .profile-btn { border: 2px solid var(--bg-topbar); box-shadow: 0 0 0 1px var(--border-color); }
+    .profile-menu { background: var(--bg-sidebar); border: 1px solid var(--border-color); }
+    .profile-menu a { color: var(--text-main); }
+    .profile-menu a:hover { background: var(--hover-bg); color: var(--accent-purple); }
+    .menu-divider { background: var(--border-color); }
+    .content { background: var(--bg-card); min-height: calc(100vh - 64px); transition: background 0.3s ease; }
+    .sidebar-footer { border-top: 1px solid var(--border-color); }
+    .footer-avatar { border: 2px solid var(--accent-purple); }
+    .sidebar-footer .user-name { color: var(--text-main); }
+    .sidebar-footer .user-email { color: var(--text-muted); }
+    .sidebar-footer .user-role { color: var(--accent-purple); background: var(--sidebar-active); }
+    .notif-badge { border-color: var(--bg-topbar); }
+
   </style>
 </head>
 <body>
@@ -206,6 +263,9 @@ $searchTerm = $_GET['search'] ?? '';
     // PRE-LOAD FIX
     if (localStorage.getItem("sidebarStatus") === "collapsed") {
         document.documentElement.classList.add('sidebar-is-collapsed');
+    }
+    if (localStorage.getItem("theme") === "dark") {
+        document.documentElement.setAttribute("data-theme", "dark");
     }
 </script>
 
@@ -271,7 +331,7 @@ $searchTerm = $_GET['search'] ?? '';
             </button>
           </form>
 
-          <i class="fa-solid fa-sun"></i>
+          <i class="fa-solid fa-sun" id="themeToggle" style="cursor: pointer;" title="Toggle Theme"></i>
           <a href="?page=notifications" class="notif-wrapper" style="color: inherit; text-decoration: none;">
               <i class="fa-solid fa-bell"></i>
               <?php if ($unreadCount > 0): ?>
@@ -313,7 +373,27 @@ $searchTerm = $_GET['search'] ?? '';
   const profileBtn = document.getElementById("profileBtn");
   const profileMenu = document.getElementById("profileMenu");
   const sidebarToggle = document.getElementById("sidebarToggle");
+  const themeToggle = document.getElementById("themeToggle");
   const globalSearch = document.getElementById("globalSearch");
+
+  // --- Theme Toggle ---
+  themeToggle.addEventListener("click", function() {
+    const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+    if (isDark) {
+      document.documentElement.removeAttribute("data-theme");
+      localStorage.setItem("theme", "light");
+      themeToggle.classList.replace("fa-moon", "fa-sun");
+    } else {
+      document.documentElement.setAttribute("data-theme", "dark");
+      localStorage.setItem("theme", "dark");
+      themeToggle.classList.replace("fa-sun", "fa-moon");
+    }
+  });
+
+  // Set correct icon on load
+  if (localStorage.getItem("theme") === "dark") {
+    themeToggle.classList.replace("fa-sun", "fa-moon");
+  }
 
   // --- Sidebar Toggle ---
   sidebarToggle.addEventListener("click", function() {

@@ -13,6 +13,31 @@ $_SESSION['email'] = $_SESSION['email'] ?? "spender@email.com";
   <title>Link Requests</title>
 
   <style>
+    /* ===== THEME VARIABLES ===== */
+    :root {
+        --bg-body: #f5f7fb;
+        --bg-card: #ffffff;
+        --text-main: #333333;
+        --text-muted: #666666;
+        --border-color: #e0e0e0;
+        --accent-purple: #7c3aed;
+        --accent-green: #10b981;
+        --accent-red: #ef4444;
+        --shadow: rgba(0,0,0,0.1);
+    }
+
+    [data-theme="dark"] {
+        --bg-body: #12141a;
+        --bg-card: #191c24;
+        --text-main: #f8fafc;
+        --text-muted: #94a3b8;
+        --border-color: #2a2e39;
+        --accent-purple: #a855f7;
+        --accent-green: #22c55e;
+        --accent-red: #ef4444;
+        --shadow: rgba(0,0,0,0.2);
+    }
+
     * {
       margin: 0;
       padding: 0;
@@ -21,8 +46,10 @@ $_SESSION['email'] = $_SESSION['email'] ?? "spender@email.com";
     }
 
     body {
-      background: #f5f7fb;
+      background: var(--bg-body);
       padding: 30px;
+      color: var(--text-main);
+      transition: background 0.3s ease;
     }
           /* --- Force Hide Scrollbar but allow scrolling --- */
       html, body {
@@ -91,12 +118,13 @@ $_SESSION['email'] = $_SESSION['email'] ?? "spender@email.com";
 
     /* Layout */
     .card {
-      background: white;
+      background: var(--bg-card);
       padding: 22px;
       border-radius: 16px;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+      box-shadow: 0 4px 14px var(--shadow);
       max-width: 900px;
       margin: auto;
+      transition: background 0.3s ease;
     }
 
     .card h2 {
@@ -119,8 +147,10 @@ $_SESSION['email'] = $_SESSION['email'] ?? "spender@email.com";
       align-items: center;
       padding: 16px;
       border-radius: 16px;
-      border: 1px solid #eee;
+      border: 1px solid var(--border-color);
       margin-bottom: 12px;
+      background: var(--bg-card);
+      transition: background 0.3s ease;
       gap: 14px;
     }
 

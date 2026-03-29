@@ -12,15 +12,34 @@ if (!isset($_SESSION['user_id'])) {
 
 $current_user_id = $_SESSION['user_id'];
 
-// Fetch logs with fullname
-$stmt = $conn->prepare("
+// Get search term from URL
+$searchTerm = $_GET['search'] ?? '';
+
+// Build query with search filter
+$query = "
     SELECT logs.*, users.fullname, users.role
     FROM logs
     JOIN users ON logs.user_id = users.id
     WHERE logs.user_id = ?
-    ORDER BY logs.created_at DESC
-");
-$stmt->execute([$current_user_id]);
+";
+
+if (!empty($searchTerm)) {
+    $query .= " AND (logs.action LIKE ? OR logs.description LIKE ? OR logs.table_name LIKE ?)";
+}
+
+$query .= " ORDER BY logs.created_at DESC";
+
+$stmt = $conn->prepare($query);
+$params = [$current_user_id];
+
+if (!empty($searchTerm)) {
+    $searchWildcard = "%{$searchTerm}%";
+    $params[] = $searchWildcard;
+    $params[] = $searchWildcard;
+    $params[] = $searchWildcard;
+}
+
+$stmt->execute($params);
 $logs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 function timeAgo($datetime) {
@@ -47,15 +66,34 @@ function timeAgo($datetime) {
 <meta charset="UTF-8">
 <title>Activity Logs</title>
 <style>
-body {font-family:'Segoe UI',sans-serif; background:#f1f5f9; margin:0;}
+/* ===== THEME VARIABLES ===== */
+:root {
+    --bg-body: #f1f5f9;
+    --bg-card: #ffffff;
+    --text-main: #0f172a;
+    --text-muted: #475569;
+    --text-light: #94a3b8;
+    --border-shadow: rgba(0,0,0,0.05);
+}
+
+[data-theme="dark"] {
+    --bg-body: #12141a;
+    --bg-card: #191c24;
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --text-light: #64748b;
+    --border-shadow: rgba(0,0,0,0.2);
+}
+
+body {font-family:'Segoe UI',sans-serif; background: var(--bg-body); margin:0; color: var(--text-main); transition: background 0.3s ease;}
 .container {max-width:900px; margin:30px auto;}
 h2 {margin-bottom:20px; padding: 0 10px;}
-.log-card {background:#fff; border-radius:12px; padding:15px 20px; margin-bottom:12px; display:flex; justify-content:space-between; align-items: center; box-shadow:0 2px 8px rgba(0,0,0,0.05);}
+.log-card {background: var(--bg-card); border-radius:12px; padding:15px 20px; margin-bottom:12px; display:flex; justify-content:space-between; align-items: center; box-shadow:0 2px 8px var(--border-shadow); transition: background 0.3s ease;}
 .left {display:flex; flex-direction:column; gap: 4px;}
 .right {text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 8px;}
-.fullname {font-weight:600; color:#0f172a;}
-.action {color:#475569; font-size:14px;}
-.time {font-size:13px; color:#94a3b8;}
+.fullname {font-weight:600; color: var(--text-main);}
+.action {color: var(--text-muted); font-size:14px;}
+.time {font-size:13px; color: var(--text-light);}
 .badge {padding:4px 12px; border-radius:20px; font-size:11px; font-weight:600; text-transform: uppercase;}
 
 /* Badge Colors */
@@ -96,7 +134,7 @@ h2 {margin-bottom:20px; padding: 0 10px;}
     </div>
     <?php endforeach; ?>
 <?php else: ?>
-    <div style="text-align: center; padding: 40px; color: #64748b;">
+    <div style="text-align: center; padding: 40px; color: var(--text-light);">
         <p>No activity history found.</p>
     </div>
 <?php endif; ?>

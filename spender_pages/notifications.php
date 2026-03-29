@@ -63,8 +63,25 @@ if(isset($_POST['accept_invite'])){
 }
 
 // --- 3. FETCH NOTIFICATIONS (Updated to include type and parent_id) ---
-$stmt = $conn->prepare("SELECT id, message, status, created_at, type, parent_id FROM notifications WHERE user_id=? ORDER BY created_at DESC");
-$stmt->execute([$spender_id]);
+$searchTerm = $_GET['search'] ?? '';
+
+$query = "SELECT id, message, status, created_at, type, parent_id FROM notifications WHERE user_id=?";
+
+if (!empty($searchTerm)) {
+    $query .= " AND message LIKE ?";
+}
+
+$query .= " ORDER BY created_at DESC";
+
+$stmt = $conn->prepare($query);
+$params = [$spender_id];
+
+if (!empty($searchTerm)) {
+    $searchWildcard = "%{$searchTerm}%";
+    $params[] = $searchWildcard;
+}
+
+$stmt->execute($params);
 $notifications = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
@@ -80,11 +97,25 @@ $notifications = $stmt->fetchAll(PDO::FETCH_ASSOC);
         :root {
             --primary: #7c3aed; --primary-light: #f5f3ff; --unread-bg: #f0f7ff;
             --unread-border: #3b82f6; --text-main: #111827; --text-muted: #6b7280;
-            --bg-body: #f9fafb; --white: #ffffff; --border: #e5e7eb;
+            --bg-body: #f9fafb; --bg-card: #ffffff; --border: #e5e7eb;
+            --shadow: rgba(0,0,0,0.05);
         }
+
+        [data-theme="dark"] {
+            --bg-body: #12141a;
+            --bg-card: #191c24;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #2a2e39;
+            --unread-bg: #1e293b;
+            --unread-border: #3b82f6;
+            --shadow: rgba(0,0,0,0.2);
+        }
+
+        body { background: var(--bg-body); color: var(--text-main); transition: background 0.3s ease; }
         /* ... existing styles ... */
         .notif-container { max-width: 800px; margin: 20px auto; padding: 0 20px; height: 75vh; overflow-y: auto; }
-        .notification-card { background: var(--white); padding: 20px; border-radius: 16px; margin-bottom: 12px; border: 1px solid var(--border); display: flex; gap: 16px; position: relative; }
+        .notification-card { background: var(--bg-card); padding: 20px; border-radius: 16px; margin-bottom: 12px; border: 1px solid var(--border); display: flex; gap: 16px; position: relative; transition: background 0.3s ease; box-shadow: 0 2px 4px var(--shadow); }
         .notification-card.unread { background: var(--unread-bg); border-color: #dbeafe; }
         .icon-box { width: 44px; height: 44px; background: var(--primary-light); color: var(--primary); border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
         .btn { padding: 8px 16px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer; border: none; }

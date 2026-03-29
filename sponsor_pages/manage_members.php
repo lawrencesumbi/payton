@@ -8,15 +8,33 @@ if(!isset($_SESSION['user_id'])){
 
 $sponsor_id = $_SESSION['user_id'];
 
+// Get search term from URL
+$searchTerm = $_GET['search'] ?? '';
+
 // Fetch linked members for display
-$stmt = $conn->prepare("
+$query = "
     SELECT u.id, u.fullname, u.email
     FROM users u
     JOIN sponsor_spender ss ON u.id = ss.spender_id
     WHERE ss.sponsor_id = ?
-    ORDER BY u.fullname
-");
-$stmt->execute([$sponsor_id]);
+";
+
+if (!empty($searchTerm)) {
+    $query .= " AND (u.fullname LIKE ? OR u.email LIKE ?)";
+}
+
+$query .= " ORDER BY u.fullname";
+
+$stmt = $conn->prepare($query);
+$params = [$sponsor_id];
+
+if (!empty($searchTerm)) {
+    $searchWildcard = "%{$searchTerm}%";
+    $params[] = $searchWildcard;
+    $params[] = $searchWildcard;
+}
+
+$stmt->execute($params);
 $students = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 

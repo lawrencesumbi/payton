@@ -10,16 +10,32 @@ $sponsor_id = $_SESSION['user_id'];
 $selected_spender = $_GET['spender_id'] ?? null;
 $selected_allowance = $_GET['allowance_id'] ?? null;
 
+// Get search term from URL
+$searchTerm = $_GET['search'] ?? '';
+
 /* ==========================================
    FETCH SPENDERS
    ========================================== */
-$stmt = $conn->prepare("
+$query = "
     SELECT u.id, u.fullname 
     FROM users u
     INNER JOIN sponsor_spender ss ON u.id = ss.spender_id
     WHERE ss.sponsor_id = ?
-");
-$stmt->execute([$sponsor_id]);
+";
+
+if (!empty($searchTerm)) {
+    $query .= " AND u.fullname LIKE ?";
+}
+
+$stmt = $conn->prepare($query);
+$params = [$sponsor_id];
+
+if (!empty($searchTerm)) {
+    $searchWildcard = "%{$searchTerm}%";
+    $params[] = $searchWildcard;
+}
+
+$stmt->execute($params);
 $spenders = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 /* ==========================================
@@ -46,15 +62,30 @@ $total_budget = 0;
 $allowance_left = 0;
 
 if ($selected_spender && $selected_allowance) {
-    $stmt = $conn->prepare("
+    $query = "
         SELECT e.*, c.category_name, pm.payment_method_name
         FROM expenses e
         LEFT JOIN category c ON e.category_id = c.id
         LEFT JOIN payment_method pm ON e.payment_method_id = pm.id
         WHERE e.user_id = ? AND e.budget_id = ?
-        ORDER BY e.expense_date DESC
-    ");
-    $stmt->execute([$selected_spender, $selected_allowance]);
+    ";
+    
+    if (!empty($searchTerm)) {
+        $query .= " AND (e.description LIKE ? OR c.category_name LIKE ?)";
+    }
+    
+    $query .= " ORDER BY e.expense_date DESC";
+    
+    $stmt = $conn->prepare($query);
+    $params = [$selected_spender, $selected_allowance];
+    
+    if (!empty($searchTerm)) {
+        $searchWildcard = "%{$searchTerm}%";
+        $params[] = $searchWildcard;
+        $params[] = $searchWildcard;
+    }
+    
+    $stmt->execute($params);
     $expenses = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     foreach ($expenses as $ex) {

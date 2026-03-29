@@ -106,15 +106,25 @@ if (isset($_POST['remove_photo'])) {
             --primary: #7f00d4;
             --primary-hover: #943acf;
             --bg: #f8fafc;
-            --card-bg: #ffffff;
+            --bg-card: #ffffff;
             --text-main: #1e293b;
             --text-muted: #64748b;
             --border: #e2e8f0;
             --radius: 16px;
+            --shadow: rgba(0,0,0,0.05);
+        }
+
+        [data-theme="dark"] {
+            --bg: #12141a;
+            --bg-card: #191c24;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #2a2e39;
+            --shadow: rgba(0,0,0,0.2);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        body { background: var(--bg); color: var(--text-main);}
+        body { background: var(--bg); color: var(--text-main); transition: background 0.3s ease;}
         /* --- Force Hide Scrollbar but allow scrolling --- */
         html, body {
             height: 100%;
@@ -139,12 +149,13 @@ if (isset($_POST['remove_photo'])) {
         .acc-layout { display: grid; grid-template-columns: 1fr 320px; gap: 24px; }
         
         .acc-card { 
-            background: var(--card-bg); 
+            background: var(--bg-card); 
             border-radius: var(--radius); 
             padding: 18px; 
             border: 1px solid var(--border);
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -2px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 6px -1px var(--shadow), 0 2px 4px -2px var(--shadow);
             margin-bottom: 10px;
+            transition: background 0.3s ease;
         }
 
         .acc-card h3 { font-size: 16px; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }

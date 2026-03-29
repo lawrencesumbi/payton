@@ -27,9 +27,28 @@ $userStmt->execute([$user_id]);
 $me = $userStmt->fetch(PDO::FETCH_ASSOC);
 $my_name = $me['fullname'] ?? "Me (You)";
 
+// Get search term from URL
+$searchTerm = $_GET['search'] ?? '';
+
 // Fetch list for table
-$stmt = $conn->prepare("SELECT e.*, c.category_name FROM expenses e JOIN category c ON c.id = e.category_id WHERE e.user_id = ? AND EXISTS (SELECT 1 FROM expense_shares es WHERE es.expense_id = e.id) ORDER BY e.expense_date DESC");
-$stmt->execute([$user_id]);
+$query = "SELECT e.*, c.category_name FROM expenses e JOIN category c ON c.id = e.category_id WHERE e.user_id = ? AND EXISTS (SELECT 1 FROM expense_shares es WHERE es.expense_id = e.id)";
+
+if (!empty($searchTerm)) {
+    $query .= " AND (e.description LIKE ? OR c.category_name LIKE ?)";
+}
+
+$query .= " ORDER BY e.expense_date DESC";
+
+$stmt = $conn->prepare($query);
+$params = [$user_id];
+
+if (!empty($searchTerm)) {
+    $searchWildcard = "%{$searchTerm}%";
+    $params[] = $searchWildcard;
+    $params[] = $searchWildcard;
+}
+
+$stmt->execute($params);
 $expenses = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Fetch categories and friends for modal
@@ -48,8 +67,39 @@ $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <title>Manage Splits</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #6366f1; --primary-light: #e0e7ff; --bg: #f8fafc; --text-main: #1e293b; --text-muted: #64748b; --border: #e2e8f0; --danger: #ef4444; --success: #22c55e; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text-main); margin: 0; }
+        :root { 
+            --primary: #6366f1; 
+            --primary-light: #e0e7ff; 
+            --bg: #f8fafc; 
+            --bg-card: #ffffff;
+            --text-main: #1e293b; 
+            --text-muted: #64748b; 
+            --border: #e2e8f0; 
+            --border-light: #f1f5f9;
+            --danger: #ef4444; 
+            --danger-light: #fee2e2;
+            --success: #22c55e; 
+            --shadow: rgba(0,0,0,0.05);
+            --accent-purple: #6f42c1;
+            --accent-purple-dark: #8c3bf6;
+        }
+
+        [data-theme="dark"] {
+            --bg: #12141a;
+            --bg-card: #191c24;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #2a2e39;
+            --border-light: #374151;
+            --danger: #ef4444;
+            --danger-light: #451a1a;
+            --success: #22c55e;
+            --shadow: rgba(0,0,0,0.2);
+            --accent-purple: #a855f7;
+            --accent-purple-dark: #a855f7;
+        }
+
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text-main); margin: 0; transition: background 0.3s ease; }
         
         html, body {
             height: 100%;
@@ -67,28 +117,30 @@ $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         .container { width:100%; padding: 0 24px; box-sizing: border-box;}
         .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; padding-top: 20px; }
-        .card { background: white; border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); overflow: hidden; }
+        .card { background: var(--bg-card); border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 4px 6px -1px var(--shadow); overflow: hidden; transition: background 0.3s ease; }
         table { width: 100%; border-collapse: collapse; }
-        th { background: #8c3bf6; padding: 14px 20px; text-align: left; font-size: 14px; text-transform: uppercase; color: white; font-weight: 700; }
-        td { padding: 18px 20px; border-bottom: 1px solid var(--border); }
+        th { background: var(--accent-purple-dark); padding: 14px 20px; text-align: left; font-size: 14px; text-transform: uppercase; color: white; font-weight: 700; }
+        td { padding: 18px 20px; border-bottom: 1px solid var(--border); color: var(--text-main); }
         .btn { padding: 10px 16px; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 0.9rem; transition: 0.2s; border: none; display: inline-flex; align-items: center; gap: 8px; text-decoration: none; }
-        .btn-main { background: #6f42c1;; color: white; }
+        .btn-main { background: var(--accent-purple); color: white; }
         .btn-icon { background: transparent; border: 1px solid var(--border); padding: 8px; border-radius: 8px; color: var(--text-main); }
-        .btn-icon:hover { background: #f1f5f9; }
-        .btn-delete:hover { color: var(--danger); border-color: #fecaca; background: #fee2e2; }
+        .btn-icon:hover { background: var(--border-light); }
+        .btn-delete:hover { color: var(--danger); border-color: var(--danger-light); background: var(--danger-light); }
 
         #modalOverlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); justify-content:center; align-items:center; z-index: 9999; }
-        .modal-card { background: white; padding: 32px; border-radius: 20px; width: 100%; max-width: 480px; transition: max-width 0.4s ease; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); }
+        .modal-card { background: var(--bg-card); padding: 32px; border-radius: 20px; width: 100%; max-width: 480px; transition: max-width 0.4s ease; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); transition: background 0.3s ease; }
         .modal-card h2{margin-bottom: 10px;}
         label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; color: var(--text-muted); }
-        .input-box { width: 100%; padding: 12px; margin-bottom: 20px; border: 1px solid var(--border); border-radius: 10px; font-family: inherit; box-sizing: border-box; }
+        .input-box { width: 100%; padding: 12px; margin-bottom: 20px; border: 1px solid var(--border); border-radius: 10px; font-family: inherit; box-sizing: border-box; background: var(--bg-card); color: var(--text-main); transition: border-color 0.2s; }
+        .input-box:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); }
         .friend-grid { display: grid; grid-template-columns: 1fr; gap: 8px; max-height: 200px; overflow-y: auto; }
-        .friend-item { display: flex; align-items: center; gap: 10px; padding: 10px; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; font-size: 0.9rem; }
+        .friend-item { display: flex; align-items: center; gap: 10px; padding: 10px; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; font-size: 0.9rem; background: var(--bg-card); color: var(--text-main); transition: all 0.2s; }
         .friend-item:has(input:checked) { border-color: var(--primary); background: var(--primary-light); color: var(--primary); }
-        .split-toggle { display: flex; background: #f1f5f9; padding: 4px; border-radius: 12px; margin-bottom: 20px; }
-        .split-toggle label { flex: 1; text-align: center; padding: 8px; cursor: pointer; border-radius: 10px; }
+        .friend-item:hover { background: var(--hover-bg); }
+        .split-toggle { display: flex; background: var(--bg-card); padding: 4px; border-radius: 12px; margin-bottom: 20px; border: 1px solid var(--border); }
+        .split-toggle label { flex: 1; text-align: center; padding: 8px; cursor: pointer; border-radius: 10px; color: var(--text-muted); transition: all 0.2s; }
         .split-toggle input { display: none; }
-        .split-toggle label:has(input:checked) { background: white; color: var(--primary); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .split-toggle label:has(input:checked) { background: var(--primary); color: white; }
         .status-badge { font-size: 0.75rem; font-weight: 700; padding: 4px 8px; border-radius: 6px; margin-top: 10px; display: inline-block; }
 
         /* TOAST STYLES */

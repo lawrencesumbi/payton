@@ -36,6 +36,9 @@ $stmtCount = $conn->prepare("SELECT COUNT(*) FROM notifications WHERE user_id = 
 $stmtCount->execute([$id]);
 $unreadCount = $stmtCount->fetchColumn();
 
+// Get current search term for persistence
+$searchTerm = $_GET['search'] ?? '';
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -142,6 +145,37 @@ $unreadCount = $stmtCount->fetchColumn();
     .topbar-right { display: flex; align-items: center; gap: 24px; }
     .header-icons { display: flex; align-items: center; gap: 18px; color: var(--text-muted); font-size: 16px; }
     .header-icons i:hover { color: var(--accent-purple); }
+
+    /* ===== SEARCH BAR STYLES ===== */
+    .search-wrapper {
+      display: flex;
+      align-items: center;
+      background: var(--bg-input, #f3f4f6);
+      padding: 6px 15px;
+      border-radius: 20px;
+      border: 1px solid transparent;
+      transition: all 0.3s ease;
+    }
+    .search-wrapper:focus-within {
+      background: var(--bg-topbar);
+      border-color: var(--accent-purple);
+      box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.1);
+    }
+    .search-wrapper input {
+      border: none;
+      background: transparent;
+      outline: none;
+      font-size: 14px;
+      color: var(--text-main);
+      width: 140px;
+      transition: width 0.3s ease;
+    }
+    .search-wrapper input:focus { width: 220px; }
+    .search-wrapper button {
+      background: none; border: none; padding: 0; cursor: pointer;
+      color: var(--text-muted); display: flex; align-items: center;
+    }
+    .search-wrapper button:hover { color: var(--accent-purple); }
 
     .profile-dropdown { position: relative; }
     .profile-btn {
@@ -262,7 +296,14 @@ $unreadCount = $stmtCount->fetchColumn();
 
       <div class="topbar-right">
         <div class="header-icons">
-          <i class="fa-solid fa-magnifying-glass"></i>
+          <form action="" method="GET" class="search-wrapper" id="searchForm">
+            <input type="hidden" name="page" value="<?= htmlspecialchars($page) ?>">
+            <input type="text" name="search" id="globalSearch" placeholder="Search <?= str_replace('_',' ', $page) ?>..." value="<?= htmlspecialchars($searchTerm) ?>">
+            <button type="submit">
+              <i class="fa-solid fa-magnifying-glass"></i>
+            </button>
+          </form>
+
           <i class="fa-solid fa-sun" id="themeToggle" style="cursor: pointer;"></i>
           <a href="?page=notifications" class="notif-wrapper" style="color: inherit; text-decoration: none;">
               <i class="fa-solid fa-bell"></i>

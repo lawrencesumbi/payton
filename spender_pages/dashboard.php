@@ -104,6 +104,20 @@ $percChange = ($trends['lm'] > 0) ? (($trends['tm'] - $trends['lm']) / $trends['
             --text-main: #0f172a; 
             --text-muted: #64748b;
             --bg: #f8fafc; 
+            --card-bg: #fff;
+            --border-color: #eef1f6;
+            --hover-bg: #f1f5f9;
+            --shadow: rgba(0,0,0,0.02);
+        }
+
+        [data-theme="dark"] {
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --bg: #12141a;
+            --card-bg: #191c24;
+            --border-color: #2a2e39;
+            --hover-bg: #242833;
+            --shadow: rgba(0,0,0,0.2);
         }
 
         body { 
@@ -111,7 +125,7 @@ $percChange = ($trends['lm'] > 0) ? (($trends['tm'] - $trends['lm']) / $trends['
             margin: 0; 
             color: var(--text-main); 
             font-family: 'Inter', sans-serif;
-            
+            transition: background 0.3s ease;
         }
                 /* --- Force Hide Scrollbar but allow scrolling --- */
         html, body {
@@ -145,14 +159,15 @@ $percChange = ($trends['lm'] > 0) ? (($trends['tm'] - $trends['lm']) / $trends['
         }
         
         .stat-card {
-            background: #fff; 
+            background: var(--card-bg); 
             padding: 15px; 
             border-radius: 24px; 
-            border: 1px solid #eef1f6;
+            border: 1px solid var(--border-color);
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
-            box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+            box-shadow: 0 4px 20px var(--shadow);
+            transition: background 0.3s ease;
         }
 
         .stat-label { font-size: 11px; color: var(--text-muted); font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; margin: 0; }
@@ -171,14 +186,15 @@ $percChange = ($trends['lm'] > 0) ? (($trends['tm'] - $trends['lm']) / $trends['
         }
 
         .panel { 
-            background: #fff; 
+            background: var(--card-bg); 
             border-radius: 28px; 
             padding: 15px; 
-            border: 1px solid #eef1f6; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.02);
+            border: 1px solid var(--border-color); 
+            box-shadow: 0 10px 30px var(--shadow);
             min-height: 350px; /* Ensures panels look balanced */
             display: flex;
             flex-direction: column;
+            transition: background 0.3s ease;
         }
 
         .panel-header { font-weight: 800; font-size: 18px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
@@ -198,12 +214,12 @@ $percChange = ($trends['lm'] > 0) ? (($trends['tm'] - $trends['lm']) / $trends['
             justify-content: space-between; 
             align-items: center; 
             padding: 15px; 
-            background: #f8fafc; 
+            background: var(--bg); 
             border-radius: 18px; 
             margin-bottom: 12px;
             transition: all 0.2s ease;
         }
-        .payment-row:hover { background: #f1f5f9; transform: translateY(-2px); }
+        .payment-row:hover { background: var(--hover-bg); transform: translateY(-2px); }
         .p-title { font-weight: 700; font-size: 14px; margin: 0; }
         .p-sub { font-size: 12px; color: var(--text-muted); margin: 3px 0 0; }
         .p-price { font-weight: 900; color: var(--primary); font-size: 15px; }

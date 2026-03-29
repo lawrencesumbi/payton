@@ -21,8 +21,25 @@ if (isset($_POST['delete_notification'])) {
 }
 
 // Fetch all notifications
-$stmt = $conn->prepare("SELECT id, message, status, created_at FROM notifications WHERE user_id=? ORDER BY created_at DESC");
-$stmt->execute([$sponsor_id]);
+$searchTerm = $_GET['search'] ?? '';
+
+$query = "SELECT id, message, status, created_at FROM notifications WHERE user_id=?";
+
+if (!empty($searchTerm)) {
+    $query .= " AND message LIKE ?";
+}
+
+$query .= " ORDER BY created_at DESC";
+
+$stmt = $conn->prepare($query);
+$params = [$sponsor_id];
+
+if (!empty($searchTerm)) {
+    $searchWildcard = "%{$searchTerm}%";
+    $params[] = $searchWildcard;
+}
+
+$stmt->execute($params);
 $notifications = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 

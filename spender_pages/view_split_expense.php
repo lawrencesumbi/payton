@@ -71,6 +71,14 @@ $your_share = $expense['amount'] - $total_others_owe;
             --text-main: #1e293b; --text-muted: #64748b;
             --success: #22c55e; --danger: #ef4444; --border: #e2e8f0;
         }
+
+        [data-theme="dark"] {
+            --bg: #12141a;
+            --card: #191c24;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #2a2e39;
+        }
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text-main); margin: 0; }
         
         html, body { height: 100%; margin: 0; padding: 0; -ms-overflow-style: none; scrollbar-width: none; }
@@ -79,13 +87,13 @@ $your_share = $expense['amount'] - $total_others_owe;
         .container { width: 100%; padding: 0 20px; box-sizing: border-box; padding-top: 20px; }
         .selector { width: 100%; padding: 14px; border-radius: 12px; border: 2px solid var(--border); background: var(--card); font-weight: 600; font-family: inherit; cursor: pointer; margin-bottom: 24px; }
         .split-container { display: flex; background: var(--card); border-radius: 24px; border: 1px solid var(--border); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); overflow: hidden; min-height: 460px; }
-        .left-col { flex: 1; padding: 40px; background: linear-gradient(145deg, #6366f1, #4f46e5); color: white; display: flex; flex-direction: column; justify-content: center; }
+        .left-col { flex: 1; padding: 40px; background: linear-gradient(145deg, var(--primary), #4f46e5); color: white; display: flex; flex-direction: column; justify-content: center; }
         .left-col h1 { margin: 10px 0; font-size: 2rem; font-weight: 800; }
         .tag { background: rgba(255,255,255,0.2); padding: 4px 12px; border-radius: 8px; font-size: 0.8rem; font-weight: 600; display: inline-block; }
         .detail-item { margin-bottom: 24px; }
         .detail-item label { display: block; font-size: 0.75rem; text-transform: uppercase; opacity: 0.8; letter-spacing: 0.05em; margin-bottom: 4px; }
         .detail-item span { font-size: 1.4rem; font-weight: 600; }
-        .right-col { flex: 1.6; padding: 40px; background: white; }
+        .right-col { flex: 1.6; padding: 40px; background: var(--card); }
         table { width: 100%; border-collapse: collapse; }
         th { text-align: left; padding: 12px; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; border-bottom: 2px solid var(--border); }
         td { padding: 18px 12px; border-bottom: 1px solid var(--border); font-size: 0.95rem; }
@@ -98,9 +106,9 @@ $your_share = $expense['amount'] - $total_others_owe;
         /* TOAST STYLES */
         .toast-container{ position:fixed; top:20px; right:20px; z-index:9999; }
         .custom-toast{ 
-            display:flex; align-items:flex-start; gap:10px; background:white; padding:15px; 
+            display:flex; align-items:flex-start; gap:10px; background: var(--card); padding:15px; 
             border-radius:10px; margin-bottom:10px; min-width:280px; box-shadow:0 5px 15px rgba(0,0,0,0.1); 
-            animation: slideIn 0.3s ease; transition: opacity 0.3s ease;
+            animation: slideIn 0.3s ease; transition: opacity 0.3s ease; border: 1px solid var(--border);
         }
         @keyframes slideIn{ from{ transform: translateX(100%); opacity:0; } to{ transform: translateX(0); opacity:1; } }
         .toast-success{ border-left:5px solid #22c55e; }

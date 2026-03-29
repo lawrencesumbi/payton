@@ -8,30 +8,47 @@ $user_id = $_SESSION['user_id'] ?? 1;
 
 // Get the filter from URL, default to 'unpaid_overdue'
 $filter = $_GET['filter'] ?? 'unpaid_overdue';
+    
+    // Get search term from URL
+    $searchTerm = $_GET['search'] ?? '';
 
-/* ================= FETCH PAYMENTS WITH FILTER ================= */
-$query = "
-    SELECT 
-        sp.id, sp.payment_name, sp.amount, sp.due_date, sp.paid_date,
-        pm.payment_method_name AS payment_method,
-        ds.due_status_name AS status
-    FROM scheduled_payments sp
-    LEFT JOIN payment_method pm ON sp.payment_method_id = pm.id
-    LEFT JOIN due_status ds ON sp.due_status_id = ds.id
-    WHERE sp.user_id = ?
-";
+    /* ================= FETCH PAYMENTS WITH FILTER ================= */
+    $query = "
+        SELECT 
+            sp.id, sp.payment_name, sp.amount, sp.due_date, sp.paid_date,
+            pm.payment_method_name AS payment_method,
+            ds.due_status_name AS status
+        FROM scheduled_payments sp
+        LEFT JOIN payment_method pm ON sp.payment_method_id = pm.id
+        LEFT JOIN due_status ds ON sp.due_status_id = ds.id
+        WHERE sp.user_id = ?
+    ";
 
-if ($filter === 'paid') {
-    $query .= " AND ds.due_status_name = 'Paid'";
-} else {
-    $query .= " AND (ds.due_status_name = 'Unpaid' OR ds.due_status_name = 'Overdue')";
-}
+    if ($filter === 'paid') {
+        $query .= " AND ds.due_status_name = 'Paid'";
+    } else {
+        $query .= " AND (ds.due_status_name = 'Unpaid' OR ds.due_status_name = 'Overdue')";
+    }
+    
+    // Add search filter
+    if (!empty($searchTerm)) {
+        $query .= " AND (sp.payment_name LIKE ? OR CAST(sp.amount AS CHAR) LIKE ? OR sp.due_date LIKE ?)";
+    }
 
-$query .= " ORDER BY id DESC";
+    $query .= " ORDER BY id DESC";
 
-$stmt = $pdo->prepare($query);
-$stmt->execute([$user_id]);
-$payments = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $stmt = $pdo->prepare($query);
+    $params = [$user_id];
+    
+    if (!empty($searchTerm)) {
+        $searchWildcard = "%{$searchTerm}%";
+        $params[] = $searchWildcard;
+        $params[] = $searchWildcard;
+        $params[] = $searchWildcard;
+    }
+    
+    $stmt->execute($params);
+    $payments = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 /* ================= ANALYTICS LOGIC (Always total everything) ================= */
 // We fetch all for analytics regardless of table filter to keep stats accurate
@@ -55,7 +72,48 @@ foreach ($allStats as $s) {
 <title>Manage Payments</title>
 
 <style>
-body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f6f9; margin: 0; }
+/* ===== THEME VARIABLES ===== */
+:root {
+    --bg-body: #f4f6f9;
+    --bg-card: #ffffff;
+    --bg-modal: #fcfaff;
+    --text-main: #0f172a;
+    --text-muted: #64748b;
+    --text-light: #94a3b8;
+    --border-color: #eef1f6;
+    --border-light: #f1f5f9;
+    --border-table: #ddd;
+    --shadow: rgba(15, 23, 42, 0.05);
+    --shadow-modal: rgba(0, 0, 0, 0.25);
+    --accent-purple: #8c3bf6;
+    --accent-purple-light: #f3eaff;
+    --accent-red: #ef4444;
+    --accent-red-light: #ffecec;
+    --success: #62C976;
+    --success-bg: #fff;
+}
+
+[data-theme="dark"] {
+    --bg-body: #12141a;
+    --bg-card: #191c24;
+    --bg-modal: #242833;
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --text-light: #64748b;
+    --border-color: #2a2e39;
+    --border-light: #374151;
+    --border-table: #4b5563;
+    --shadow: rgba(0,0,0,0.2);
+    --shadow-modal: rgba(0,0,0,0.4);
+    --accent-purple: #a855f7;
+    --accent-purple-light: #373250;
+    --accent-red: #ef4444;
+    --accent-red-light: #451a1a;
+    --success: #22c55e;
+    --success-bg: #191c24;
+}
+
+body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg-body); margin: 0; color: var(--text-main); transition: background 0.3s ease; }
 /* --- Force Hide Scrollbar but allow scrolling --- */
 html, body {
     height: 100%;
@@ -77,26 +135,28 @@ body::-webkit-scrollbar {
 /* --- ANALYTICS --- */
 .analytics-row { display: flex; gap: 15px;  width: 100%;}
 .stat-card {
-    flex: 1; background: #ffffff; padding: 18px; border-radius: 12px; border: 1px solid #eef1f6;
-    box-shadow: 0 4px 10px rgba(15, 23, 42, 0.05); position: relative; overflow: hidden;
+    flex: 1; background: var(--bg-card); padding: 18px; border-radius: 12px; border: 1px solid var(--border-color);
+    box-shadow: 0 4px 10px var(--shadow); position: relative; overflow: hidden;
     display: flex; align-items: center; justify-content: space-between;
+    transition: background 0.3s ease;
 }
 .stat-card::before { content: ""; position: absolute; top: 0; left: 0; height: 100%; width: 4px; }
 .stat-blue::before { background: #2f7cff; }
 .stat-purple::before { background: #2a7a31; }
 .stat-orange::before { background: #f8bf5c; }
-.stat-red::before { background: #ef4444; }
-.stat-label { font-size: 10px; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
-.stat-value { font-size: 17px; font-weight: 900; color: #0f172a; margin-top: 4px; }
+.stat-red::before { background: var(--accent-red); }
+.stat-label { font-size: 10px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+.stat-value { font-size: 17px; font-weight: 900; color: var(--text-main); margin-top: 4px; }
 
 /* --- SCROLLABLE TABLE CONTAINER --- */
 .container { 
     width: 100%; 
     margin-top: 20px;
-    background: white; 
+    background: var(--bg-card); 
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0,0,0,0.03);
     overflow: hidden; /* Clips the internal scroll box border-radius */
+    transition: background 0.3s ease;
 }
 
 .table-wrapper {
@@ -107,16 +167,16 @@ body::-webkit-scrollbar {
 
 /* Custom Scrollbar for the right border */
 .table-wrapper::-webkit-scrollbar { width: 8px; }
-.table-wrapper::-webkit-scrollbar-track { background: #f1f1f1; }
+.table-wrapper::-webkit-scrollbar-track { background: var(--border-light); }
 .table-wrapper::-webkit-scrollbar-thumb { background: #838383; border-radius: 4px; }
-.table-wrapper::-webkit-scrollbar-thumb:hover { background: #8c3bf6; }
+.table-wrapper::-webkit-scrollbar-thumb:hover { background: var(--accent-purple); }
 
 table { width: 100%; border-collapse: collapse; }
 th { 
-    background: #8c3bf6; color: white; padding: 12px; 
+    background: var(--accent-purple); color: white; padding: 12px; 
     position: sticky; top: 0; z-index: 10; /* Keeps header visible while scrolling */
 }
-td { padding: 12px; border-bottom: .5px solid #ddd; text-align: center; }
+td { padding: 12px; border-bottom: .5px solid var(--border-table); text-align: center; color: var(--text-main); }
 
 .paid { color: green; font-weight: bold; }
 .unpaid { color: orange; font-weight: bold; }
@@ -125,9 +185,9 @@ td { padding: 12px; border-bottom: .5px solid #ddd; text-align: center; }
 /* --- BUTTONS & ACTIONS --- */
 .actions { display: flex; justify-content: center; gap: 8px; }
 .btn-edit, .btn-delete { padding: 6px 10px; border-radius: 8px; font-size: 13px; font-weight: 700; text-decoration: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; height: 34px; }
-.btn-edit { background: #f3eaff; color: #7210c8; }
-.btn-delete { background: #ffecec; color: #a30000; }
-.fab { position: fixed; bottom: 30px; right: 30px; background: #8c3bf6; color: white; font-size: 26px; border: none; width: 60px; height: 60px; border-radius: 50%; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+.btn-edit { background: var(--accent-purple-light); color: var(--accent-purple); }
+.btn-delete { background: var(--accent-red-light); color: var(--accent-red); }
+.fab { position: fixed; bottom: 30px; right: 30px; background: var(--accent-purple); color: white; font-size: 26px; border: none; width: 60px; height: 60px; border-radius: 50%; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
 
 /* --- MODAL --- */
 .modal { display: none; position: fixed; z-index: 1000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(5px); }
@@ -136,32 +196,35 @@ td { padding: 12px; border-bottom: .5px solid #ddd; text-align: center; }
 @keyframes slideInUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
 .modal-left { 
-    width: 500px; flex-shrink: 0; padding: 40px; background: #ffffff; border-radius: 20px; 
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    width: 500px; flex-shrink: 0; padding: 40px; background: var(--bg-card); border-radius: 20px; 
+    box-shadow: 0 25px 50px -12px var(--shadow-modal);
     animation: slideInUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; 
+    transition: background 0.3s ease;
 }
 .modal-right { 
-    width: 380px; flex-shrink: 0; background: #fcfaff; border-radius: 20px; padding: 40px; display: none; 
-    flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    width: 380px; flex-shrink: 0; background: var(--bg-modal); border-radius: 20px; padding: 40px; display: none; 
+    flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 25px 50px -12px var(--shadow-modal);
     animation: slideInUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; 
+    transition: background 0.3s ease;
 }
 
-.title-payment h3 { margin: 0; color: #1e293b; font-size: 24px; font-weight: 800; }
-.form-subtitle { color: #94a3b8; font-size: 13px; margin-bottom: 25px; margin-top: 5px; }
-.modal label { display: block; font-size: 11px; font-weight: 800; color: #64748b; margin-bottom: 8px; text-transform: uppercase; }
-.modal input, .modal select { width: 100%; padding: 12px 16px; margin-bottom: 20px; border: 2px solid #f1f5f9; border-radius: 12px; box-sizing: border-box; }
-.modal-footer { display: flex; justify-content: flex-end; gap: 12px; margin-top: 10px; padding-top: 20px; border-top: 1px solid #f1f5f9; }
-.save { background: #8c3bf6; color: white; padding: 12px 28px; border-radius: 10px; border:none; cursor: pointer; font-weight: 700; }
-.mark-paid { background: #7c3aed; color: white; padding: 12px 28px; border-radius: 10px; border:none; cursor: pointer; font-weight: 700; }
-.cancel { background: #f1f5f9; color: #64748b; padding: 12px 24px; border-radius: 10px; cursor: pointer; font-weight: 700; border: none !important; }
+.title-payment h3 { margin: 0; color: var(--text-main); font-size: 24px; font-weight: 800; }
+.form-subtitle { color: var(--text-light); font-size: 13px; margin-bottom: 25px; margin-top: 5px; }
+.modal label { display: block; font-size: 11px; font-weight: 800; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase; }
+.modal input, .modal select { width: 100%; padding: 12px 16px; margin-bottom: 20px; border: 2px solid var(--border-light); border-radius: 12px; box-sizing: border-box; background: var(--bg-card); color: var(--text-main); transition: border-color 0.3s ease; }
+.modal input:focus, .modal select:focus { border-color: var(--accent-purple); outline: none; }
+.modal-footer { display: flex; justify-content: flex-end; gap: 12px; margin-top: 10px; padding-top: 20px; border-top: 1px solid var(--border-light); }
+.save { background: var(--accent-purple); color: white; padding: 12px 28px; border-radius: 10px; border:none; cursor: pointer; font-weight: 700; }
+.mark-paid { background: var(--accent-purple); color: white; padding: 12px 28px; border-radius: 10px; border:none; cursor: pointer; font-weight: 700; }
+.cancel { background: var(--border-light); color: var(--text-muted); padding: 12px 24px; border-radius: 10px; cursor: pointer; font-weight: 700; border: none !important; }
 
-.summary-card { width: 100%; background: white; border: 1px solid #e2e8f0; border-radius: 15px; padding: 20px; margin-top: 15px; }
-.summary-row { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px; }
-.total-divider { border-top: 1px dashed #cbd5e1; margin: 10px 0; padding-top: 10px; }
+.summary-card { width: 100%; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 15px; padding: 20px; margin-top: 15px; transition: background 0.3s ease; }
+.summary-row { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px; color: var(--text-main); }
+.total-divider { border-top: 1px dashed var(--border-color); margin: 10px 0; padding-top: 10px; }
 
 /* --- TOASTS --- */
 .toast-container { position: fixed; top: 20px; right: 20px; z-index: 10001; display: flex; flex-direction: column; gap: 10px; }
-.custom-toast { display: flex; align-items: center; background: #fff; width: 350px; padding: 15px; border-radius: 12px; box-shadow: 0 8px 25px rgba(0,0,0,0.1); animation: toastSlideIn 0.4s ease forwards; border-left: 5px solid #62C976; }
+.custom-toast { display: flex; align-items: center; background: var(--success-bg); width: 350px; padding: 15px; border-radius: 12px; box-shadow: 0 8px 25px rgba(0,0,0,0.1); animation: toastSlideIn 0.4s ease forwards; border-left: 5px solid var(--success); color: var(--text-main); transition: background 0.3s ease; }
 @keyframes toastSlideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 @keyframes toastSlideOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(120%); opacity: 0; } }
 .slide-out { animation: toastSlideOut 0.5s ease forwards; }
@@ -169,17 +232,18 @@ td { padding: 12px; border-bottom: .5px solid #ddd; text-align: center; }
 .filter-container {
         display: flex;
         align-items: center;
-        background: white;
+        background: var(--bg-card);
         padding: 0 15px;
         border-radius: 12px;
-        border: 1px solid #eef1f6;
-        box-shadow: 0 4px 10px rgba(15, 23, 42, 0.05);
+        border: 1px solid var(--border-color);
+        box-shadow: 0 4px 10px var(--shadow);
+        transition: background 0.3s ease;
     }
     .filter-container select {
         border: none;
         outline: none;
         font-weight: 700;
-        color: #8c3bf6;
+        color: var(--accent-purple);
         background: transparent;
         cursor: pointer;
         padding: 10px;

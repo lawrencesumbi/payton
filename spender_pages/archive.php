@@ -12,15 +12,27 @@ $user_id = $_SESSION['user_id'];
 /* =====================================================
    FETCH ALL INACTIVE BUDGETS & THEIR EXPENSES
 ===================================================== */
-// We fetch the budgets first to create the sections
+// Get search term from URL
+$searchTerm = $_GET['search'] ?? '';
+
+// Build WHERE clause with search filter
+$whereClause = "WHERE user_id = :user_id AND status = 'Inactive'";
+
 $budgetStmt = $conn->prepare("
     SELECT id, budget_name, budget_amount, start_date, end_date 
     FROM budget 
-    WHERE user_id = :user_id AND status = 'Inactive'
+    $whereClause
     ORDER BY end_date DESC
 ");
 $budgetStmt->execute(['user_id' => $user_id]);
 $inactiveBudgets = $budgetStmt->fetchAll(PDO::FETCH_ASSOC);
+
+// If search term exists, filter budgets by name
+if (!empty($searchTerm)) {
+    $inactiveBudgets = array_filter($inactiveBudgets, function($budget) use ($searchTerm) {
+        return stripos($budget['budget_name'], $searchTerm) !== false;
+    });
+}
 ?>
 
 <!DOCTYPE html>
@@ -31,8 +43,33 @@ $inactiveBudgets = $budgetStmt->fetchAll(PDO::FETCH_ASSOC);
     <title>Expense Archive</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
     <style>
+        /* ===== THEME VARIABLES ===== */
+        :root {
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --border-light: #f1f5f9;
+            --accent-purple: #7c3aed;
+            --accent-purple-light: #f5f0ff;
+            --shadow: rgba(0, 0, 0, 0.1);
+        }
+
+        [data-theme="dark"] {
+            --bg-body: #12141a;
+            --bg-card: #191c24;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: #2a2e39;
+            --border-light: #374151;
+            --accent-purple: #a855f7;
+            --accent-purple-light: #373250;
+            --shadow: rgba(0,0,0,0.2);
+        }
+
         * { margin:0; padding:0; box-sizing:border-box; font-family: 'Inter', sans-serif; }
-        body { background: #f8fafc; color: #1e293b;}
+        body { background: var(--bg-body); color: var(--text-main); transition: background 0.3s ease;}
         /* --- Force Hide Scrollbar but allow scrolling --- */
         html, body {
             height: 100%;
@@ -59,29 +96,31 @@ $inactiveBudgets = $budgetStmt->fetchAll(PDO::FETCH_ASSOC);
 
         .archive-header i {
             font-size: 24px;
-            color: #7c3aed;
-            background: #f5f0ff;
+            color: var(--accent-purple);
+            background: var(--accent-purple-light);
             padding: 12px;
             border-radius: 12px;
         }
 
         /* Budget Section Card */
         .budget-group {
-            background: white;
+            background: var(--bg-card);
             border-radius: 20px;
-            border: 1px solid #e2e8f0;
+            border: 1px solid var(--border-color);
             margin-bottom: 40px;
             overflow: hidden;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 6px -1px var(--shadow);
+            transition: background 0.3s ease;
         }
 
         .budget-summary-bar {
-            background: #ffffff;
+            background: var(--bg-card);
             padding: 20px 25px;
-            border-bottom: 1px solid #f1f5f9;
+            border-bottom: 1px solid var(--border-light);
             display: flex;
             justify-content: space-between;
             align-items: center;
+            transition: background 0.3s ease;
         }
 
         .budget-info h2 {

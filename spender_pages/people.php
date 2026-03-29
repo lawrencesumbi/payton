@@ -11,8 +11,21 @@ $user_id = $_SESSION['user_id'];
 /* =========================================
    FETCH PEOPLE LIST
    ========================================= */
-$stmt = $conn->prepare("SELECT * FROM people WHERE user_id = ? ORDER BY name ASC");
-$stmt->execute([$user_id]);
+// Get search term from URL
+$searchTerm = $_GET['search'] ?? '';
+
+// Build WHERE clause with search filter
+$whereClause = "WHERE user_id = ?";
+$params = [$user_id];
+
+if (!empty($searchTerm)) {
+    $whereClause .= " AND name LIKE ?";
+    $searchWildcard = "%{$searchTerm}%";
+    $params[] = $searchWildcard;
+}
+
+$stmt = $conn->prepare("SELECT * FROM people $whereClause ORDER BY name ASC");
+$stmt->execute($params);
 $people = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
@@ -23,20 +36,51 @@ $people = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 
     <style>
-        body{background:#f9fafb; margin:0; font-family:'Inter', sans-serif;}
+        /* ===== THEME VARIABLES ===== */
+        :root {
+            --bg-body: #f9fafb;
+            --bg-card: #ffffff;
+            --text-main: #111827;
+            --text-muted: #6b7280;
+            --border-color: #e5e7eb;
+            --border-light: #eeeeee;
+            --accent-purple: #6f42c1;
+            --accent-purple-dark: #8c3bf6;
+            --accent-red: #dc2626;
+            --accent-red-light: #fef2f2;
+            --accent-red-border: #fee2e2;
+            --shadow: rgba(0,0,0,0.1);
+        }
+
+        [data-theme="dark"] {
+            --bg-body: #12141a;
+            --bg-card: #191c24;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: #2a2e39;
+            --border-light: #374151;
+            --accent-purple: #a855f7;
+            --accent-purple-dark: #a855f7;
+            --accent-red: #ef4444;
+            --accent-red-light: #451a1a;
+            --accent-red-border: #7f1d1d;
+            --shadow: rgba(0,0,0,0.2);
+        }
+
+        body{background: var(--bg-body); margin:0; font-family:'Inter', sans-serif; color: var(--text-main); transition: background 0.3s ease;}
 
         .container{ width: 100%; padding:20px; }
         .header{ display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
 
         .btn{ padding:10px 18px; border:none; border-radius:8px; cursor:pointer; font-weight:500; }
-        .btn-primary{ background:#6f42c1; color:white; }
-        .btn-danger{ background:#fef2f2; color:#dc2626; border: 1px solid #fee2e2; }
+        .btn-primary{ background: var(--accent-purple); color:white; }
+        .btn-danger{ background: var(--accent-red-light); color: var(--accent-red); border: 1px solid var(--accent-red-border); }
 
-        .card{ background: white; border-radius:12px; border:1px solid #e5e7eb; overflow: hidden; }
+        .card{ background: var(--bg-card); border-radius:12px; border:1px solid var(--border-color); overflow: hidden; transition: background 0.3s ease; }
 
         table{ width:100%; border-collapse:collapse; }
-        th{ padding:12px; text-align:left; background:#8c3bf6; font-size:14px; color:white; }
-        td{ padding:14px; border-top:1px solid #eeeeee; }
+        th{ padding:12px; text-align:left; background: var(--accent-purple-dark); font-size:14px; color:white; }
+        td{ padding:14px; border-top:1px solid var(--border-light); color: var(--text-main); }
 
         /* MODAL */
         .modal{
@@ -51,18 +95,21 @@ $people = $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
 
         .modal-card{
-            background:white;
+            background: var(--bg-card);
             padding:25px;
             border-radius:12px;
             width:320px;
+            transition: background 0.3s ease;
         }
 
         .input-box{
             width:100%;
             padding:12px;
             margin:15px 0;
-            border:1px solid #ddd;
+            border:1px solid var(--border-color);
             border-radius:8px;
+            background: var(--bg-card);
+            color: var(--text-main);
         }
 
         /* TOAST */
@@ -77,13 +124,15 @@ $people = $stmt->fetchAll(PDO::FETCH_ASSOC);
             display:flex;
             align-items:flex-start;
             gap:10px;
-            background:white;
+            background: var(--bg-card);
             padding:15px;
             border-radius:10px;
             margin-bottom:10px;
             min-width:250px;
-            box-shadow:0 5px 15px rgba(0,0,0,0.1);
+            box-shadow:0 5px 15px var(--shadow);
             animation: slideIn 0.3s ease;
+            color: var(--text-main);
+            transition: background 0.3s ease;
         }
 
         @keyframes slideIn{
