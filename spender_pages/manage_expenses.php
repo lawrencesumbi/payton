@@ -1650,7 +1650,7 @@ tr:hover {
             </form>
 
             <!-- ================= AI PREDICTION CARD ================= -->
-            <div id="aiPredictionContainer" class="ai-prediction-card" style="display: none; min-width: 250px;">
+            <div id="aiPredictionContainer" class="ai-prediction-card" style="display: block; min-width: 250px; min-height: 300px;">
                 <div class="ai-header">AI Category Suggestion</div>
                 
                 <div class="ai-body">
@@ -1662,31 +1662,31 @@ tr:hover {
                     </div>
                      <div class="label">Confidence Level</div>
 
-                    <div class="ai-options-list">
-                        <div class="option-item active">
-                            <div class="label-group">
-                                <span class="dot pink"></span>
-                                <span id="primaryLabel">Food & Drinks</span>
-                            </div>
-                            <span class="dynamic-pct-small" id="primaryPct">95%</span>
-                        </div>
+                    <div class="ai-options-list" id="aiOptionsList">
+    <div class="option-item active" id="slot1" style="cursor: pointer;">
+        <div class="label-group">
+            <span class="dot pink"></span>
+            <span id="label1">Food & Dining</span>
+        </div>
+        <span class="dynamic-pct-small" id="pct1">0%</span>
+    </div>
 
-                        <div class="option-item">
-                            <div class="label-group">
-                                <span class="dot orange"></span>
-                                <span>Shopping</span>
-                            </div>
-                            <span class="val">3%</span>
-                        </div>
+    <div class="option-item" id="slot2" style="cursor: pointer;">
+        <div class="label-group">
+            <span class="dot orange"></span>
+            <span id="label2">Miscellaneous</span>
+        </div>
+        <span class="val" id="pct2">0%</span>
+    </div>
 
-                        <div class="option-item">
-                            <div class="label-group">
-                                <span class="dot purple"></span>
-                                <span>Personal Care</span>
-                            </div>
-                            <span class="val">2%</span>
-                        </div>
-                    </div>
+    <div class="option-item" id="slot3" style="cursor: pointer;">
+        <div class="label-group">
+            <span class="dot purple"></span>
+            <span id="label3">Savings</span>
+        </div>
+        <span class="val" id="pct3">0%</span>
+    </div>
+</div>
 
                     <div class="ai-footer">
                         <button type="button" onclick="closeAI()" class="btn-manual">Change Manually</button>
@@ -1788,7 +1788,6 @@ tr:hover {
 </style>
 
 <script>
-
 /* Keep these outside so HTML onclick can see them */
 function closeToast(button) {
     const toast = button.closest('.custom-toast');
@@ -1813,6 +1812,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const aiContainer = document.getElementById('aiPredictionContainer');
     const manualContainer = document.getElementById('manualCategoryContainer');
     const categoryLabel = document.getElementById('selectedCategoryLabel');
+    const confirmBtn = document.getElementById('confirmAI');
 
     const categoryNames = {
         1: "Food & Dining", 2: "Transportation", 3: "Housing / Rent",
@@ -1821,7 +1821,7 @@ document.addEventListener("DOMContentLoaded", () => {
         10: "Miscellaneous"
     };
 
-    /* ================= APPLY CATEGORY (Unified) ================= */
+    /* ================= SHARED FUNCTIONS ================= */
     function applyCategory(id, name) {
         categoryInput.value = id;
         if(categoryLabel) categoryLabel.innerText = name;
@@ -1832,14 +1832,34 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    function confirmAISelection(name) {
+        const aiCard = document.getElementById('aiPredictionContainer');
+        aiCard.style.opacity = "1";
+        aiCard.style.border = "2px solid #28a745";
+        
+        confirmBtn.innerHTML = '<i class="fa-solid fa-check"></i> Confirmed';
+        confirmBtn.style.backgroundColor = "#28a745";
+        confirmBtn.disabled = true;
+
+        // Update main text para sync sila sa gi-click
+        document.getElementById('predictedCategoryName').innerText = name.toUpperCase();
+    }
+
     /* ================= AI LOGIC ================= */
     let typingTimer;
     descInput?.addEventListener("input", () => {
         clearTimeout(typingTimer);
         const text = descInput.value.trim();
+
+        // Reset the state to "Initial" when typing starts again
+        aiContainer.style.opacity = "1";
+        aiContainer.style.border = "none"; 
+        confirmBtn.innerHTML = 'Confirm';
+        confirmBtn.style.backgroundColor = ""; 
+        confirmBtn.disabled = false;
         
         if (text.length < 3) {
-            aiContainer.style.display = 'none';
+            document.getElementById('predictedCategoryName').innerText = "Keep typing...";
             return;
         }
 
@@ -1854,27 +1874,56 @@ document.addEventListener("DOMContentLoaded", () => {
                     method: 'POST',
                     body: formData
                 });
+
+                if (!response.ok) throw new Error("Server error");
+                
                 const data = await response.json();
 
-                aiContainer.style.display = 'block';
                 if(manualContainer) manualContainer.style.display = 'none';
 
-                const catName = data.category_name;
-                document.getElementById('predictedCategoryName').innerText = catName.toUpperCase();
-                if(document.getElementById('primaryLabel')) {
-                    document.getElementById('primaryLabel').innerText = catName;
-                }
-
+                // 1. UPDATE MAIN DISPLAY (Gauge)
+                document.getElementById('predictedCategoryName').innerText = data.category_name.toUpperCase();
                 const rotation = (data.confidence / 100) * 180;
                 document.querySelector('.gauge-box .arc').style.transform = `rotate(${rotation}deg)`;
                 document.querySelectorAll('.dynamic-pct').forEach(el => el.innerText = data.confidence + "%");
 
-                document.getElementById('confirmAI').onclick = () => {
-                    applyCategory(data.category_id, catName);
-                    aiContainer.style.display = 'none';
+                // 2. SETUP THE 3 SLOTS
+                const suggestions = data.suggestions || [
+                    { id: data.category_id, name: data.category_name, conf: data.confidence },
+                    { id: 10, name: "Miscellaneous", conf: (100 - data.confidence) * 0.6 },
+                    { id: 9, name: "Savings", conf: (100 - data.confidence) * 0.4 }
+                ];
+
+                suggestions.forEach((sug, index) => {
+                    const slotNum = index + 1;
+                    const labelEl = document.getElementById(`label${slotNum}`);
+                    const pctEl = document.getElementById(`pct${slotNum}`);
+                    const slotEl = document.getElementById(`slot${slotNum}`);
+
+                    if (slotEl) {
+                        if (labelEl) labelEl.innerText = sug.name;
+                        if (pctEl) pctEl.innerText = parseFloat(sug.conf).toFixed(1) + "%";
+                        
+                        // Handle clicking a specific slot
+                        slotEl.onclick = () => {
+                            document.querySelectorAll('.option-item').forEach(opt => opt.classList.remove('active'));
+                            slotEl.classList.add('active');
+                            applyCategory(sug.id, sug.name);
+                            confirmAISelection(sug.name);
+                        };
+                    }
+                });
+
+                // 3. SETUP THE MAIN CONFIRM BUTTON (Primary Category)
+                confirmBtn.onclick = () => {
+                    applyCategory(data.category_id, data.category_name);
+                    confirmAISelection(data.category_name);
                 };
+
             } catch (err) {
                 console.error("AI Error:", err);
+                document.getElementById('predictedCategoryName').innerText = "AI Offline (Limit Reached)";
+                if(manualContainer) manualContainer.style.display = 'block';
             }
         }, 800);
     });
@@ -1890,8 +1939,21 @@ document.addEventListener("DOMContentLoaded", () => {
     /* ================= MODAL CONTROLS ================= */
     fab?.addEventListener('click', () => {
         modalOverlay.style.display = 'flex';
-        aiContainer.style.display = "none";
+        aiContainer.style.display = "block"; 
+
+        // Reset Visuals
+        aiContainer.style.opacity = "1";
+        aiContainer.style.border = "none";
+        confirmBtn.innerHTML = 'Confirm';
+        confirmBtn.style.backgroundColor = "";
+        confirmBtn.disabled = false;
+
         if(manualContainer) manualContainer.style.display = "none";
+        
+        document.getElementById('predictedCategoryName').innerText = "Waiting for description...";
+        document.querySelector('.gauge-box .arc').style.transform = `rotate(0deg)`;
+        document.querySelectorAll('.dynamic-pct').forEach(el => el.innerText = "0%");
+
         document.querySelector('.expense-form').reset();
         document.getElementById('submitBtn').textContent = 'Add Expense';
         document.querySelector('.expense-form').action = 'add_expense_process.php';
@@ -1918,7 +1980,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 });
-
 </script>
 
 </body>
