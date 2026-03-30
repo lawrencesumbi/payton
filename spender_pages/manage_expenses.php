@@ -1665,8 +1665,14 @@ tr:hover {
                 <button type="submit" class="btn-save" id="submitBtn">Add Expense</button>
             </form>
 
+            <div id="receiptScanUI" class="receipt-preview-container">
+                <div class="scan-line"></div>
+                <div class="scanning-text">AI IS ANALYZING...</div>
+                <img id="receiptPreviewImg" src="" alt="Receipt Preview">
+            </div>
+
             <!-- ================= AI PREDICTION CARD ================= -->
-            <div id="aiPredictionContainer" class="ai-prediction-card" style="display: block; min-width: 250px; min-height: 300px;">
+            <div id="aiPredictionContainer" class="ai-prediction-card">
                 <div class="ai-header">AI Category Suggestion</div>
                 
                 <div class="ai-body">
@@ -1679,30 +1685,30 @@ tr:hover {
                      <div class="label">Confidence Level</div>
 
                     <div class="ai-options-list" id="aiOptionsList">
-    <div class="option-item active" id="slot1" style="cursor: pointer;">
-        <div class="label-group">
-            <span class="dot pink"></span>
-            <span id="label1">Food & Dining</span>
-        </div>
-        <span class="dynamic-pct-small" id="pct1">0%</span>
-    </div>
+                        <div class="option-item active" id="slot1" style="cursor: pointer;">
+                            <div class="label-group">
+                                <span class="dot pink"></span>
+                                <span id="label1">Food & Dining</span>
+                            </div>
+                            <span class="dynamic-pct-small" id="pct1">0%</span>
+                        </div>
 
-    <div class="option-item" id="slot2" style="cursor: pointer;">
-        <div class="label-group">
-            <span class="dot orange"></span>
-            <span id="label2">Miscellaneous</span>
-        </div>
-        <span class="val" id="pct2">0%</span>
-    </div>
+                        <div class="option-item" id="slot2" style="cursor: pointer;">
+                            <div class="label-group">
+                                <span class="dot orange"></span>
+                                <span id="label2">Miscellaneous</span>
+                            </div>
+                            <span class="val" id="pct2">0%</span>
+                        </div>
 
-    <div class="option-item" id="slot3" style="cursor: pointer;">
-        <div class="label-group">
-            <span class="dot purple"></span>
-            <span id="label3">Savings</span>
-        </div>
-        <span class="val" id="pct3">0%</span>
-    </div>
-</div>
+                        <div class="option-item" id="slot3" style="cursor: pointer;">
+                            <div class="label-group">
+                                <span class="dot purple"></span>
+                                <span id="label3">Savings</span>
+                            </div>
+                            <span class="val" id="pct3">0%</span>
+                        </div>
+                    </div>
 
                     <div class="ai-footer">
                         <button type="button" onclick="closeAI()" class="btn-manual">Change Manually</button>
@@ -1710,6 +1716,8 @@ tr:hover {
                     </div>
                 </div>
             </div>
+
+            
             <!-- ================= END AI CARD ================= -->
               <div id="manualCategoryContainer" class="manual-category-card" style="display:none;">
                  <div class="manual-header">Select Category</div>
@@ -1801,6 +1809,58 @@ tr:hover {
     height:40px;
     cursor:pointer;
   }
+
+
+  /* Container para sa Preview sa Resibo */
+.receipt-preview-container {
+    position: relative;
+    width: 100%;
+    max-width: 300px;
+    height: 400px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(168, 85, 247, 0.4); /* Purple border */
+    border-radius: 15px;
+    overflow: hidden;
+    display: none; /* Hide initially */
+    margin: 0 auto;
+}
+
+.receipt-preview-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+/* Scanning Line Animation */
+.scan-line {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(to bottom, transparent, #a855f7, transparent);
+    box-shadow: 0 0 15px #a855f7;
+    animation: scanMove 2s infinite ease-in-out;
+    z-index: 10;
+}
+
+@keyframes scanMove {
+    0% { top: 0%; }
+    50% { top: 90%; }
+    100% { top: 0%; }
+}
+
+/* Overlay samtang nag-scan */
+.scanning-text {
+    position: absolute;
+    bottom: 10px;
+    width: 100%;
+    text-align: center;
+    color: white;
+    font-weight: bold;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    z-index: 11;
+}
 </style>
 
 <script>
@@ -1892,6 +1952,22 @@ window.handleReceiptScan = async function(input) {
         return;
     }
 
+    // --- KANI ANG BAG-ONG LOGIC PARA SA PREVIEW ---
+    const receiptPreviewImg = document.getElementById('receiptPreviewImg'); // I-select ang <img> element
+    
+    if (receiptPreviewImg) {
+        const reader = new FileReader(); // Paghimo og FileReader object
+        
+        // Inig human og basa sa file, i-set ang result ingon src sa img
+        reader.onload = function(e) {
+            receiptPreviewImg.src = e.target.result;
+        };
+        
+        // Basaha ang file ingon data URL
+        reader.readAsDataURL(input.files[0]);
+    }
+    // ------------------------------------------------
+
     // 1. Show UI Loading State
     const choiceModal = document.getElementById('choiceModal');
     const modalOverlay = document.getElementById('modalOverlay');
@@ -1902,7 +1978,7 @@ window.handleReceiptScan = async function(input) {
     
     // Tawgon nato ang reset function nga naa sa imong script
     if (typeof resetFormAndAI === "function") {
-        resetFormAndAI();
+        resetFormAndAI(true);
     }
     
     if (predictedName) predictedName.innerText = "SCANNING RECEIPT...";
@@ -1947,8 +2023,20 @@ window.handleReceiptScan = async function(input) {
     }
 };
 
-    function resetFormAndAI() {
-        aiContainer.style.display = "block"; 
+    function resetFormAndAI(isScanning = false) {
+        const receiptUI = document.getElementById('receiptScanUI');
+        const aiContainer = document.getElementById('aiPredictionContainer');
+
+        // MOPILI KUNG UNSA ANG I-SHOW
+        if (isScanning) {
+            if (aiContainer) aiContainer.style.display = "none";
+            if (receiptUI) receiptUI.style.display = "block";
+        } else {
+            if (aiContainer) aiContainer.style.display = "block";
+            if (receiptUI) receiptUI.style.display = "none";
+        }
+
+        // --- ANG IMONG ORIGINAL LOGIC SA UBOS (WALA GIHILABTAN) ---
         aiContainer.style.opacity = "1";
         aiContainer.style.border = "none";
         confirmBtn.innerHTML = 'Confirm';
