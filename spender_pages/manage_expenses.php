@@ -1585,6 +1585,22 @@ tr:hover {
     <i class="fa-solid fa-plus"></i>
 </button>
 
+<div class="modal-overlay" id="choiceModal" style="display:none; align-items:center; justify-content:center;">
+    <div class="choice-container" style="background: white; padding: 30px; border-radius: 20px; display: flex; gap: 20px;">
+        <div class="choice-card" onclick="openManualEntry()" style="text-align:center; cursor:pointer; padding:20px; border:2px solid #eee; border-radius:15px; flex:1;">
+            <i class="fa-solid fa-keyboard" style="font-size:40px; color:#6f42c1;"></i>
+            <h3 style="margin-top:10px;">Manual Input</h3>
+            <p style="font-size:12px; color:#666;">Type details & AI categorize</p>
+        </div>
+        <div class="choice-card" onclick="triggerReceiptUpload()" style="text-align:center; cursor:pointer; padding:20px; border:2px solid #eee; border-radius:15px; flex:1;">
+            <i class="fa-solid fa-receipt" style="font-size:40px; color:#6f42c1;"></i>
+            <h3 style="margin-top:10px;">Scan Receipt</h3>
+            <p style="font-size:12px; color:#666;">AI will scan & fill the form</p>
+            <input type="file" id="instantScanInput" accept="image/*" style="display:none;" onchange="handleReceiptScan(this)">
+        </div>
+    </div>
+</div>
+
 <div class="modal-overlay" id="modalOverlay">
     <div class="expense-area">
         <button class="close-btn">&times;</button>
@@ -1788,7 +1804,7 @@ tr:hover {
 </style>
 
 <script>
-/* Keep these outside so HTML onclick can see them */
+/* ================= GLOBAL HELPERS ================= */
 function closeToast(button) {
     const toast = button.closest('.custom-toast');
     toast.classList.add('fade-out');
@@ -1801,10 +1817,19 @@ function closeAI() {
     if (manual) manual.style.display = "block";
 }
 
+// Para ma-close ang Choice Modal kung mo-click sa gawas
+window.onclick = function(event) {
+    const choiceModal = document.getElementById('choiceModal');
+    if (event.target == choiceModal) {
+        choiceModal.style.display = "none";
+    }
+}
+
 document.addEventListener("DOMContentLoaded", () => {
     /* ================= ELEMENTS ================= */
     const fab = document.querySelector('.fab');
     const modalOverlay = document.getElementById('modalOverlay');
+    const choiceModal = document.getElementById('choiceModal');
     const closeBtn = document.querySelector('.close-btn');
     const catCards = document.querySelectorAll('.cat-card');
     const categoryInput = document.getElementById('categoryInput'); 
@@ -1821,43 +1846,136 @@ document.addEventListener("DOMContentLoaded", () => {
         10: "Miscellaneous"
     };
 
-    /* ================= SHARED FUNCTIONS ================= */
+    /* ================= APPLY CATEGORY ================= */
     function applyCategory(id, name) {
         categoryInput.value = id;
         if(categoryLabel) categoryLabel.innerText = name;
-        
-        // Update visual state of cards in the manual grid
         catCards.forEach(card => {
             card.classList.toggle('active', card.getAttribute('data-category-id') == id);
         });
     }
 
     function confirmAISelection(name) {
-        const aiCard = document.getElementById('aiPredictionContainer');
-        aiCard.style.opacity = "1";
-        aiCard.style.border = "2px solid #28a745";
-        
+        aiContainer.style.border = "2px solid #28a745";
         confirmBtn.innerHTML = '<i class="fa-solid fa-check"></i> Confirmed';
         confirmBtn.style.backgroundColor = "#28a745";
         confirmBtn.disabled = true;
-
-        // Update main text para sync sila sa gi-click
         document.getElementById('predictedCategoryName').innerText = name.toUpperCase();
     }
 
-    /* ================= AI LOGIC ================= */
+    /* ================= CHOICE MODAL ACTIONS ================= */
+    
+    // 1. FAB Click -> Show Choices
+    fab?.addEventListener('click', () => {
+        choiceModal.style.display = 'flex';
+    });
+
+    // 2. Manual Entry Selection
+    window.openManualEntry = function() {
+        choiceModal.style.display = 'none';
+        modalOverlay.style.display = 'flex';
+        resetFormAndAI();
+    };
+
+    // 3. Scan Receipt Selection
+    window.triggerReceiptUpload = function() {
+        document.getElementById('instantScanInput').click();
+    };
+
+    // 4. Handle the Scanning Process
+    /* ================= RECEIPT SCAN LOGIC ================= */
+window.handleReceiptScan = async function(input) {
+    console.log("Input detected! File selected:", input.files[0]); // TEST 1
+
+    if (!input.files || !input.files[0]) {
+        console.error("No file found in input.");
+        return;
+    }
+
+    // 1. Show UI Loading State
+    const choiceModal = document.getElementById('choiceModal');
+    const modalOverlay = document.getElementById('modalOverlay');
+    const predictedName = document.getElementById('predictedCategoryName');
+
+    if (choiceModal) choiceModal.style.display = 'none';
+    if (modalOverlay) modalOverlay.style.display = 'flex';
+    
+    // Tawgon nato ang reset function nga naa sa imong script
+    if (typeof resetFormAndAI === "function") {
+        resetFormAndAI();
+    }
+    
+    if (predictedName) predictedName.innerText = "SCANNING RECEIPT...";
+
+    // 2. Prepare Data
+    const formData = new FormData();
+    formData.append('receipt', input.files[0]);
+
+    console.log("Sending fetch request to scan_receipt.php..."); // TEST 2
+
+    try {
+        const response = await fetch('scan_receipt.php', {
+            method: 'POST',
+            body: formData
+        });
+
+        console.log("Response received from server. Status:", response.status); // TEST 3
+
+        const rawText = await response.text();
+        console.log("Raw Response Content:", rawText);
+
+        const result = JSON.parse(rawText);
+
+        if (result.success) {
+            document.getElementById('descInput').value = result.description || "";
+            document.getElementById('amountInput').value = result.amount || "";
+            document.getElementById('paymentInput').value = result.payment_method_id || "1";
+            
+            // Tawgon ang function para mo-update ang AI Card visuals
+            if (typeof applyCategory === "function") {
+                applyCategory(result.category_id, result.category_name);
+            }
+            if (typeof confirmAISelection === "function") {
+                confirmAISelection(result.category_name);
+            }
+        } else {
+            predictedName.innerText = "SCAN FAILED: " + (result.error || "Unknown Error");
+        }
+    } catch (err) {
+        console.error("Critical Fetch Error:", err);
+        predictedName.innerText = "NETWORK ERROR";
+    }
+};
+
+    function resetFormAndAI() {
+        aiContainer.style.display = "block"; 
+        aiContainer.style.opacity = "1";
+        aiContainer.style.border = "none";
+        confirmBtn.innerHTML = 'Confirm';
+        confirmBtn.style.backgroundColor = "";
+        confirmBtn.disabled = false;
+        if(manualContainer) manualContainer.style.display = "none";
+        document.getElementById('predictedCategoryName').innerText = "Waiting for description...";
+        document.querySelector('.gauge-box .arc').style.transform = `rotate(0deg)`;
+        document.querySelectorAll('.dynamic-pct').forEach(el => el.innerText = "0%");
+        document.querySelector('.expense-form').reset();
+        document.getElementById('submitBtn').textContent = 'Add Expense';
+        document.querySelector('.expense-form').action = 'add_expense_process.php';
+        document.getElementById('expenseId').value = "";
+    }
+
+    /* ================= AI CATEGORIZE LOGIC (KEEP UNCHANGED) ================= */
     let typingTimer;
     descInput?.addEventListener("input", () => {
         clearTimeout(typingTimer);
         const text = descInput.value.trim();
 
-        // Reset the state to "Initial" when typing starts again
-        aiContainer.style.opacity = "1";
-        aiContainer.style.border = "none"; 
+        // Reset state for new typing
+        aiContainer.style.border = "none";
         confirmBtn.innerHTML = 'Confirm';
-        confirmBtn.style.backgroundColor = ""; 
+        confirmBtn.style.backgroundColor = "";
         confirmBtn.disabled = false;
-        
+
         if (text.length < 3) {
             document.getElementById('predictedCategoryName').innerText = "Keep typing...";
             return;
@@ -1865,29 +1983,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
         typingTimer = setTimeout(async () => {
             document.getElementById('predictedCategoryName').innerText = "Analyzing...";
-            
             try {
                 let formData = new FormData();
                 formData.append('description', text);
-
-                const response = await fetch('local_categorize.php', {
-                    method: 'POST',
-                    body: formData
-                });
-
-                if (!response.ok) throw new Error("Server error");
-                
+                const response = await fetch('local_categorize.php', { method: 'POST', body: formData });
                 const data = await response.json();
 
                 if(manualContainer) manualContainer.style.display = 'none';
 
-                // 1. UPDATE MAIN DISPLAY (Gauge)
                 document.getElementById('predictedCategoryName').innerText = data.category_name.toUpperCase();
                 const rotation = (data.confidence / 100) * 180;
                 document.querySelector('.gauge-box .arc').style.transform = `rotate(${rotation}deg)`;
                 document.querySelectorAll('.dynamic-pct').forEach(el => el.innerText = data.confidence + "%");
 
-                // 2. SETUP THE 3 SLOTS
                 const suggestions = data.suggestions || [
                     { id: data.category_id, name: data.category_name, conf: data.confidence },
                     { id: 10, name: "Miscellaneous", conf: (100 - data.confidence) * 0.6 },
@@ -1895,16 +2003,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 ];
 
                 suggestions.forEach((sug, index) => {
-                    const slotNum = index + 1;
-                    const labelEl = document.getElementById(`label${slotNum}`);
-                    const pctEl = document.getElementById(`pct${slotNum}`);
-                    const slotEl = document.getElementById(`slot${slotNum}`);
-
+                    const slotEl = document.getElementById(`slot${index + 1}`);
                     if (slotEl) {
-                        if (labelEl) labelEl.innerText = sug.name;
-                        if (pctEl) pctEl.innerText = parseFloat(sug.conf).toFixed(1) + "%";
-                        
-                        // Handle clicking a specific slot
+                        document.getElementById(`label${index + 1}`).innerText = sug.name;
+                        document.getElementById(`pct${index + 1}`).innerText = parseFloat(sug.conf).toFixed(1) + "%";
                         slotEl.onclick = () => {
                             document.querySelectorAll('.option-item').forEach(opt => opt.classList.remove('active'));
                             slotEl.classList.add('active');
@@ -1914,21 +2016,15 @@ document.addEventListener("DOMContentLoaded", () => {
                     }
                 });
 
-                // 3. SETUP THE MAIN CONFIRM BUTTON (Primary Category)
                 confirmBtn.onclick = () => {
                     applyCategory(data.category_id, data.category_name);
                     confirmAISelection(data.category_name);
                 };
-
-            } catch (err) {
-                console.error("AI Error:", err);
-                document.getElementById('predictedCategoryName').innerText = "AI Offline (Limit Reached)";
-                if(manualContainer) manualContainer.style.display = 'block';
-            }
+            } catch (err) { console.error("AI Error:", err); }
         }, 800);
     });
 
-    /* ================= MANUAL SELECTION ================= */
+    /* ================= MANUAL & EDIT LOGIC ================= */
     catCards.forEach(card => {
         card.addEventListener('click', () => {
             const id = card.getAttribute('data-category-id');
@@ -1936,44 +2032,17 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    /* ================= MODAL CONTROLS ================= */
-    fab?.addEventListener('click', () => {
-        modalOverlay.style.display = 'flex';
-        aiContainer.style.display = "block"; 
-
-        // Reset Visuals
-        aiContainer.style.opacity = "1";
-        aiContainer.style.border = "none";
-        confirmBtn.innerHTML = 'Confirm';
-        confirmBtn.style.backgroundColor = "";
-        confirmBtn.disabled = false;
-
-        if(manualContainer) manualContainer.style.display = "none";
-        
-        document.getElementById('predictedCategoryName').innerText = "Waiting for description...";
-        document.querySelector('.gauge-box .arc').style.transform = `rotate(0deg)`;
-        document.querySelectorAll('.dynamic-pct').forEach(el => el.innerText = "0%");
-
-        document.querySelector('.expense-form').reset();
-        document.getElementById('submitBtn').textContent = 'Add Expense';
-        document.querySelector('.expense-form').action = 'add_expense_process.php';
-    });
-
     closeBtn?.addEventListener('click', () => { modalOverlay.style.display = 'none'; });
 
-    /* ================= EDIT LOGIC ================= */
     document.querySelectorAll('.btn-edit').forEach(btn => {
         btn.addEventListener('click', function(e) {
             e.preventDefault();
             const d = this.dataset;
             modalOverlay.style.display = 'flex';
-            
             applyCategory(d.category, categoryNames[d.category]);
-            
             document.querySelector('input[name="description"]').value = d.description;
             document.querySelector('input[name="amount"]').value = d.amount;
             document.querySelector('select[name="payment_method_id"]').value = d.payment;
-
             document.getElementById('submitBtn').textContent = 'Update Expense';
             document.querySelector('.expense-form').action = 'update_expense_process.php';
             document.getElementById('expenseId').value = d.id;
