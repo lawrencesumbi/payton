@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 28, 2026 at 05:07 PM
+-- Generation Time: Mar 31, 2026 at 06:00 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -198,7 +198,14 @@ INSERT INTO `logs` (`id`, `user_id`, `action`, `created_at`) VALUES
 (14, 2, 'Patricia Ann Mae Obaob Logged in As Sponsor', '2026-03-28 23:49:01'),
 (15, 2, 'Patricia Ann Mae Obaob Added or Updated an Allowance: March 25-30', '2026-03-28 23:50:27'),
 (16, 2, 'Patricia Ann Mae Obaob Logged in As Sponsor', '2026-03-29 00:01:58'),
-(17, 1, 'Lawrence Sumbi Logged in As Spender', '2026-03-29 00:02:14');
+(17, 1, 'Lawrence Sumbi Logged in As Spender', '2026-03-29 00:02:14'),
+(18, 1, 'Lawrence Sumbi Logged in As Spender', '2026-03-31 21:57:39'),
+(19, 2, 'Patricia Ann Mae Obaob Logged in As Sponsor', '2026-03-31 22:56:29'),
+(20, 2, 'Patricia Ann Mae Obaob Logged in As Sponsor', '2026-03-31 23:00:13'),
+(21, 2, 'Patricia Ann Mae Obaob Logged in As Sponsor', '2026-03-31 23:01:28'),
+(22, 2, 'Patricia Ann Mae Obaob Logged in As Sponsor', '2026-03-31 23:02:32'),
+(23, 2, 'Patricia Ann Mae Obaob Logged in As Sponsor', '2026-03-31 23:11:54'),
+(24, 2, 'Patricia Ann Mae Obaob Logged in As Sponsor', '2026-03-31 23:16:41');
 
 -- --------------------------------------------------------
 
@@ -364,6 +371,7 @@ CREATE TABLE `users` (
   `email` varchar(100) NOT NULL,
   `password` varchar(255) NOT NULL,
   `role` varchar(20) NOT NULL,
+  `phone` varchar(11) NOT NULL,
   `profile_pic` varchar(255) NOT NULL,
   `verification_code` varchar(6) DEFAULT NULL,
   `is_verified` tinyint(1) NOT NULL DEFAULT 0,
@@ -376,19 +384,19 @@ CREATE TABLE `users` (
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `fullname`, `email`, `password`, `role`, `profile_pic`, `verification_code`, `is_verified`, `reset_token`, `reset_expiry`, `created_at`) VALUES
-(1, 'Lawrence Sumbi', 'guiansumbi@gmail.com', '$2y$10$cKIACjgglVTrRjDZaKSZjulwkdA0CIDUwOBkU12h2PPGKK03U0aT6', 'spender', 'profile/1773301216_69b26de0c5031.jpg', NULL, 1, NULL, NULL, '2026-02-07 17:08:23'),
-(2, 'Patricia Ann Mae Obaob', 'patriciaannmaeobaob721@gmail.com', '$2y$10$gVokRQej23KaxSKKUZPiSOn/mL5IE0kvfoGyPRTZfN1in/ZpNAQku', 'sponsor', 'profile/1773380531_69b3a3b3f074d.jpg', NULL, 1, NULL, NULL, '2026-02-08 11:52:14'),
-(3, 'Dranreb Misa', 'draymisa@gmail.com', '$2y$10$Gw3YeLEMfsCIOPV3xFs5h.jClSQLC9rilddvuzZ063CceY9/IVgue', 'spender', '', NULL, 1, NULL, NULL, '2026-02-09 00:03:22'),
-(4, 'Aljon Paragoso', 'aljon@gmail.com', '$2y$10$Wt8Xf9aFRGG6zRdmdsfP1.bzpQS9xPfN/20Rsf.l7gb5ivx7H.t8u', 'spender', '', NULL, 1, NULL, NULL, '2026-02-10 02:32:42'),
-(5, 'King James', 'king@gmail.com', '$2y$10$gEXzRZe1Yx1W/lVHDmk8ju/S//8ksu6iLCjJaJyxXhy3lWOLBBTw6', 'spender', '', NULL, 1, NULL, NULL, '2026-02-23 08:07:35'),
-(6, 'sample1', 'sample1@gmail.com', '$2y$10$XkOSorJMOiPKBmZhqqGwWuRJKdGV5PzCQo3XrueMu3cK8GnHfyOJy', 'spender', 'profile/1773497217_69b56b816f5b2.jpg', NULL, 1, NULL, NULL, '2026-03-14 13:30:53'),
-(7, 'Sponsor User', 'sponsor@gmail.com', '$2y$10$Lr9hm92Iha4J2va9tH7XYOhEiGgscf6qmvHn8oZ16WKrGTBtrsEI6', 'sponsor', '', NULL, 1, NULL, NULL, '2026-03-14 16:24:13'),
-(8, 'sample', 'sample2@gmail.com', '$2y$10$COoyyUVfJ8VQcPRk6Kf78eXV1YMs./Xs2zIct38PqfacTCewGRKoe', 'spender', '', NULL, 1, NULL, NULL, '2026-03-24 01:27:28'),
-(9, 'sample3', 'sample3@gmail.com', '$2y$10$W.Q5X/WGz2KLXTv.c59FxeAwfrhvKU4PQbZTPXP/AMkx8r9Icv1qS', '', '', NULL, 1, NULL, NULL, '2026-03-25 00:05:13'),
-(10, 'sample4', 'sample4@gmail.com', '$2y$10$kVcs8DgHEugTzGtvsaRiSOi7ZgTxkEE7qHPOGQD/1WYc5FOrpObru', 'sponsor', 'profile/1774416092_69c370dcc7ae4.jpg', NULL, 1, NULL, NULL, '2026-03-25 00:20:48'),
-(11, 'sample5', 'sample5@gmail.com', '$2y$10$JqvDRqR2nlCJsG1IZqvclO444PsfqvzEuUmD8P8CCKzJLZD9asD9W', '', '', NULL, 1, NULL, NULL, '2026-03-25 00:22:06'),
-(22, 'Rowena Sumbi', 'rowenasumbi5@gmail.com', '$2y$10$tz.XeuMiVTzrEkxx4NAk6uLFePdLZdIKjccl9dYi7vK78x3F99s1e', 'sponsor', '', NULL, 1, NULL, NULL, '2026-03-26 13:08:52');
+INSERT INTO `users` (`id`, `fullname`, `email`, `password`, `role`, `phone`, `profile_pic`, `verification_code`, `is_verified`, `reset_token`, `reset_expiry`, `created_at`) VALUES
+(1, 'Lawrence Sumbi', 'guiansumbi@gmail.com', '$2y$10$cKIACjgglVTrRjDZaKSZjulwkdA0CIDUwOBkU12h2PPGKK03U0aT6', 'spender', '09223198120', 'profile/1773301216_69b26de0c5031.jpg', NULL, 1, NULL, NULL, '2026-02-07 17:08:23'),
+(2, 'Patricia Ann Mae Obaob', 'patriciaannmaeobaob721@gmail.com', '$2y$10$gVokRQej23KaxSKKUZPiSOn/mL5IE0kvfoGyPRTZfN1in/ZpNAQku', 'sponsor', '09059641855', 'profile/1773380531_69b3a3b3f074d.jpg', NULL, 1, NULL, NULL, '2026-02-08 11:52:14'),
+(3, 'Dranreb Misa', 'draymisa@gmail.com', '$2y$10$Gw3YeLEMfsCIOPV3xFs5h.jClSQLC9rilddvuzZ063CceY9/IVgue', 'spender', '', '', NULL, 1, NULL, NULL, '2026-02-09 00:03:22'),
+(4, 'Aljon Paragoso', 'aljon@gmail.com', '$2y$10$Wt8Xf9aFRGG6zRdmdsfP1.bzpQS9xPfN/20Rsf.l7gb5ivx7H.t8u', 'spender', '', '', NULL, 1, NULL, NULL, '2026-02-10 02:32:42'),
+(5, 'King James', 'king@gmail.com', '$2y$10$gEXzRZe1Yx1W/lVHDmk8ju/S//8ksu6iLCjJaJyxXhy3lWOLBBTw6', 'spender', '', '', NULL, 1, NULL, NULL, '2026-02-23 08:07:35'),
+(6, 'sample1', 'sample1@gmail.com', '$2y$10$XkOSorJMOiPKBmZhqqGwWuRJKdGV5PzCQo3XrueMu3cK8GnHfyOJy', 'spender', '', 'profile/1773497217_69b56b816f5b2.jpg', NULL, 1, NULL, NULL, '2026-03-14 13:30:53'),
+(7, 'Sponsor User', 'sponsor@gmail.com', '$2y$10$Lr9hm92Iha4J2va9tH7XYOhEiGgscf6qmvHn8oZ16WKrGTBtrsEI6', 'sponsor', '', '', NULL, 1, NULL, NULL, '2026-03-14 16:24:13'),
+(8, 'sample', 'sample2@gmail.com', '$2y$10$COoyyUVfJ8VQcPRk6Kf78eXV1YMs./Xs2zIct38PqfacTCewGRKoe', 'spender', '', '', NULL, 1, NULL, NULL, '2026-03-24 01:27:28'),
+(9, 'sample3', 'sample3@gmail.com', '$2y$10$W.Q5X/WGz2KLXTv.c59FxeAwfrhvKU4PQbZTPXP/AMkx8r9Icv1qS', '', '', '', NULL, 1, NULL, NULL, '2026-03-25 00:05:13'),
+(10, 'sample4', 'sample4@gmail.com', '$2y$10$kVcs8DgHEugTzGtvsaRiSOi7ZgTxkEE7qHPOGQD/1WYc5FOrpObru', 'sponsor', '', 'profile/1774416092_69c370dcc7ae4.jpg', NULL, 1, NULL, NULL, '2026-03-25 00:20:48'),
+(11, 'sample5', 'sample5@gmail.com', '$2y$10$JqvDRqR2nlCJsG1IZqvclO444PsfqvzEuUmD8P8CCKzJLZD9asD9W', '', '', '', NULL, 1, NULL, NULL, '2026-03-25 00:22:06'),
+(22, 'Rowena Sumbi', 'rowenasumbi5@gmail.com', '$2y$10$tz.XeuMiVTzrEkxx4NAk6uLFePdLZdIKjccl9dYi7vK78x3F99s1e', 'sponsor', '', '', NULL, 1, NULL, NULL, '2026-03-26 13:08:52');
 
 --
 -- Indexes for dumped tables
@@ -524,7 +532,7 @@ ALTER TABLE `expense_shares`
 -- AUTO_INCREMENT for table `logs`
 --
 ALTER TABLE `logs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
 -- AUTO_INCREMENT for table `notifications`
