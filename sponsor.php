@@ -54,6 +54,7 @@ $searchTerm = $_GET['search'] ?? '';
         --bg-sidebar: #ffffff;
         --bg-topbar: #ffffff;
         --bg-card: #ffffff;
+        --bg-input: #ffffff;
         --text-main: #111827;
         --text-muted: #6b7280;
         --border-color: #eeeeee;
@@ -67,6 +68,7 @@ $searchTerm = $_GET['search'] ?? '';
         --bg-sidebar: #191c24;
         --bg-topbar: #191c24;
         --bg-card: #191c24;
+        --bg-input: #1f2431;
         --text-main: #f8fafc;
         --text-muted: #94a3b8;
         --border-color: #2a2e39;
@@ -150,32 +152,32 @@ $searchTerm = $_GET['search'] ?? '';
     .search-wrapper {
       display: flex;
       align-items: center;
-      background: var(--bg-input, #f3f4f6);
+      background: #f3f4f6;
       padding: 6px 15px;
       border-radius: 20px;
       border: 1px solid transparent;
       transition: all 0.3s ease;
     }
     .search-wrapper:focus-within {
-      background: var(--bg-topbar);
-      border-color: var(--accent-purple);
-      box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.1);
+      background: #fff;
+      border-color: #7f308f;
+      box-shadow: 0 0 0 3px rgba(127, 48, 143, 0.1);
     }
     .search-wrapper input {
       border: none;
       background: transparent;
       outline: none;
       font-size: 14px;
-      color: var(--text-main);
+      color: #374151;
       width: 140px;
       transition: width 0.3s ease;
     }
     .search-wrapper input:focus { width: 220px; }
     .search-wrapper button {
       background: none; border: none; padding: 0; cursor: pointer;
-      color: var(--text-muted); display: flex; align-items: center;
+      color: #9ca3af; display: flex; align-items: center;
     }
-    .search-wrapper button:hover { color: var(--accent-purple); }
+    .search-wrapper button:hover { color: #7f308f; }
 
     .profile-dropdown { position: relative; }
     .profile-btn {
@@ -236,6 +238,12 @@ $searchTerm = $_GET['search'] ?? '';
     text-align: center;
     line-height: 1;
 }
+
+    .search-wrapper { background: var(--bg-input); }
+    .search-wrapper:focus-within { background: var(--bg-topbar); border-color: var(--accent-purple); box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.1); }
+    .search-wrapper input { color: var(--text-main); }
+    .search-wrapper button { color: var(--text-muted); }
+    .search-wrapper button:hover { color: var(--accent-purple); }
 
   </style>
 </head>

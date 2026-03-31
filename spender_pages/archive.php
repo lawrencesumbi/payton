@@ -10,7 +10,7 @@ if (!isset($_SESSION['user_id'])) {
 $user_id = $_SESSION['user_id'];
 
 /* =====================================================
-   FETCH ALL INACTIVE BUDGETS & THEIR EXPENSES
+    FETCH ALL INACTIVE BUDGETS & THEIR EXPENSES
 ===================================================== */
 // Get search term from URL
 $searchTerm = $_GET['search'] ?? '';
@@ -54,6 +54,9 @@ if (!empty($searchTerm)) {
             --accent-purple: #7c3aed;
             --accent-purple-light: #f5f0ff;
             --shadow: rgba(0, 0, 0, 0.1);
+            --table-header-bg: #f8fafc;
+            --badge-bg: #f1f5f9;
+            --badge-text: #475569;
         }
 
         [data-theme="dark"] {
@@ -66,27 +69,30 @@ if (!empty($searchTerm)) {
             --accent-purple: #a855f7;
             --accent-purple-light: #373250;
             --shadow: rgba(0,0,0,0.2);
+            --table-header-bg: #21252e;
+            --badge-bg: #2a2e39;
+            --badge-text: #cbd5e1;
         }
 
         * { margin:0; padding:0; box-sizing:border-box; font-family: 'Inter', sans-serif; }
         body { background: var(--bg-body); color: var(--text-main); transition: background 0.3s ease;}
+        
         /* --- Force Hide Scrollbar but allow scrolling --- */
         html, body {
             height: 100%;
             margin: 0;
             padding: 0;
-            /* Hide for IE, Edge and Firefox */
             -ms-overflow-style: none;  
             scrollbar-width: none;  
         }
 
-        /* Hide for Chrome, Safari and Opera */
         html::-webkit-scrollbar, 
         body::-webkit-scrollbar {
             display: none;
             width: 0 !important;
             height: 0 !important;
         }
+
         .archive-header {
             margin-bottom: 30px;
             display: flex;
@@ -126,12 +132,12 @@ if (!empty($searchTerm)) {
         .budget-info h2 {
             font-size: 18px;
             font-weight: 800;
-            color: #0f172a;
+            color: var(--text-main);
         }
 
         .budget-info span {
             font-size: 13px;
-            color: #64748b;
+            color: var(--text-muted);
             font-weight: 500;
         }
 
@@ -141,15 +147,15 @@ if (!empty($searchTerm)) {
         }
 
         .stat-pill {
-            background: #f8fafc;
+            background: var(--bg-body);
             padding: 8px 16px;
             border-radius: 10px;
-            border: 1px solid #eef1f6;
+            border: 1px solid var(--border-color);
             text-align: center;
         }
 
-        .stat-label { font-size: 10px; text-transform: uppercase; color: #94a3b8; font-weight: 700; }
-        .stat-val { font-size: 14px; font-weight: 800; color: #7c3aed; }
+        .stat-label { font-size: 10px; text-transform: uppercase; color: var(--text-muted); font-weight: 700; }
+        .stat-val { font-size: 14px; font-weight: 800; color: var(--accent-purple); }
 
         /* Table Styling */
         .table-container { width: 100%; overflow-x: auto; }
@@ -157,28 +163,28 @@ if (!empty($searchTerm)) {
         th { 
             text-align: left; 
             padding: 12px 25px; 
-            background: #f8fafc; 
+            background: var(--table-header-bg); 
             font-size: 12px; 
             text-transform: uppercase; 
-            color: #64748b; 
+            color: var(--text-muted); 
             letter-spacing: 0.05em;
         }
-        td { padding: 15px 25px; border-bottom: 1px solid #f1f5f9; font-size: 14px; color: #334155; }
+        td { padding: 15px 25px; border-bottom: 1px solid var(--border-light); font-size: 14px; color: var(--text-main); }
         tr:last-child td { border-bottom: none; }
         
         .category-badge {
-            background: #f1f5f9;
+            background: var(--badge-bg);
             padding: 4px 10px;
             border-radius: 6px;
             font-size: 12px;
             font-weight: 600;
-            color: #475569;
+            color: var(--badge-text);
         }
 
         .no-data {
             text-align: center;
             padding: 60px;
-            color: #94a3b8;
+            color: var(--text-muted);
         }
     </style>
 </head>
@@ -187,8 +193,8 @@ if (!empty($searchTerm)) {
     <div class="archive-header">
         <i class="fa-solid fa-box-archive"></i>
         <div>
-            <h1 style="font-size: 24px; font-weight: 900;">Expense Archive</h1>
-            <p style="color: #64748b; font-size: 14px;">Review your past spending performance.</p>
+            <h1 style="font-size: 24px; font-weight: 900; color: var(--text-main);">Expense Archive</h1>
+            <p style="color: var(--text-muted); font-size: 14px;">Review your past spending performance.</p>
         </div>
     </div>
 
@@ -227,7 +233,7 @@ if (!empty($searchTerm)) {
                 </div>
                 <div class="stat-pill">
                     <div class="stat-label">Total Spent</div>
-                    <div class="stat-val" style="color: #0f172a;">$<?= number_format($totalSpent, 2) ?></div>
+                    <div class="stat-val" style="color: var(--text-main);">$<?= number_format($totalSpent, 2) ?></div>
                 </div>
             </div>
         </div>
@@ -244,14 +250,14 @@ if (!empty($searchTerm)) {
                 </thead>
                 <tbody>
                     <?php if (empty($expenses)): ?>
-                        <tr><td colspan="4" style="text-align:center; color:#94a3b8;">No expenses recorded for this period.</td></tr>
+                        <tr><td colspan="4" style="text-align:center; color: var(--text-muted);">No expenses recorded for this period.</td></tr>
                     <?php else: ?>
                         <?php foreach ($expenses as $e): ?>
                         <tr>
                             <td><?= date('d M Y', strtotime($e['expense_date'])) ?></td>
-                            <td style="font-weight: 600;"><?= htmlspecialchars($e['description']) ?></td>
+                            <td style="font-weight: 600; color: var(--text-main);"><?= htmlspecialchars($e['description']) ?></td>
                             <td><span class="category-badge"><?= htmlspecialchars($e['category_name'] ?? 'Uncategorized') ?></span></td>
-                            <td style="font-weight: 800; color: #1e293b;">$<?= number_format($e['amount'], 2) ?></td>
+                            <td style="font-weight: 800; color: var(--text-main);">$<?= number_format($e['amount'], 2) ?></td>
                         </tr>
                         <?php endforeach; ?>
                     <?php endif; ?>

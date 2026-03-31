@@ -1,5 +1,5 @@
 <?php
-// Keeping your existing logic intact
+
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit();
@@ -12,48 +12,59 @@ if ($conn->connect_error) {
     die("Database connection failed: " . $conn->connect_error);
 }
 
-$stmt = $conn->prepare("SELECT fullname, email, profile_pic, password FROM users WHERE id = ?");
+$stmt = $conn->prepare("SELECT fullname, email, phone, profile_pic, password FROM users WHERE id = ?");
 $stmt->bind_param("i", $uid);
 $stmt->execute();
 $userData = $stmt->get_result()->fetch_assoc();
 
 $fullname = $userData['fullname'] ?? "Unknown User";
 $email    = $userData['email'] ?? "No email";
+$phone    = $userData['phone'] ?? ""; 
 $profile  = $userData['profile_pic'] ?? "";
 $profilePath = !empty($profile) && file_exists($profile) ? $profile : "profile/default.jpg";
 
-// Calculate Progress
+$is_valid_ph = preg_match('/^(09|\+639)\d{9}$/', $phone);
+
 $progress = 10; 
-if (!empty($fullname)) $progress += 25;
-if (!empty($email))    $progress += 25;
-if (!empty($profile))  $progress += 20;
-if (!empty($userData['password'])) $progress += 20;
+if (!empty($fullname)) $progress += 20;
+if (!empty($email))    $progress += 20;
+if ($is_valid_ph)      $progress += 20; 
+if (!empty($profile))  $progress += 15;
+if (!empty($userData['password'])) $progress += 15; 
 $progress = min($progress, 100);
 
-// UPDATE PERSONAL INFO
+// UPDATE PERSONAL INFO (Stays on Sponsor/Spender page)
 if (isset($_POST['save_profile'])) {
     $newFullname = trim($_POST['fullname']);
     $newEmail    = trim($_POST['email']);
-    if ($newFullname && $newEmail) {
-        $stmt = $conn->prepare("UPDATE users SET fullname = ?, email = ? WHERE id = ?");
-        $stmt->bind_param("ssi", $newFullname, $newEmail, $uid);
+    $newPhone    = trim($_POST['phone']); 
+
+    if (!preg_match('/^(09|\+639)\d{9}$/', $newPhone)) {
+        $_SESSION['msg'] = ["type"=>"error", "text"=>"Please enter a valid PH phone number"];
+    } elseif ($newFullname && $newEmail) {
+        $stmt = $conn->prepare("UPDATE users SET fullname = ?, email = ?, phone = ? WHERE id = ?");
+        $stmt->bind_param("sssi", $newFullname, $newEmail, $newPhone, $uid);
         $stmt->execute();
-        echo "<script>alert('Personal information updated successfully'); window.location.href = 'spender.php?page=my_account';</script>";
+        $_SESSION['msg'] = ["type"=>"success", "text"=>"Personal information updated!"];
+        echo "<script>window.location.href = 'sponsor.php?page=my_account';</script>";
+        exit();
     }
 }
 
-// UPDATE PASSWORD
+// UPDATE PASSWORD (Redirects to Login)
 if (isset($_POST['update_password'])) {
     $oldPassword = $_POST['old_password'];
     $newPassword = $_POST['new_password'];
     if (!$userData || !password_verify($oldPassword, $userData['password'])) {
-        echo "<script>alert('Old password is incorrect');</script>";
+        $_SESSION['msg'] = ["type"=>"error", "text"=>"Old password is incorrect"];
     } else {
         $newHash = password_hash($newPassword, PASSWORD_DEFAULT);
         $stmt = $conn->prepare("UPDATE users SET password = ? WHERE id = ?");
         $stmt->bind_param("si", $newHash, $uid);
         $stmt->execute();
-        echo "<script>alert('Password updated successfully'); window.location.href = 'login.php';</script>";
+        $_SESSION['msg'] = ["type"=>"success", "text"=>"Password updated successfully!"];
+        echo "<script>window.location.href = 'login.php';</script>";
+        exit();
     }
 }
 
@@ -61,9 +72,8 @@ if (isset($_POST['update_password'])) {
 if (isset($_POST['update_photo']) && !empty($_FILES['profile_pic']['name'])) {
     $file = $_FILES['profile_pic'];
     $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-    $allowed = ['jpg', 'jpeg', 'png'];
-    if (!in_array($ext, $allowed)) {
-        echo "<script>alert('Only JPG and PNG files are allowed');</script>";
+    if (!in_array($ext, ['jpg', 'jpeg', 'png'])) {
+         $_SESSION['msg'] = ["type"=>"error", "text"=>"Only JPG and PNG allowed"];
     } else {
         $uploadDir = "profile/";
         if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
@@ -74,27 +84,28 @@ if (isset($_POST['update_photo']) && !empty($_FILES['profile_pic']['name'])) {
             $stmt = $conn->prepare("UPDATE users SET profile_pic = ? WHERE id = ?");
             $stmt->bind_param("si", $uploadPath, $uid);
             $stmt->execute();
-            echo "<script>alert('Profile photo updated successfully'); window.location.href = 'spender.php?page=my_account';</script>";
+            $_SESSION['msg'] = ["type"=>"success", "text"=>"Profile photo updated!"];
+            echo "<script>window.location.href = 'sponsor.php?page=my_account';</script>";
+            exit();
         }
     }
 }
 
 // REMOVE PHOTO
 if (isset($_POST['remove_photo'])) {
-    if (!empty($profile) && file_exists($profile)) {
-        unlink($profile);
-    }
+    if (!empty($profile) && file_exists($profile)) unlink($profile); 
     $stmt = $conn->prepare("UPDATE users SET profile_pic = NULL WHERE id = ?");
     $stmt->bind_param("i", $uid);
     $stmt->execute();
-    echo "<script>alert('Profile photo removed'); window.location.href = 'spender.php?page=my_account';</script>";
+    $_SESSION['msg'] = ["type"=>"success", "text"=>"Profile photo removed"];
+    echo "<script>window.location.href = 'sponsor.php?page=my_account';</script>";
+    exit();
 }
 ?>
 
 <style>
-    /* Use the existing variables from sponsor.php/spender.php */
     :root {
-        --primary: #8f2cd1;;
+        --primary: #8f2cd1;
         --primary-hover: #943acf;
         --bg-card-local: var(--bg-card, #ffffff);
         --text-main-local: var(--text-main, #111827);
@@ -103,7 +114,6 @@ if (isset($_POST['remove_photo'])) {
         --input-bg-local: var(--hover-bg, #ffffff);
     }
 
-    /* Local overrides for dark mode if variables aren't defined globally */
     [data-theme="dark"] {
         --bg-card-local: #191c24;
         --text-main-local: #f8fafc;
@@ -114,11 +124,7 @@ if (isset($_POST['remove_photo'])) {
 
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
     
-    /* Ensure the container itself is transparent to show the main app background */
     .acc-container { width: 100%; margin: 0 auto; background: transparent; color: var(--text-main-local); }
-    
-    .acc-header h1 { font-size: 24px; font-weight: 800; color: var(--text-main-local); margin-bottom: 24px; }
-
     .acc-layout { display: grid; grid-template-columns: 1fr 320px; gap: 24px; }
     
     .acc-card { 
@@ -158,10 +164,8 @@ if (isset($_POST['remove_photo'])) {
     .btn-outline { background: var(--input-bg-local); border: 1px solid var(--border-local); color: var(--text-main-local); }
     .btn-outline:hover { background: var(--border-local); }
 
-    .progress-card { text-align: center; position: sticky; top: 20px; }
     .circular-progress { 
         width: 150px; height: 150px; border-radius: 50%; margin: 20px auto;
-        /* Center of progress bar matches card background */
         background: radial-gradient(closest-side, var(--bg-card-local) 79%, transparent 80% 100%),
                     conic-gradient(var(--primary) <?= (int)$progress ?>%, var(--border-local) 0);
         display: flex; align-items: center; justify-content: center;
@@ -169,17 +173,27 @@ if (isset($_POST['remove_photo'])) {
     }
 
     .p-item { display: flex; align-items: center; justify-content: space-between; font-size: 13px; margin-bottom: 12px; color: var(--text-muted-local); }
-    .p-item i { color: #10b981; margin-right: 8px; }
+    .status-icon.done { color: #10b981; }
+    .status-icon.missing { color: #ef4444; }
+
+    /* TOAST STYLES */
+    #toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; }
+    .toast-box {
+        background: var(--bg-card-local); padding: 16px 24px; border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-left: 5px solid var(--primary);
+        display: flex; align-items: center; gap: 12px; margin-bottom: 10px;
+        animation: slideIn 0.4s forwards;
+    }
+    @keyframes slideIn { from { transform: translateX(120%); } to { transform: translateX(0); } }
 
     @media (max-width: 850px) {
         .acc-layout { grid-template-columns: 1fr; }
         .form-grid { grid-template-columns: 1fr; }
         .profile-section { flex-direction: column; text-align: center; }
     }
-
-    
-    
 </style>
+
+<div id="toast-container"></div>
 
 <div class="acc-container">
     <div class="acc-layout">
@@ -200,7 +214,6 @@ if (isset($_POST['remove_photo'])) {
                                 </button>
                                 <button type="submit" name="update_photo" class="btn btn-primary">Save</button>
                             </form>
-
                             <?php if (!empty($profile)): ?>
                             <form method="post" style="display: contents;" onsubmit="return confirm('Are you sure you want to remove your profile picture?');">
                                 <button type="submit" name="remove_photo" class="btn btn-outline" style="color: #dc2626; border-color: #fca5a5;">
@@ -224,6 +237,10 @@ if (isset($_POST['remove_photo'])) {
                         <div class="form-group">
                             <label>Email Address</label>
                             <input type="email" name="email" value="<?= htmlspecialchars($email) ?>" placeholder="name@company.com">
+                        </div>
+                        <div class="form-group" style="grid-column: span 2;">
+                            <label>Phone Number (Philippines)</label>
+                            <input type="text" name="phone" value="<?= htmlspecialchars($phone) ?>" placeholder="+63xxxxxxxxx or 09xxxxxxxxx">
                         </div>
                     </div>
                     <button type="submit" name="save_profile" class="btn btn-primary">
@@ -256,41 +273,53 @@ if (isset($_POST['remove_photo'])) {
             <div class="acc-card progress-card">
                 <h3>Profile Completion</h3>
                 <div class="circular-progress"><?= (int)$progress ?>%</div>
-                
                 <div class="progress-items">
-                    <div class="p-item">
-                        <span><i class="fa-solid <?= $progress >= 10 ? 'fa-circle-check' : 'fa-circle' ?>"></i> Account Setup</span> 
-                        <b>10%</b>
-                    </div>
-                    <div class="p-item">
-                        <span><i class="fa-solid <?= !empty($profile) ? 'fa-circle-check' : 'fa-circle' ?>"></i> Profile Image</span> 
-                        <b>20%</b>
-                    </div>
-                    <div class="p-item">
-                        <span><i class="fa-solid <?= (!empty($fullname) && !empty($email)) ? 'fa-circle-check' : 'fa-circle' ?>"></i> Personal Info</span> 
-                        <b>50%</b>
-                    </div>
-                    <div class="p-item">
-                        <span><i class="fa-solid <?= !empty($userData['password']) ? 'fa-circle-check' : 'fa-circle' ?>"></i> Security Set</span> 
-                        <b>20%</b>
-                    </div>
+                    <div class="p-item"><span>Account Setup</span> <i class="fa-solid fa-circle-check status-icon done"></i></div>
+                    <div class="p-item"><span>Profile Image</span> <i class="fa-solid <?= !empty($profile) ? 'fa-circle-check status-icon done' : 'fa-circle-xmark status-icon missing' ?>"></i></div>
+                    <div class="p-item"><span>Personal Info</span> <i class="fa-solid <?= (!empty($fullname) && !empty($email)) ? 'fa-circle-check status-icon done' : 'fa-circle-xmark status-icon missing' ?>"></i></div>
+                    <div class="p-item"><span>PH Phone Number</span> <i class="fa-solid <?= $is_valid_ph ? 'fa-circle-check status-icon done' : 'fa-circle-xmark status-icon missing' ?>"></i></div>
+                    <div class="p-item"><span>Security Set</span> <i class="fa-solid <?= !empty($userData['password']) ? 'fa-circle-check status-icon done' : 'fa-circle-xmark status-icon missing' ?>"></i></div>
                 </div>
             </div>
+            
             <div class="acc-card" style="margin-top: 20px;">
-                <h3 style="font-size: 14px; color: var(--accent-cyan);">
+                <h3 style="font-size: 14px; color: #00bcd4;">
                     <i class="fa-solid fa-lightbulb"></i> Security Tip
                 </h3>
                 <p style="font-size: 12px; color: var(--text-muted-local); line-height: 1.6;">
                     Use a unique password for Payton to keep your financial data safe. Enabling 2FA is coming soon!
                 </p>
                 <p style="font-size: 12px; color: var(--text-muted-local); line-height: 1.6; margin-top: 20px; margin-bottom: 20px;">
-                    Always click <b>Logout</b> when you're finished to clear your session tokens from the browser.
+                    Always click <b>Logout</b> when you're finished to clear your session tokens.
+                </p>
             </div>
         </aside>
     </div>
 </div>
 
 <script>
+    function showToast(msg, type = 'success') {
+        const container = document.getElementById('toast-container');
+        const toast = document.createElement('div');
+        toast.className = 'toast-box';
+        const color = type === 'success' ? '#10b981' : '#ef4444';
+        const icon = type === 'success' ? 'fa-circle-check' : 'fa-circle-exclamation';
+        toast.style.borderLeftColor = color;
+        toast.innerHTML = `<i class="fa-solid ${icon}" style="color:${color}"></i><span>${msg}</span>`;
+        container.appendChild(toast);
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transition = 'opacity 0.4s';
+            setTimeout(() => toast.remove(), 400);
+        }, 4000);
+    }
+
+    // Capture PHP Session Message and display Toast
+    <?php if (isset($_SESSION['msg'])): ?>
+        showToast("<?= $_SESSION['msg']['text'] ?>", "<?= $_SESSION['msg']['type'] ?>");
+        <?php unset($_SESSION['msg']); ?>
+    <?php endif; ?>
+
     document.getElementById('profilePicInput').addEventListener('change', function(e) {
         const file = e.target.files[0];
         if (file) {

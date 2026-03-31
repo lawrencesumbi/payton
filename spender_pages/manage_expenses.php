@@ -202,6 +202,9 @@ if ($prevMonthTotal > 0) {
       --accent-red-light: #fee2e2;
       --shadow: rgba(15, 23, 42, 0.06);
       --shadow-light: rgba(15, 23, 42, 0.05);
+      --accent-orange: #f89b1c;        /* A slightly richer orange for light mode */
+      --accent-orange-light: #fff7ed;  /* The background you're currently using */
+      --border-orange: #ffe2c3;
     }
 
     [data-theme="dark"] {
@@ -224,6 +227,9 @@ if ($prevMonthTotal > 0) {
       --accent-red-light: #7f1d1d;
       --shadow: rgba(0,0,0,0.2);
       --shadow-light: rgba(0,0,0,0.1);
+      --accent-orange: #fb923c;        /* Vibrant orange for dark mode */
+      --accent-orange-light: #2d1a10;  /* Deep brownish-orange background */
+      --border-orange: #432719; 
     }
 
     * { margin:0; padding:0; box-sizing:border-box; }
@@ -434,10 +440,11 @@ if ($prevMonthTotal > 0) {
 .stat-green::before { background: var(--accent-green); }
 
 .stat-orange {
-  background: #fff7ed;
-  border: 1px solid #ffe2c3;
+  background: var(--accent-orange-light);
+  border: 1px solid var(--border-orange);
 }
-.stat-orange::before { background: #f8bf5c; }
+
+.stat-orange::before { background: var(--accent-orange); }
 
 /* =========================
    BREAKDOWN SECTION
