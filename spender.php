@@ -70,6 +70,12 @@ $searchTerm = $_GET['search'] ?? '';
       --accent-purple: #a855f7;
     }
 
+    /* ADD THIS RIGHT BELOW IT */
+    [data-theme="dark"] .content {
+        background-color: var(--bg-body); /* Forces the 'white block' to be dark slate */
+        min-height: calc(100vh - 64px);  /* Ensures it covers the whole screen */
+    }
+
     /* ===== BASIC RESET ===== */
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', Arial, sans-serif; }
     body { background: var(--bg-body); color: var(--text-main); min-height: 100vh; line-height: 1.5; transition: background 0.3s ease, color 0.3s ease; }
@@ -100,9 +106,9 @@ $searchTerm = $_GET['search'] ?? '';
       font-size: 14px; display: flex; align-items: center; gap: 15px; transition: all 0.2s ease; 
       border-radius: 25px 0 0 25px; white-space: nowrap;
     }
-    .menu a i { font-size: 18px; min-width: 25px; text-align: center; color: #7f308f; }
-    .menu a.active { background: #ebe0f7; color: #7f308f !important; }
-    .menu a:hover:not(.active) { background: #f9f9f9; color: #7f308f; }
+    .menu a i { font-size: 18px; min-width: 25px; text-align: center; color: var(--accent-purple); }
+    .menu a.active { background: var(--sidebar-active); color: var(--accent-purple) !important; }
+    .menu a:hover:not(.active) { background: var(--hover-bg); color: var(--accent-purple); }
 
     /* ===== SIDEBAR COLLAPSED LOGIC ===== */
     .sidebar-is-collapsed .sidebar { width: 80px; }

@@ -146,7 +146,7 @@ if (isset($_POST['remove_photo'])) {
     .profile-info-meta h4 { font-size: 18px; font-weight: 700; color: var(--text-main-local); }
     .profile-info-meta p { color: var(--text-muted-local); font-size: 13px; margin-top: 4px; }
 
-    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
     .form-group { margin-bottom: 18px; }
     .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 8px; color: var(--text-main-local); }
     .form-group input { 
@@ -165,7 +165,7 @@ if (isset($_POST['remove_photo'])) {
     .btn-outline:hover { background: var(--border-local); }
 
     .circular-progress { 
-        width: 150px; height: 150px; border-radius: 50%; margin: 20px auto;
+        width: 125px; height: 125px; border-radius: 50%; margin: 20px auto;
         background: radial-gradient(closest-side, var(--bg-card-local) 79%, transparent 80% 100%),
                     conic-gradient(var(--primary) <?= (int)$progress ?>%, var(--border-local) 0);
         display: flex; align-items: center; justify-content: center;
@@ -238,7 +238,7 @@ if (isset($_POST['remove_photo'])) {
                             <label>Email Address</label>
                             <input type="email" name="email" value="<?= htmlspecialchars($email) ?>" placeholder="name@company.com">
                         </div>
-                        <div class="form-group" style="grid-column: span 2;">
+                        <div class="form-group">
                             <label>Phone Number (Philippines)</label>
                             <input type="text" name="phone" value="<?= htmlspecialchars($phone) ?>" placeholder="+63xxxxxxxxx or 09xxxxxxxxx">
                         </div>

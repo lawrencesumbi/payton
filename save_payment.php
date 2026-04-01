@@ -3,84 +3,62 @@ require 'db.php';
 session_start();
 include 'log_helper.php';
 
-if (!isset($_SESSION['user_id'])) {
-    exit;
-}
-
+if (!isset($_SESSION['user_id'])) { exit; }
 $user_id = $_SESSION['user_id'];
+$user_name = $_SESSION['user_name'] ?? "User";
 
-// Get POST values safely
 $id = $_POST['id'] ?? null;
 $name = $_POST['payment_name'] ?? null;
-$amount = $_POST['amount'] ?? null;
+$amount = $_POST['amount'] ?? 0;
 $due_date = $_POST['due_date'] ?? null;
-
-// Optional fields
 $payment_method_id = $_POST['payment_method_id'] ?? null;
 $paid_date = $_POST['paid_date'] ?? null;
 
-// ================= ADD PAYMENT =================
+$today = date('Y-m-d');
+
+// ================= CASE: ADD NEW PAYMENT =================
 if (empty($id)) {
+    // Determine if new entry is already overdue based on date
+    $status = ($due_date < $today) ? 3 : 1; 
 
-    if (!$name || !$amount || !$due_date) {
-        $_SESSION['error_msg'] = "Please fill in all required fields.";
-        header("Location: http://localhost/payton/spender.php?page=manage_payments");
-        exit();
-    }
+    $sql = "INSERT INTO scheduled_payments (user_id, payment_name, amount, due_date, due_status_id) VALUES (?, ?, ?, ?, ?)";
+    $conn->prepare($sql)->execute([$user_id, $name, $amount, $due_date, $status]);
+    
+    addLog($conn, $user_id, "$user_name Scheduled: $name");
+    $_SESSION['success_msg'] = "Payment added!";
+} 
 
-    // Default unpaid
-    $due_status_id = 1;
-
-    $sql = "INSERT INTO scheduled_payments
-            (user_id, payment_name, amount, due_date, due_status_id)
-            VALUES (?, ?, ?, ?, ?)";
-
-    $stmt = $conn->prepare($sql);
-    $stmt->execute([
-        $user_id,
-        $name,
-        $amount,
-        $due_date,
-        $due_status_id
-    ]);
-
-    $logAction = "$user_name Scheduled a Payment: $name - ₱" . number_format($amount, 2);
-    addLog($conn, $user_id, $logAction);
-
-    $_SESSION['success_msg'] = "Payment for '$name' scheduled successfully!";
-}
-
-// ================= EDIT PAYMENT =================
+// ================= CASE: UPDATE / MARK AS PAID =================
 else {
-
-    // If paid_date exists → mark as paid
     if (!empty($paid_date)) {
-        $due_status_id = 2; // Paid
+        $status = 2; // Paid
     } else {
-        $due_status_id = 1; // Still unpaid
+        $status = ($due_date < $today) ? 3 : 1; // Overdue or Unpaid
     }
 
-    $sql = "UPDATE scheduled_payments
-            SET 
-                paid_date = ?,
-                payment_method_id = ?,
-                due_status_id = ?
+    $sql = "UPDATE scheduled_payments 
+            SET paid_date = ?, 
+                payment_method_id = ?, 
+                due_status_id = ?,
+                payment_name = ?,
+                amount = ?,
+                due_date = ?
             WHERE id = ? AND user_id = ?";
-
-    $stmt = $conn->prepare($sql);
-    $stmt->execute([
-        $paid_date,
-        $payment_method_id,
-        $due_status_id,
-        $id,
+            
+    $conn->prepare($sql)->execute([
+        $paid_date, 
+        $payment_method_id, 
+        $status, 
+        $name, 
+        $amount, 
+        $due_date, 
+        $id, 
         $user_id
     ]);
 
-    $logAction = "$user_name Updated a Scheduled Payment: $name - ₱" . number_format($amount, 2);
-    addLog($conn, $user_id, $logAction);
-
-    $_SESSION['success_msg'] = "Payment details updated successfully!";
+    addLog($conn, $user_id, "$user_name Updated: $name");
+    $_SESSION['success_msg'] = "Changes saved!";
 }
 
-header("Location: http://localhost/payton/spender.php?page=manage_payments");
+header("Location: spender.php?page=manage_payments");
 exit;

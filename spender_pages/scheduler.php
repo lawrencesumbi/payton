@@ -99,7 +99,7 @@ body::-webkit-scrollbar {
             border-radius: 10px;
             
             box-shadow: 0 20px 50px rgba(0,0,0,0.1);
-            max-height: 100vh;
+            
         }
 
 .calendar {
@@ -514,7 +514,7 @@ function renderCalendar() {
         const formattedAmount = "₱" + Number(payment.amount).toLocaleString();
         paymentList += `
             <div style="
-                color: #ff0000;      /* Violet text */
+                color: #ff5656;      /* Violet text */
                 font-size: 11px;
                 font-weight: 500;
                 overflow: hidden;

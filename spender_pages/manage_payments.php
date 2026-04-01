@@ -6,6 +6,29 @@ if (session_status() === PHP_SESSION_NONE) {
 $pdo = new PDO("mysql:host=localhost;dbname=payton", "root", "");
 $user_id = $_SESSION['user_id'] ?? 1;
 
+/* ================= THE TWO-WAY AUTO-AUDIT ================= */
+
+// RULE 1: If Unpaid (1) and date is in the PAST -> Change to Overdue (3)
+$conn->prepare("
+    UPDATE scheduled_payments 
+    SET due_status_id = 3 
+    WHERE due_status_id = 1 
+    AND due_date < CURDATE() 
+    AND user_id = ?
+")->execute([$user_id]);
+
+// RULE 2: If Overdue (3) and date is TODAY OR FUTURE -> Change back to Unpaid (1)
+// This handles cases where you edited an overdue bill to a later date
+$conn->prepare("
+    UPDATE scheduled_payments 
+    SET due_status_id = 1 
+    WHERE due_status_id = 3 
+    AND due_date >= CURDATE() 
+    AND user_id = ?
+")->execute([$user_id]);
+
+/* ========================================================== */
+
 // Get the filter from URL, default to 'unpaid_overdue'
 $filter = $_GET['filter'] ?? 'unpaid_overdue';
     

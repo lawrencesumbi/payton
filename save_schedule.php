@@ -3,19 +3,19 @@ session_start();
 require 'db.php';
 include 'log_helper.php';
 
-
 if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $user_id = $_SESSION['user_id'];
-    $date = $_POST['date'];
-    $name = $_POST['payment_name'];
-    $amount = $_POST['amount'];
+    // Basic sanitization
+    $date    = $_POST['date'];
+    $name    = htmlspecialchars($_POST['payment_name']);
+    $amount  = floatval($_POST['amount']);
 
     try {
-        // Status 1 is usually 'Unpaid' in your logic
+        // 1. Insert the schedule
         $sql = "INSERT INTO scheduled_payments (user_id, payment_name, amount, due_date, due_status_id) 
                 VALUES (?, ?, ?, ?, 1)";
         
@@ -24,6 +24,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($result) {
             $_SESSION['success_msg'] = "Payment for '$name' added to " . date("M d, Y", strtotime($date));
+            
+            // 2. LOGGING FIX: Fetch user details if they aren't in the session
+            // Assuming your 'users' table has these columns
+            $userStmt = $conn->prepare("SELECT fullname, role FROM users WHERE id = ?");
+            $userStmt->execute([$user_id]);
+            $user = $userStmt->fetch();
+
+            if ($user) {
+                $logAction = $user["fullname"] . " Scheduled a Payment: $name (" . ucfirst($user["role"]) . ")";
+                addLog($conn, $user_id, $logAction);
+            }
         } else {
             $_SESSION['error_msg'] = "Failed to save payment.";
         }
@@ -31,11 +42,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['error_msg'] = "Database error: " . $e->getMessage();
     }
 
-
-    $logAction = $user["fullname"] . " Scheduled a Payment: $name " . ucfirst($user["role"]);
-    addLog($conn, $user["id"], $logAction);
-
-    // Redirect back to the calendar page
     header("Location: spender.php?page=scheduler");
     exit;
 }

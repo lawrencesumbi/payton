@@ -151,7 +151,7 @@ if (isset($_POST['remove_photo'])) {
 
         .acc-container { width: 100%;}
         .acc-header { margin-bottom: 24px; }
-        .acc-layout { display: grid; grid-template-columns: 1fr 320px; gap: 24px; padding: 20px;}
+        .acc-layout { display: grid; grid-template-columns: 1fr 320px; gap: 24px;}
         
         .acc-card { 
             background: var(--bg-card); border-radius: var(--radius); padding: 18px; 
@@ -168,7 +168,7 @@ if (isset($_POST['remove_photo'])) {
         .profile-info-meta h4 { font-size: 18px; font-weight: 700; }
         .profile-info-meta p { color: var(--text-muted); font-size: 13px; margin-top: 4px; }
 
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
         .form-group { margin-bottom: 18px; }
         .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 8px; color: var(--text-main); }
         .form-group input { 
@@ -261,7 +261,7 @@ if (isset($_POST['remove_photo'])) {
                             <label>Email Address</label>
                             <input type="email" name="email" value="<?= htmlspecialchars($email) ?>" placeholder="name@company.com">
                         </div>
-                        <div class="form-group" style="grid-column: span 2;">
+                        <div class="form-group">
                             <label>Phone Number (Philippines)</label>
                             <input type="text" name="phone" value="<?= htmlspecialchars($phone) ?>" placeholder="+639xxxxxxxxx or 09xxxxxxxxx">
                         </div>
@@ -319,6 +319,17 @@ if (isset($_POST['remove_photo'])) {
                         <i class="fa-solid <?= !empty($userData['password']) ? 'fa-circle-check status-icon done' : 'fa-circle-xmark status-icon missing' ?>"></i>
                     </div>
                 </div>
+            </div>
+            <div class="acc-card" style="margin-top: 20px;">
+                <h3 style="font-size: 14px; color: #00bcd4;">
+                    <i class="fa-solid fa-lightbulb"></i> Security Tip
+                </h3>
+                <p style="font-size: 12px; color: var(--text-muted-local); line-height: 1.6;">
+                    Use a unique password for Payton to keep your financial data safe. Enabling 2FA is coming soon!
+                </p>
+                <p style="font-size: 12px; color: var(--text-muted-local); line-height: 1.6; margin-top: 20px; margin-bottom: 20px;">
+                    Always click <b>Logout</b> when you're finished to clear your session tokens.
+                </p>
             </div>
         </aside>
     </div>
