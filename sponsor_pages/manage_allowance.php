@@ -9,6 +9,20 @@ if (!isset($_SESSION['user_id'])) {
 $user_id = $_SESSION['user_id'];
 
 /* =====================================================
+   AUTO UPDATE BUDGET STATUS BASED ON DATE
+===================================================== */
+$updateStatus = $conn->prepare("
+    UPDATE budget
+    SET status = 
+        CASE
+            WHEN CURDATE() BETWEEN start_date AND end_date
+            THEN 'Active'
+            ELSE 'Inactive'
+        END
+");
+$updateStatus->execute();
+
+/* =====================================================
     FETCH ALL BUDGETS (Unified Table Query)
 ===================================================== */
 $stmt = $conn->prepare("
