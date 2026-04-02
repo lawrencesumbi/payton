@@ -1861,7 +1861,7 @@ tr:hover {
 .receipt-preview-container {
     position: relative;
     width: 100%;
-    max-width: 300px;
+    max-width: 400px;
     height: 400px;
     background: rgba(255, 255, 255, 0.1);
     border: 2px solid rgba(168, 85, 247, 0.4); /* Purple border */
@@ -2049,6 +2049,18 @@ window.handleReceiptScan = async function(input) {
         const result = JSON.parse(rawText);
 
         if (result.success) {
+            // 1. I-transfer ang file gikan sa Scan Input padulong sa Main Form Input
+            const mainFileInput = document.querySelector('input[name="receipt_upload"]');
+            if (mainFileInput) {
+                mainFileInput.files = input.files; // Kini ang magic line para mo-fill ang file input
+            }
+
+            // 2. I-update ang label nga "No receipt uploaded" para makita sa user ang filename
+            const receiptText = document.getElementById('currentReceipt');
+            if (receiptText && input.files[0]) {
+                receiptText.textContent = "Scanned: " + input.files[0].name;
+                receiptText.style.color = "#55efc4"; // Green color para "Success" look
+            }
             document.getElementById('descInput').value = result.description || "";
             document.getElementById('amountInput').value = result.amount || "";
             document.getElementById('paymentInput').value = result.payment_method_id || "1";
@@ -2180,7 +2192,57 @@ window.handleReceiptScan = async function(input) {
             document.getElementById('submitBtn').textContent = 'Update Expense';
             document.querySelector('.expense-form').action = 'update_expense_process.php';
             document.getElementById('expenseId').value = d.id;
+            // --- NEW RECEIPT LOGIC START ---
+            const receiptText = document.getElementById('currentReceipt');
+            if (d.receipt && d.receipt !== "") {
+                // This extracts just the filename if "uploads/" is included
+                const fileName = d.receipt.split('/').pop(); 
+                receiptText.textContent = "Current: " + fileName;
+                receiptText.style.color = "#a29bfe"; // A light purple to match a dark theme
+            } else {
+                receiptText.textContent = "No receipt uploaded";
+                receiptText.style.color = "#888";
+            }
+            // --- NEW RECEIPT LOGIC END ---
         });
+    });
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('receiptModal');
+    const receiptImg = document.getElementById('receiptImage');
+    const closeBtn = document.querySelector('.close-receipt-btn');
+
+    // 1. Listen for clicks on the "View" buttons
+    document.querySelectorAll('.btn-view-receipt').forEach(button => {
+        button.addEventListener('click', function() {
+            // This variable now already contains "uploads/filename.jpg" from your DB
+            const fullPath = this.getAttribute('data-receipt'); 
+            
+            const modal = document.getElementById('receiptModal');
+            const receiptImg = document.getElementById('receiptImage');
+            const downloadLink = document.getElementById('downloadLink');
+
+            // Set the source and download link
+            receiptImg.src = fullPath;
+            if(downloadLink) {
+                downloadLink.href = fullPath;
+            }
+
+            modal.style.display = 'flex';
+        });
+    });
+
+    // 2. Close modal when clicking the '×' button
+    closeBtn.addEventListener('click', () => {
+        modal.style.display = 'none';
+    });
+
+    // 3. Close modal when clicking on the dark overlay (outside the image)
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.style.display = 'none';
+        }
     });
 });
 </script>
