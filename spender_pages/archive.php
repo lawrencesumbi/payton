@@ -1,33 +1,33 @@
 <?php
 require 'db.php';
 
-// Make sure user is logged in
+// 1. Ensure Session is started
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// 2. Security Check
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit;
 }
 
 $user_id = $_SESSION['user_id'];
-
-/* =====================================================
-    FETCH ALL INACTIVE BUDGETS & THEIR EXPENSES
-===================================================== */
-// Get search term from URL
 $searchTerm = $_GET['search'] ?? '';
 
-// Build WHERE clause with search filter
-$whereClause = "WHERE user_id = :user_id AND status = 'Inactive'";
-
+/* =====================================================
+    FETCH ALL INACTIVE BUDGETS
+===================================================== */
 $budgetStmt = $conn->prepare("
     SELECT id, budget_name, budget_amount, start_date, end_date 
     FROM budget 
-    $whereClause
+    WHERE user_id = :user_id AND status = 'Inactive'
     ORDER BY end_date DESC
 ");
 $budgetStmt->execute(['user_id' => $user_id]);
 $inactiveBudgets = $budgetStmt->fetchAll(PDO::FETCH_ASSOC);
 
-// If search term exists, filter budgets by name
+// Filter by search term if provided
 if (!empty($searchTerm)) {
     $inactiveBudgets = array_filter($inactiveBudgets, function($budget) use ($searchTerm) {
         return stripos($budget['budget_name'], $searchTerm) !== false;
@@ -186,6 +186,24 @@ if (!empty($searchTerm)) {
             padding: 60px;
             color: var(--text-muted);
         }
+        .budget-stats {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap; /* Allows pills to drop to next line on mobile */
+        }
+
+        .stat-pill {
+            min-width: 100px; /* Ensures pills have a consistent look */
+            padding: 8px 12px;
+            background: var(--bg-body);
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            transition: transform 0.2s;
+        }
+
+        .stat-pill:hover {
+            transform: translateY(-2px); /* Subtle lift effect */
+        }
     </style>
 </head>
 <body>
@@ -206,18 +224,19 @@ if (!empty($searchTerm)) {
     <?php endif; ?>
 
     <?php foreach ($inactiveBudgets as $budget): 
-        // Fetch expenses for this specific inactive budget
-        $expStmt = $conn->prepare("
-            SELECT e.*, c.category_name 
-            FROM expenses e
-            LEFT JOIN category c ON e.category_id = c.id
-            WHERE e.budget_id = ?
-            ORDER BY e.expense_date DESC
-        ");
-        $expStmt->execute([$budget['id']]);
+        // 1. Fetch expenses
+        $expStmt = $conn->prepare("SELECT e.*, c.category_name FROM expenses e LEFT JOIN category c ON e.category_id = c.id WHERE e.budget_id = ? ORDER BY e.expense_date DESC");
+        $expStmt->execute([$budget['id']]); 
         $expenses = $expStmt->fetchAll(PDO::FETCH_ASSOC);
 
+        // 2. Calculations
         $totalSpent = array_sum(array_column($expenses, 'amount'));
+        $remaining = (float)$budget['budget_amount'] - $totalSpent;
+
+        // 3. Status Logic - MAKE SURE THESE NAMES MATCH THE HTML BELOW
+        $isOverspent = $remaining < 0;
+        $remainingColor = $isOverspent ? '#ef4444' : '#10b981'; 
+        $remainingLabel = $isOverspent ? 'Overspent' : 'Remaining';
     ?>
 
     <div class="budget-group">
@@ -229,11 +248,17 @@ if (!empty($searchTerm)) {
             <div class="budget-stats">
                 <div class="stat-pill">
                     <div class="stat-label">Limit</div>
-                    <div class="stat-val">$<?= number_format($budget['budget_amount'], 2) ?></div>
+                    <div class="stat-val">₱<?= number_format($budget['budget_amount'], 2) ?></div>
                 </div>
                 <div class="stat-pill">
                     <div class="stat-label">Total Spent</div>
-                    <div class="stat-val" style="color: var(--text-main);">$<?= number_format($totalSpent, 2) ?></div>
+                    <div class="stat-val" style="color: var(--text-main);">₱<?= number_format($totalSpent, 2) ?></div>
+                </div>
+                <div class="stat-pill" style="border-color: <?= $remainingColor ?>44; background: <?= $remainingColor ?>05;">
+                    <div class="stat-label" style="color: <?= $remainingColor ?>;"><?= $remainingLabel ?></div>
+                    <div class="stat-val" style="color: <?= $remainingColor ?>;">
+                        ₱<?= number_format(abs($remaining), 2) ?>
+                    </div>
                 </div>
             </div>
         </div>
@@ -257,7 +282,7 @@ if (!empty($searchTerm)) {
                             <td><?= date('d M Y', strtotime($e['expense_date'])) ?></td>
                             <td style="font-weight: 600; color: var(--text-main);"><?= htmlspecialchars($e['description']) ?></td>
                             <td><span class="category-badge"><?= htmlspecialchars($e['category_name'] ?? 'Uncategorized') ?></span></td>
-                            <td style="font-weight: 800; color: var(--text-main);">$<?= number_format($e['amount'], 2) ?></td>
+                            <td style="font-weight: 800; color: var(--text-main);">₱<?= number_format($e['amount'], 2) ?></td>
                         </tr>
                         <?php endforeach; ?>
                     <?php endif; ?>

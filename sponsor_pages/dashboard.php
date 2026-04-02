@@ -185,6 +185,30 @@ $all_budgets = $stmt->fetchAll(PDO::FETCH_ASSOC);
     background: rgba(21, 128, 61, 0.2) !important;
     color: #4ade80 !important;
 }
+
+/* Fix for scrollable table container */
+.table-scroll-container {
+    height: 300px; /* Adjust this value (e.g., 300px, 500px) to your liking */
+    overflow-y: auto;
+    scrollbar-width: thin; /* Makes scrollbar less bulky in Firefox */
+}
+
+/* Custom scrollbar for Chrome/Edge/Safari to match your dark theme */
+.table-scroll-container::-webkit-scrollbar {
+    width: 6px;
+}
+.table-scroll-container::-webkit-scrollbar-thumb {
+    background-color: var(--border-color);
+    border-radius: 10px;
+}
+
+/* Keeps the header visible while scrolling */
+.sticky-top {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background-color: var(--card-bg) !important;
+}
 </style>
 </head>
 <body>
@@ -236,7 +260,7 @@ $all_budgets = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <div class="col-lg-8">
             <div class="chart-container shadow-sm">
                 <h6 class="fw-bold mb-4">Manage Allowances</h6>
-                <div class="table-responsive" style="height: 100%; overflow-y: auto;">
+                <div class="table-scroll-container">
                     <table class="table align-middle">
                         <thead class="table-light sticky-top">
                             <tr>
@@ -259,7 +283,6 @@ $all_budgets = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                         <?= ucfirst($b['status']) ?>
                                     </span>
                                 </td>
-                                
                             </tr>
                             <?php endforeach; ?>
                         </tbody>

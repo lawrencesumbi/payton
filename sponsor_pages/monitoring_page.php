@@ -152,7 +152,6 @@ if ($selected_spender && $selected_allowance) {
     }
 
     .main-wrapper {
-        padding: 20px;
         width: 100%;
     }
 

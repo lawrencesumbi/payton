@@ -76,10 +76,39 @@ $people = $stmt->fetchAll(PDO::FETCH_ASSOC);
         .btn-primary{ background: var(--accent-purple); color:white; }
         .btn-danger{ background: var(--accent-red-light); color: var(--accent-red); border: 1px solid var(--accent-red-border); }
 
-        .card{ background: var(--bg-card); border-radius:12px; border:1px solid var(--border-color); overflow: hidden; transition: background 0.3s ease; }
+        .card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 6px var(--shadow);
+            display: flex;
+            flex-direction: column;
+            max-height: 500px; /* Adjust this height as needed */
+            overflow: hidden;
+        }
+        .table-scroll {
+            overflow-y: auto;
+            flex-grow: 1;
+            /* Hide scrollbar for Chrome, Safari and Opera */
+            &::-webkit-scrollbar {
+                display: none;
+            }
 
-        table{ width:100%; border-collapse:collapse; }
-        th{ padding:12px; text-align:left; background: var(--accent-purple-dark); font-size:14px; color:white; }
+            /* Hide scrollbar for IE, Edge and Firefox */
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+
+        table{ width:100%; border-collapse:collapse;}
+        thead th {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background: var(--accent-purple); /* Or your preferred header color */
+            color: white;
+            padding: 12px;
+            text-align: left;
+        }
         td{ padding:14px; border-top:1px solid var(--border-light); color: var(--text-main); }
 
         /* MODAL */
@@ -165,37 +194,39 @@ $people = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </div>
 
     <div class="card">
-        <table>
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Date Added</th>
-                    <th style="text-align:right">Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php if(!empty($people)): ?>
-                    <?php foreach($people as $p): ?>
+        <div class="table-scroll">
+            <table>
+                <thead>
                     <tr>
-                        <td><?= htmlspecialchars($p['name']) ?></td>
-                        <td><?= date("M d, Y", strtotime($p['created_at'])) ?></td>
-                        <td style="text-align:right">
-                            <form method="POST" action="add_delete_people.php" onsubmit="return confirm('Remove this person?');">
-                                <input type="hidden" name="person_id" value="<?= $p['id'] ?>">
-                                <button name="delete_person" class="btn btn-danger">Remove</button>
-                            </form>
-                        </td>
+                        <th>Name</th>
+                        <th>Date Added</th>
+                        <th style="text-align:right">Action</th>
                     </tr>
-                    <?php endforeach; ?>
-                <?php else: ?>
-                    <tr>
-                        <td colspan="3" style="text-align:center; padding:40px; color:gray">
-                            No people found.
-                        </td>
-                    </tr>
-                <?php endif; ?>
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    <?php if(!empty($people)): ?>
+                        <?php foreach($people as $p): ?>
+                        <tr>
+                            <td><?= htmlspecialchars($p['name']) ?></td>
+                            <td><?= date("M d, Y", strtotime($p['created_at'])) ?></td>
+                            <td style="text-align:right">
+                                <form method="POST" action="add_delete_people.php" onsubmit="return confirm('Remove this person?');">
+                                    <input type="hidden" name="person_id" value="<?= $p['id'] ?>">
+                                    <button name="delete_person" class="btn btn-danger">Remove</button>
+                                </form>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="3" style="text-align:center; padding:40px; color:gray">
+                                No people found.
+                            </td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 

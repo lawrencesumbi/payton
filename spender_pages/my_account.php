@@ -22,7 +22,7 @@ $fullname = $userData['fullname'] ?? "Unknown User";
 $email    = $userData['email'] ?? "No email";
 $phone    = $userData['phone'] ?? ""; // Added phone variable
 $profile  = $userData['profile_pic'] ?? "";
-$profilePath = !empty($profile) && file_exists($profile) ? $profile : "profile/default.png";
+$profilePath = !empty($profile) && file_exists($profile) ? $profile : "profile/default.jpg";
 
 // --- ADDED PHILIPPINES PHONE VALIDATION LOGIC ---
 $is_valid_ph = preg_match('/^(09|\+639)\d{9}$/', $phone);

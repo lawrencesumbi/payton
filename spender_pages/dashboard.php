@@ -191,7 +191,7 @@ $percChange = ($trends['lm'] > 0) ? (($trends['tm'] - $trends['lm']) / $trends['
             padding: 15px; 
             border: 1px solid var(--border-color); 
             box-shadow: 0 10px 30px var(--shadow);
-            min-height: 350px; /* Ensures panels look balanced */
+            height: 375px; /* Ensures panels look balanced */
             display: flex;
             flex-direction: column;
             transition: background 0.3s ease;
@@ -234,7 +234,7 @@ $percChange = ($trends['lm'] > 0) ? (($trends['tm'] - $trends['lm']) / $trends['
 
 <div class="wrapper">
     <header style="margin-bottom: 20px;">
-        <h1 style="font-weight: 900; font-size: clamp(24px, 5vw, 32px); margin: 0;">Payton <span style="color: var(--primary);">Dashboard</span></h1>
+        <h1 style="font-weight: 900; font-size: clamp(24px, 5vw, 32px); margin: 0;">Spender <span style="color: var(--primary);">Dashboard</span></h1>
         <p style="color: var(--text-muted); margin: 5px 0 0; font-weight: 500;">Overview of your financial obligations</p>
     </header>
 

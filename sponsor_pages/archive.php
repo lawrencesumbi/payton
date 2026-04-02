@@ -81,7 +81,7 @@ function getStatusBadge($status) {
 
     /* 2. THEME VARIABLES */
     :root {
-        --primary: #7f308f;
+        --primary: #a855f7;
         --card-bg: #ffffff;
         --text-main: #334155;
         --text-muted: #64748b;

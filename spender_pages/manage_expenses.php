@@ -673,7 +673,7 @@ tr:hover {
   gap: 8px;
   padding: 12px 15px;
   text-align: left;
-  border-bottom: 1px solid #eee;     
+  border-bottom: 1px solid var(--border-color); /* Updated */
 }
 
 .btn-edit,
@@ -897,10 +897,10 @@ tr:hover {
 /* AI Prediction Card - The "Truly AI" Look */
 .ai-prediction-card {
     flex: 0 0 340px;
-    background: var(--bg-card);
+    background: var(--bg-card); /* Changed from #ffffff */
     border-radius: 24px;
     padding: 24px;
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--border-color); /* Changed from #e2e8f0 */
     box-shadow: 0 20px 40px var(--shadow);
     position: relative;
     overflow: hidden;
@@ -932,10 +932,10 @@ tr:hover {
 
 .ai-prediction-card {
     flex: 0 0 340px;
-    background: var(--bg-card);
+    background: var(--bg-card); /* Changed from #ffffff */
     border-radius: 24px;
     padding: 24px;
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--border-color); /* Changed from #e2e8f0 */
     box-shadow: 0 20px 40px var(--shadow);
     position: relative;
     overflow: hidden;
@@ -1069,7 +1069,7 @@ tr:hover {
     z-index: 10;
     font-size: 30px; /* Slimmed down slightly */
     font-weight: 800;
-    color: #1a202c;
+    color: var(--text-main); /* Changed from #1a202c */
     line-height: 1;
 }
 
@@ -1079,27 +1079,19 @@ tr:hover {
     width: 100%;
     text-align: center;
     font-size: 10px;
-    color: #a0aec0;
+    color: var(--text-muted); /* Changed from #a0aec0 */
     font-weight: 700;
     text-transform: uppercase;
 }
 /* Option Items (Confidence Breakdown) */
 .ai-options-list {
-    background: #f8fafc;
+    background: var(--bg-body); /* Changed from #f8fafc */
     border-radius: 16px;
     padding: 8px;
     margin-bottom: 24px;
-    border: 1px solid #f1f5f9;
+    border: 1px solid var(--border-color); /* Changed from #f1f5f9 */
 }
 
-/* Container for the list */
-.ai-options-list {
-    background: #f8fafc;
-    border-radius: 16px;
-    padding: 8px;
-    margin-bottom: 24px;
-    border: 1px solid #f1f5f9;
-}
 
 /* Individual rows */
 .option-item {
@@ -1115,9 +1107,9 @@ tr:hover {
 
 /* Active/Primary prediction row */
 .option-item.active {
-    background: white;
-    box-shadow: 0 4px 12px rgba(241, 114, 231, 0.15); /* Soft pink glow */
-    color: #1a202c;
+    background: var(--bg-card); /* Changed from white */
+    box-shadow: 0 4px 12px rgba(168, 85, 247, 0.2); /* Changed to use purple alpha */
+    color: var(--text-main); /* Changed from #1a202c */
     font-weight: 700;
 }
 
@@ -1207,21 +1199,20 @@ tr:hover {
 }
 
 .ma.manual-category-card {
-    width: 320px; /* Slightly wider for better text fit */
-    background: #ffffff;
+    width: 320px;
+    background: var(--bg-card); /* Changed from #ffffff */
     border-radius: 16px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
     padding: 20px;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--border-color);
 }
 
 .manual-header {
     font-size: 14px;
     font-weight: 700;
-    color: #1e293b;
+    color: var(--text-main); /* Changed from #1e293b */
     margin-bottom: 15px;
     padding-bottom: 10px;
-    border-bottom: 1px solid #f1f5f9;
+    border-bottom: 1px solid var(--border-color);
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
@@ -1239,8 +1230,8 @@ tr:hover {
     justify-content: center;
     padding: 12px 8px;
     border-radius: 10px;
-    background: #fff;
-    border: 1px solid #f1f5f9;
+    background: var(--bg-card); /* Changed from #fff */
+    border: 1px solid var(--border-color); /* Changed from #f1f5f9 */
     cursor: pointer;
     transition: all 0.2s ease;
     text-align: center;
@@ -1298,9 +1289,9 @@ tr:hover {
     display: none; /* Hidden by default */
     align-items: center;
     justify-content: space-between;
-    background: linear-gradient(98deg, #f5f0ff 0%, #ffffff 100%);
-    border: 1px solid #e9e0ff;
-    border-left: 4px solid #6300d4;
+    background: var(--accent-purple-light); /* Changed from gradient */
+    border: 1px solid var(--border-light);
+    border-left: 4px solid var(--accent-purple);
     padding: 10px 14px;
     border-radius: 12px;
     margin: 15px 0;
@@ -1340,7 +1331,7 @@ tr:hover {
 #selectedCategoryLabel {
     font-size: 14px;
     font-weight: 700;
-    color: #1e293b;
+    color: var(--text-main); /* Changed from #1a202c */
 }
 
 .ai-status-pill {
@@ -1398,6 +1389,53 @@ tr:hover {
         transition: 0.2s;
     }
     .toast-close:hover { opacity: 0.8; transform: scale(1.1); }
+
+    /* Container for the two cards */
+    .choice-container {
+        background: var(--bg-card); /* Matches your dark dashboard cards */
+        padding: 30px;
+        border-radius: 20px;
+        display: flex;
+        gap: 20px;
+        border: 1px solid var(--border-color);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    /* Individual selection cards */
+    .choice-card {
+        text-align: center;
+        cursor: pointer;
+        padding: 25px;
+        border: 2px solid var(--border-color);
+        border-radius: 15px;
+        flex: 1;
+        transition: all 0.3s ease;
+        background: var(--bg-card); /* Changed from rgba(255,255,255,0.03) */
+    }
+
+    /* Hover effect to make it feel interactive */
+    .choice-card:hover {
+        border-color: var(--accent-purple);
+        background: var(--accent-purple-light);
+        transform: translateY(-5px);
+    }
+
+    .choice-card i {
+        font-size: 40px;
+        color: var(--accent-purple);
+        margin-bottom: 15px;
+    }
+
+    .choice-card h3 {
+        margin-top: 10px;
+        color: var(--text-main, #ffffff); /* Fallback to white if variable missing */
+    }
+
+    .choice-card p {
+        font-size: 12px;
+        color: var(--text-muted, #aaa); /* Fallback to grey if variable missing */
+        margin-top: 5px;
+    }
 
   </style>
 </head>
@@ -1592,17 +1630,18 @@ tr:hover {
     <i class="fa-solid fa-plus"></i>
 </button>
 
-<div class="modal-overlay" id="choiceModal" style="display:none; align-items:center; justify-content:center;">
-    <div class="choice-container" style="background: white; padding: 30px; border-radius: 20px; display: flex; gap: 20px;">
-        <div class="choice-card" onclick="openManualEntry()" style="text-align:center; cursor:pointer; padding:20px; border:2px solid #eee; border-radius:15px; flex:1;">
-            <i class="fa-solid fa-keyboard" style="font-size:40px; color:#6f42c1;"></i>
-            <h3 style="margin-top:10px;">Manual Input</h3>
-            <p style="font-size:12px; color:#666;">Type details & AI categorize</p>
+<div class="modal-overlay" id="choiceModal">
+    <div class="choice-container">
+        <div class="choice-card" onclick="openManualEntry()">
+            <i class="fa-solid fa-keyboard"></i>
+            <h3>Manual Input</h3>
+            <p>Type details & AI categorize</p>
         </div>
-        <div class="choice-card" onclick="triggerReceiptUpload()" style="text-align:center; cursor:pointer; padding:20px; border:2px solid #eee; border-radius:15px; flex:1;">
-            <i class="fa-solid fa-receipt" style="font-size:40px; color:#6f42c1;"></i>
-            <h3 style="margin-top:10px;">Scan Receipt</h3>
-            <p style="font-size:12px; color:#666;">AI will scan & fill the form</p>
+
+        <div class="choice-card" onclick="triggerReceiptUpload()">
+            <i class="fa-solid fa-receipt"></i>
+            <h3>Scan Receipt</h3>
+            <p>AI will scan & fill the form</p>
             <input type="file" id="instantScanInput" accept="image/*" style="display:none;" onchange="handleReceiptScan(this)">
         </div>
     </div>
