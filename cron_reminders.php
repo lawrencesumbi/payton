@@ -49,7 +49,7 @@ foreach ($reminders as $row) {
         $days = $row['days_left'];
         $amount = number_format($row['amount'], 2);
         
-        if ($row['due_status_name'] == 'Overdue') {
+        if ($row['due_status_name'] == 'overdue') {
             $subject = "🚨 OVERDUE: {$row['payment_name']} Payment";
             $message = "Your payment of <b>₱$amount</b> was due yesterday. Please settle this immediately to avoid penalties.";
             $color = "#ef4444"; // Red

@@ -1,6 +1,13 @@
 <?php
+session_start();
 require_once "db.php";
-include "log_helper.php";
+require_once "log_helper.php";
+
+// I-fetch ang data sa ga-login nga user
+$user_id = $_SESSION['user_id'];
+$stmt = $conn->prepare("SELECT id, fullname, role FROM users WHERE id = ?");
+$stmt->execute([$user_id]);
+$user = $stmt->fetch(PDO::FETCH_ASSOC); // Karon, naa na kay $user variable!
 
 if (session_status() === PHP_SESSION_NONE) { session_start(); }
 
@@ -40,7 +47,7 @@ if(isset($_POST['send_invite'])){
         }
     }
 
-    $logAction = $user["fullname"] . " Sent an Invitation: $sponsor['fullname'] " . ucfirst($user["role"]);
+    $logAction = $user["fullname"] . " Sent an Invitation: {$sponsor['fullname']} " . ucfirst($user["role"]);
     addLog($conn, $user["id"], $logAction);
 
     header("Location: sponsor.php?page=manage_members");
@@ -58,7 +65,7 @@ if(isset($_POST['delete_member'])){
         $_SESSION['error_msg'] = "Failed to remove member.";
     }
 
-    $logAction = $user["fullname"] . " Unlinked a Member: $spender['fullname'] " . ucfirst($user["role"]);
+    $logAction = $user["fullname"] . " Unlinked a Member: {$spender['fullname']} " . ucfirst($user["role"]);
     addLog($conn, $user["id"], $logAction);
 
     header("Location: sponsor.php?page=manage_members");
@@ -97,7 +104,7 @@ if (isset($_POST['accept_invite'])) {
         }
     }
 
-    $logAction = $user["fullname"] . " Accepted an Invitation: $spender['fullname'] " . ucfirst($user["role"]);
+    $logAction = $user["fullname"] . " Accepted an Invitation: {$spender['fullname']} " . ucfirst($user["role"]);
     addLog($conn, $user["id"], $logAction);
 
     header("Location: spender.php?page=notifications");
@@ -110,8 +117,8 @@ if (isset($_POST['decline_invite'])) {
     $stmt = $conn->prepare("UPDATE notifications SET status = 'read' WHERE id = ? AND user_id = ?");
     $stmt->execute([$notif_id, $_SESSION['user_id']]);
     
-
-    $logAction = $user["fullname"] . " Declined an Invitation: $spender['fullname'] " . ucfirst($user["role"]);
+    
+    $logAction = $user["fullname"] . " Declined an Invitation: {$spender['fullname']} " . ucfirst($user["role"]);
     addLog($conn, $user["id"], $logAction);
 
     $_SESSION['success_msg'] = "Invitation declined.";

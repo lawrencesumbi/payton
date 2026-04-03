@@ -108,7 +108,7 @@ body::-webkit-scrollbar {
     
     overflow-y: auto;
     overflow-x: auto;
-    width: 75%;
+    width: 80%;
     
     padding: 20px;
     border-radius: 10px;
@@ -266,7 +266,7 @@ body::-webkit-scrollbar {
 }
 
 .reminders-section {
-            flex: 0.15;
+            width: 20%;
             background: var(--bg-card);
             border-left: 1px solid var(--border-color);
             padding: 25px 25px;
@@ -287,7 +287,7 @@ body::-webkit-scrollbar {
             
         }
 
-        .reminder-card h3 { margin: 0 0 10px 0; font-size: 16px; }
+        .reminder-card h3 { margin: 0 0 10px 0; font-size: 14px; }
 
         .info-box {
             background: var(--bg-card);
