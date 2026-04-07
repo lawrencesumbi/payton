@@ -222,7 +222,7 @@
                     <thead>
                         <tr>
                             <th>Name</th>
-                            <th>Share</th>
+                            <th>Owe</th>
                             <th>Status</th>
                             <th style="text-align: right;">Action</th>
                         </tr>

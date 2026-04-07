@@ -24,7 +24,7 @@ $query = "
 ";
 
 if (!empty($searchTerm)) {
-    $query .= " AND (logs.action LIKE ? OR logs.description LIKE ? OR logs.table_name LIKE ?)";
+    $query .= " AND (logs.action LIKE ? OR logs.action LIKE ? OR logs.action LIKE ?)";
 }
 
 $query .= " ORDER BY logs.created_at DESC";
@@ -91,7 +91,6 @@ h2 {margin-bottom:20px; padding: 0 10px;}
 .log-card {background: var(--bg-card); border-radius:12px; padding:15px 20px; margin-bottom:12px; display:flex; justify-content:space-between; align-items: center; box-shadow:0 2px 8px var(--border-shadow); transition: background 0.3s ease;}
 .left {display:flex; flex-direction:column; gap: 4px;}
 .right {text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 8px;}
-.fullname {font-weight:600; color: var(--text-main);}
 .action {color: var(--text-muted); font-size:14px;}
 .time {font-size:13px; color: var(--text-light);}
 .badge {padding:4px 12px; border-radius:20px; font-size:11px; font-weight:600; text-transform: uppercase;}
@@ -121,10 +120,6 @@ h2 {margin-bottom:20px; padding: 0 10px;}
     ?>
     <div class="log-card">
         <div class="left">
-            <div class="fullname">
-                <?= htmlspecialchars($row['fullname']); ?> 
-                <span style="font-weight: 400; opacity: 0.6; font-size: 0.9em;">(<?= htmlspecialchars($row['role']); ?>)</span>
-            </div>
             <div class="action"><?= htmlspecialchars($row['action']); ?></div>
         </div>
         <div class="right">

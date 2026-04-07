@@ -23,7 +23,7 @@ $query = "
 ";
 
 if (!empty($searchTerm)) {
-    $query .= " AND (logs.action LIKE ? OR logs.description LIKE ? OR logs.table_name LIKE ?)";
+    $query .= " AND (logs.action LIKE ? OR logs.action LIKE ? OR logs.action LIKE ?)";
 }
 
 $query .= " ORDER BY logs.created_at DESC";
@@ -120,10 +120,6 @@ h2 {margin-bottom:20px; padding: 0 10px;}
     ?>
     <div class="log-card">
         <div class="left">
-            <div class="fullname">
-                <?= htmlspecialchars($row['fullname']); ?> 
-                <span style="font-weight: 400; opacity: 0.6; font-size: 0.9em;">(<?= htmlspecialchars($row['role']); ?>)</span>
-            </div>
             <div class="action"><?= htmlspecialchars($row['action']); ?></div>
         </div>
         <div class="right">

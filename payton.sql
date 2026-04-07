@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 31, 2026 at 06:00 PM
+-- Generation Time: Apr 07, 2026 at 07:55 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -46,9 +46,10 @@ CREATE TABLE `budget` (
 
 INSERT INTO `budget` (`id`, `budget_name`, `budget_amount`, `start_date`, `end_date`, `user_id`, `sponsor_id`, `status`, `created_at`, `updated_at`) VALUES
 (35, 'March 10-20', 1000.00, '2026-03-10', '2026-03-20', 1, 2, 'Inactive', '2026-03-11 10:07:19', '2026-03-12 04:42:36'),
-(38, 'March 1-31', 10000.00, '2026-03-01', '2026-03-31', 5, 2, 'Active', '2026-03-12 05:39:40', '2026-03-12 05:39:40'),
-(39, 'March 25-30', 501.00, '2026-03-25', '2026-03-30', 1, 2, 'Active', '2026-03-20 17:08:26', '2026-03-20 17:08:26'),
-(41, 'February 1 - 15', 400.00, '2026-02-01', '2026-02-15', 1, 2, 'Inactive', '2026-02-14 02:14:43', '2026-02-14 02:14:43');
+(38, 'March 1-31', 1000.00, '2026-03-01', '2026-03-31', 5, 2, 'Inactive', '2026-03-12 05:39:40', '2026-03-12 05:39:40'),
+(39, 'March 25-30', 501.00, '2026-03-25', '2026-03-30', 1, 2, 'Inactive', '2026-03-20 17:08:26', '2026-03-20 17:08:26'),
+(41, 'February 1 - 15', 400.00, '2026-02-01', '2026-02-15', 1, 2, 'Inactive', '2026-02-14 02:14:43', '2026-02-14 02:14:43'),
+(43, 'April 1st Week', 1000.00, '2026-04-01', '2026-04-04', 1, 2, 'Inactive', '2026-04-01 12:41:34', '2026-04-01 12:41:34');
 
 -- --------------------------------------------------------
 
@@ -140,7 +141,13 @@ INSERT INTO `expenses` (`id`, `user_id`, `budget_id`, `category_id`, `descriptio
 (85, 1, 41, 1, 'Taxi', 200.00, 1, NULL, '2026-02-11', '2026-02-11 02:15:43', '2026-02-11 02:15:43'),
 (86, 1, 35, 8, 'Purchased items from SM Department Store', 20.00, 1, NULL, '2026-03-19', '2026-03-18 16:24:35', '2026-03-18 16:24:35'),
 (87, 5, 38, 2, 'Nagpa Gas ko sa Shell sa akong motor', 86.00, 1, NULL, '2026-03-24', '2026-03-24 06:55:59', '2026-03-24 06:55:59'),
-(90, 5, 38, 1, 'Chowking', 300.00, 1, NULL, '2026-03-25', '2026-03-25 14:23:17', '2026-03-25 14:23:17');
+(90, 5, 38, 1, 'Chowking', 300.00, 1, NULL, '2026-03-25', '2026-03-25 14:23:17', '2026-03-25 14:23:17'),
+(91, 1, 43, 1, 'Rice', 70.00, 1, NULL, '2026-04-01', '2026-04-01 13:54:19', '2026-04-01 13:54:19'),
+(92, 1, 43, 4, 'Internet', 99.00, 3, NULL, '2026-04-02', '2026-04-02 07:31:29', '2026-04-02 07:31:29'),
+(93, 1, 43, 2, 'Gas', 50.00, 6, NULL, '2026-04-02', '2026-04-02 07:31:51', '2026-04-02 07:31:51'),
+(94, 1, 43, 6, 'Book', 30.00, 5, 'uploads/69ce72088abe9-b811fa4ddaa6e2793d2cb22171686ea2.jpg', '2026-04-02', '2026-04-02 07:32:30', '2026-04-02 13:41:28'),
+(95, 1, 43, 2, 'Jollibee', 10.00, 1, 'uploads/1775136547_mtlqh1hgajq91.jpg', '2026-04-02', '2026-04-02 13:29:07', '2026-04-02 13:29:46'),
+(97, 1, 43, 10, 'Pacifica Agrivet Supplies, Inc.', 416.00, 1, 'uploads/1775139752_1278048_orig.jpg', '2026-04-02', '2026-04-02 14:22:32', '2026-04-02 14:22:32');
 
 -- --------------------------------------------------------
 
@@ -165,7 +172,7 @@ CREATE TABLE `expense_shares` (
 INSERT INTO `expense_shares` (`id`, `expense_id`, `user_id`, `people_id`, `amount_owed`, `status`, `created_at`) VALUES
 (11, 76, 1, 1, 25.00, 'paid', '2026-03-15 13:19:24'),
 (12, 76, 1, 2, 25.00, 'paid', '2026-03-15 13:19:24'),
-(13, 76, 1, 3, 25.00, 'unpaid', '2026-03-15 13:19:24'),
+(13, 76, 1, 3, 25.00, 'paid', '2026-03-15 13:19:24'),
 (14, 77, 1, 5, 16.67, 'unpaid', '2026-03-15 13:24:15'),
 (15, 77, 1, 4, 16.67, 'paid', '2026-03-15 13:24:15'),
 (18, 79, 1, 1, 10.00, 'unpaid', '2026-03-15 13:51:26'),
@@ -205,7 +212,108 @@ INSERT INTO `logs` (`id`, `user_id`, `action`, `created_at`) VALUES
 (21, 2, 'Patricia Ann Mae Obaob Logged in As Sponsor', '2026-03-31 23:01:28'),
 (22, 2, 'Patricia Ann Mae Obaob Logged in As Sponsor', '2026-03-31 23:02:32'),
 (23, 2, 'Patricia Ann Mae Obaob Logged in As Sponsor', '2026-03-31 23:11:54'),
-(24, 2, 'Patricia Ann Mae Obaob Logged in As Sponsor', '2026-03-31 23:16:41');
+(24, 2, 'Patricia Ann Mae Obaob Logged in As Sponsor', '2026-03-31 23:16:41'),
+(25, 1, 'Lawrence Sumbi Logged in As Spender', '2026-04-01 14:41:25'),
+(26, 2, 'Patricia Ann Mae Obaob Logged in As Sponsor', '2026-04-01 14:41:47'),
+(27, 7, 'Sponsor User Logged in As Sponsor', '2026-04-01 14:49:43'),
+(28, 1, 'Lawrence Sumbi Logged in As Spender', '2026-04-01 14:56:11'),
+(29, 7, 'Sponsor User Logged in As Sponsor', '2026-04-01 14:59:14'),
+(30, 2, 'Patricia Ann Mae Obaob Logged in As Sponsor', '2026-04-01 15:42:48'),
+(31, 1, 'Lawrence Sumbi Deleted a Scheduled Payment: ', '2026-04-01 19:06:34'),
+(32, 1, 'Lawrence Sumbi Deleted a Scheduled Payment: ', '2026-04-01 19:06:36'),
+(33, 1, 'Lawrence Sumbi Scheduled a Payment: Holy Thursday (Spender)', '2026-04-01 19:06:45'),
+(34, 1, 'Lawrence Sumbi Scheduled a Payment: Holy Friday (Spender)', '2026-04-01 19:17:22'),
+(35, 1, 'User Updated: 4', '2026-04-01 20:17:55'),
+(36, 1, 'Lawrence Sumbi Logged in As Spender', '2026-04-01 20:20:10'),
+(37, 1, 'Lawrence Sumbi Logged in As Spender', '2026-04-01 20:26:56'),
+(38, 1, 'User Updated: Load', '2026-04-01 20:28:29'),
+(39, 1, 'Lawrence Sumbi Logged in As Spender', '2026-04-01 20:39:39'),
+(40, 2, 'Patricia Ann Mae Obaob Logged in As Sponsor', '2026-04-01 20:39:57'),
+(41, 2, 'Patricia Ann Mae Obaob Added or Updated an Allowance: April 1st Week Allowance', '2026-04-01 20:41:34'),
+(42, 1, 'Lawrence Sumbi Logged in As Spender', '2026-04-01 20:41:45'),
+(43, 2, 'Patricia Ann Mae Obaob Added or Updated an Allowance: April 1st Week', '2026-04-01 20:42:25'),
+(44, 1, 'Lawrence Sumbi Logged in As Spender', '2026-04-01 20:49:08'),
+(45, 1, 'Lawrence Sumbi Logged in As Spender', '2026-04-01 20:50:19'),
+(46, 1, 'Lawrence Sumbi Logged in As Spender', '2026-04-01 20:50:43'),
+(47, 1, 'Lawrence Sumbi Logged in As Spender', '2026-04-01 20:51:36'),
+(48, 2, 'Patricia Ann Mae Obaob Logged in As Sponsor', '2026-04-01 21:24:05'),
+(49, 1, 'Lawrence Sumbi Logged in As Spender', '2026-04-01 21:52:46'),
+(50, 1, 'Lawrence Sumbi Added an Expense: Rice - ?70.00', '2026-04-01 21:54:19'),
+(51, 2, 'Patricia Ann Mae Obaob Added or Updated an Allowance: April Budget 1stW', '2026-04-02 12:46:51'),
+(52, 2, 'Patricia Ann Mae Obaob Added or Updated an Allowance: Sample', '2026-04-02 12:51:55'),
+(53, 2, 'Patricia Ann Mae Obaob Logged in As Sponsor', '2026-04-02 12:56:06'),
+(54, 1, 'Lawrence Sumbi Logged in As Spender', '2026-04-02 12:56:14'),
+(55, 5, 'King James Logged in As Spender', '2026-04-02 12:56:32'),
+(56, 2, 'Patricia Ann Mae Obaob Added or Updated an Allowance: Sample', '2026-04-02 12:57:32'),
+(57, 2, 'Patricia Ann Mae Obaob Deleted an Allowance: ', '2026-04-02 12:57:41'),
+(58, 2, 'Patricia Ann Mae Obaob Deleted an Allowance: ', '2026-04-02 12:57:54'),
+(59, 2, 'Patricia Ann Mae Obaob Added or Updated an Allowance: March 1-31', '2026-03-31 13:14:35'),
+(60, 2, 'Patricia Ann Mae Obaob Logged in As Sponsor', '2026-04-02 14:01:22'),
+(61, 1, 'Lawrence Sumbi Logged in As Spender', '2026-04-02 14:01:43'),
+(62, 2, 'Patricia Ann Mae Obaob Logged in As Sponsor', '2026-04-02 14:44:23'),
+(63, 1, 'Lawrence Sumbi Logged in As Spender', '2026-04-02 14:45:24'),
+(64, 5, 'King James Logged in As Spender', '2026-04-02 14:46:01'),
+(65, 1, 'Lawrence Sumbi Logged in As Spender', '2026-04-02 14:46:47'),
+(66, 1, 'Lawrence Sumbi Added a Person: OA', '2026-04-02 15:16:42'),
+(67, 1, 'Lawrence Sumbi Added a Person: HAHAHHAHA', '2026-04-02 15:21:39'),
+(68, 1, 'Lawrence Sumbi Logged in As Spender', '2026-04-02 15:28:44'),
+(69, 1, 'Lawrence Sumbi Added an Expense: Internet - ?99.00', '2026-04-02 15:31:29'),
+(70, 1, 'Lawrence Sumbi Added an Expense: Gas - ?50.00', '2026-04-02 15:31:51'),
+(71, 1, 'Lawrence Sumbi Added an Expense: Book - ?30.00', '2026-04-02 15:32:30'),
+(72, 1, 'Lawrence Sumbi Added an Expense: Jollibee - ?10.00', '2026-04-02 21:29:07'),
+(73, 1, 'Lawrence Sumbi Updated the Expense: Jollibee to ?10.00', '2026-04-02 21:29:46'),
+(74, 1, 'Lawrence Sumbi Updated the Expense: Book to ?30.00', '2026-04-02 21:41:28'),
+(75, 1, 'Lawrence Sumbi Added an Expense: Ventures - ?190.00', '2026-04-02 21:59:09'),
+(76, 1, 'Lawrence Sumbi Deleted the Expense: ', '2026-04-02 21:59:12'),
+(77, 1, 'Lawrence Sumbi Added an Expense: Pacifica Agrivet Supplies, Inc. - ?416.00', '2026-04-02 22:22:32'),
+(78, 1, 'Lawrence Sumbi Logged in As Spender', '2026-04-03 19:20:30'),
+(79, 1, 'Lawrence Sumbi Scheduled a Payment: Black Saturday (Spender)', '2026-04-03 19:21:02'),
+(80, 1, 'Lawrence Sumbi Scheduled a Payment: Lunes (Spender)', '2026-04-03 19:31:45'),
+(81, 1, 'Lawrence Sumbi Scheduled a Payment: Martes (Spender)', '2026-04-03 19:54:56'),
+(82, 4, 'Aljon Paragoso Logged in As Spender', '2026-04-03 20:47:20'),
+(83, 1, 'Lawrence Sumbi Logged in As Spender', '2026-04-03 20:48:18'),
+(84, 2, 'Patricia Ann Mae Obaob Logged in As Sponsor', '2026-04-03 20:49:05'),
+(85, 2, 'Patricia Ann Mae Obaob Sent an Invitation:  Sponsor', '2026-04-03 20:57:23'),
+(86, 8, 'sample Logged in As Spender', '2026-04-03 20:57:40'),
+(87, 2, 'Patricia Ann Mae Obaob Logged in As Sponsor', '2026-04-03 20:58:15'),
+(88, 2, 'Patricia Ann Mae Obaob Sent an Invitation:  Sponsor', '2026-04-03 20:58:27'),
+(89, 2, 'Patricia Ann Mae Obaob Sent an Invitation:  Sponsor', '2026-04-03 20:58:33'),
+(90, 8, 'sample Logged in As Spender', '2026-04-03 20:58:41'),
+(91, 1, 'Lawrence Sumbi Logged in As Spender', '2026-04-03 20:58:58'),
+(92, 1, 'Lawrence Sumbi Logged in As Spender', '2026-04-03 21:31:30'),
+(93, 1, 'Lawrence Sumbi Logged in As Spender', '2026-04-03 21:32:39'),
+(94, 1, 'Lawrence Sumbi Logged in As Spender', '2026-04-03 21:33:12'),
+(95, 1, 'Lawrence Sumbi Logged in As Spender', '2026-04-03 21:35:17'),
+(96, 1, 'Lawrence Sumbi Logged in As Spender', '2026-04-03 21:52:26'),
+(97, 4, 'Aljon Paragoso Logged in As Spender', '2026-04-03 21:55:27'),
+(98, 1, 'Lawrence Sumbi Logged in As Spender', '2026-04-03 21:56:05'),
+(99, 2, 'Patricia Ann Mae Obaob Logged in As Sponsor', '2026-04-03 22:02:06'),
+(100, 1, 'Lawrence Sumbi Logged in As Spender', '2026-04-03 22:04:09'),
+(101, 7, 'Sponsor User Logged in As Sponsor', '2026-04-03 22:05:02'),
+(102, 7, 'Sponsor User Sent an Invitation:  Sponsor', '2026-04-03 22:05:14'),
+(103, 7, 'Sponsor User Sent an Invitation:  Sponsor', '2026-04-03 22:05:23'),
+(104, 1, 'Lawrence Sumbi Logged in As Spender', '2026-04-03 22:05:51'),
+(105, 1, 'Lawrence Sumbi Logged in As Spender', '2026-04-03 22:10:25'),
+(106, 7, 'Sponsor User Logged in As Sponsor', '2026-04-03 22:10:48'),
+(107, 7, 'Sponsor User Sent an Invitation:  Sponsor', '2026-04-03 22:10:58'),
+(108, 1, 'Lawrence Sumbi Logged in As Spender', '2026-04-03 22:11:06'),
+(109, 1, 'Lawrence Sumbi Logged in As Spender', '2026-04-07 12:35:03'),
+(110, 2, 'Patricia Ann Mae Obaob Logged in As Sponsor', '2026-04-07 12:39:38'),
+(111, 2, 'Patricia Ann Mae Obaob Sent an Invitation:  Sponsor', '2026-04-07 12:41:08'),
+(112, 3, 'Dranreb Misa Logged in As Spender', '2026-04-07 12:41:27'),
+(113, 2, 'Patricia Ann Mae Obaob Logged in As Sponsor', '2026-04-07 12:47:59'),
+(114, 3, 'Dranreb Misa Logged in As Spender', '2026-04-07 12:49:21'),
+(115, 1, 'Lawrence Sumbi Logged in As Spender', '2026-04-07 12:51:19'),
+(116, 2, 'Patricia Ann Mae Obaob Logged in As Sponsor', '2026-04-07 13:08:00'),
+(117, 1, 'Lawrence Sumbi Logged in As Spender', '2026-04-07 13:09:14'),
+(118, 2, 'Patricia Ann Mae Obaob Logged in As Sponsor', '2026-04-07 13:11:11'),
+(119, 1, 'Lawrence Sumbi Logged in As Spender', '2026-04-07 13:12:18'),
+(120, 1, 'Lawrence Sumbi Marked an Owe Expense as Paid/Settled:  - ?0.00', '2026-04-07 13:23:02'),
+(121, 1, 'Lawrence Sumbi Added a Person: Bag o', '2026-04-07 13:45:51'),
+(122, 1, 'Lawrence Sumbi Deleted a Person: ', '2026-04-07 13:48:34'),
+(123, 1, 'Lawrence Sumbi Added a Person: Bag o', '2026-04-07 13:49:07'),
+(124, 1, 'Lawrence Sumbi Deleted a Person: ', '2026-04-07 13:54:41'),
+(125, 1, 'Lawrence Sumbi Added a Person: Bag o', '2026-04-07 13:54:58');
 
 -- --------------------------------------------------------
 
@@ -216,7 +324,7 @@ INSERT INTO `logs` (`id`, `user_id`, `action`, `created_at`) VALUES
 CREATE TABLE `notifications` (
   `id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
-  `parent_id` int(11) NOT NULL,
+  `parent_id` int(11) DEFAULT NULL,
   `type` enum('invite','info') NOT NULL,
   `message` text NOT NULL,
   `status` enum('unread','read') NOT NULL,
@@ -240,9 +348,17 @@ INSERT INTO `notifications` (`id`, `user_id`, `parent_id`, `type`, `message`, `s
 (16, 6, 10, 'invite', 'You have been invited by sample4. Click accept to join.', 'read', '2026-03-25 02:45:46'),
 (17, 6, 10, 'invite', 'You have been invited by sample4. Click accept to join.', 'read', '2026-03-25 02:46:13'),
 (18, 10, 6, '', 'sample1 has accepted your invitation and is now linked to your account.', 'read', '2026-03-25 02:46:18'),
-(19, 4, 2, 'invite', 'You have been invited by Patricia Ann Mae Obaob. Click accept to join.', 'unread', '2026-03-26 09:58:08'),
+(19, 4, 2, 'invite', 'You have been invited by Patricia Ann Mae Obaob. Click accept to join.', 'read', '2026-03-26 09:58:08'),
 (20, 1, 2, 'invite', 'You have been invited by Patricia Ann Mae Obaob. Click accept to join.', 'read', '2026-03-27 13:55:32'),
-(21, 2, 1, '', 'Lawrence Sumbi has accepted your invitation and is now linked to your account.', 'read', '2026-03-27 13:55:55');
+(21, 2, 1, '', 'Lawrence Sumbi has accepted your invitation and is now linked to your account.', 'read', '2026-03-27 13:55:55'),
+(22, 8, 2, 'invite', 'You have been invited by Patricia Ann Mae Obaob. Click accept to join.', 'read', '2026-04-03 12:53:05'),
+(23, 8, 2, 'invite', 'You have been invited by Patricia Ann Mae Obaob. Click accept to join.', 'read', '2026-04-03 12:55:12'),
+(24, 8, 2, 'invite', 'You have been invited by Patricia Ann Mae Obaob. Click accept to join.', 'read', '2026-04-03 12:56:40'),
+(25, 8, 2, 'invite', 'You have been invited by Patricia Ann Mae Obaob. Click accept to join.', 'read', '2026-04-03 12:57:23'),
+(26, 8, 2, 'invite', 'You have been invited by Patricia Ann Mae Obaob. Click accept to join.', 'unread', '2026-04-03 12:58:33'),
+(128, 4, 7, 'invite', 'You have been invited by Sponsor User. Click accept to join.', 'unread', '2026-04-03 14:05:23'),
+(129, 1, 7, 'invite', 'You have been invited by Sponsor User. Click accept to join.', 'read', '2026-04-03 14:10:58'),
+(130, 3, 2, 'invite', 'You have been invited by Patricia Ann Mae Obaob. Click accept to join.', 'unread', '2026-04-07 04:41:08');
 
 -- --------------------------------------------------------
 
@@ -279,6 +395,7 @@ CREATE TABLE `people` (
   `id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
   `name` text NOT NULL,
+  `email` varchar(255) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -286,19 +403,22 @@ CREATE TABLE `people` (
 -- Dumping data for table `people`
 --
 
-INSERT INTO `people` (`id`, `user_id`, `name`, `created_at`) VALUES
-(1, 1, 'Dray Misa', '2026-03-15 12:36:14'),
-(2, 1, 'Jaylon Mantillas', '2026-03-15 12:39:38'),
-(3, 1, 'Jaymaica Narvasa', '2026-03-15 12:59:43'),
-(4, 1, 'Jay Cabatuan', '2026-03-15 13:23:43'),
-(5, 1, 'Ivan Laluna', '2026-03-15 13:23:50'),
-(7, 1, 'Sample', '2026-03-24 05:00:58'),
-(8, 1, 'Sample2', '2026-03-24 06:59:13'),
-(9, 1, 'Sample3', '2026-03-25 13:54:22'),
-(13, 5, 'Emman', '2026-03-25 14:19:40'),
-(14, 5, 'Lenzey', '2026-03-25 14:19:45'),
-(15, 5, 'Mary Divine', '2026-03-25 14:19:52'),
-(16, 5, 'Lloyd Junrex', '2026-03-25 14:22:48');
+INSERT INTO `people` (`id`, `user_id`, `name`, `email`, `created_at`) VALUES
+(1, 1, 'Dray Misa', '', '2026-03-15 12:36:14'),
+(2, 1, 'Jaylon Mantillas', '', '2026-03-15 12:39:38'),
+(3, 1, 'Jaymaica Narvasa', '', '2026-03-15 12:59:43'),
+(4, 1, 'Jay Cabatuan', '', '2026-03-15 13:23:43'),
+(5, 1, 'Ivan Laluna', '', '2026-03-15 13:23:50'),
+(7, 1, 'Sample', '', '2026-03-24 05:00:58'),
+(8, 1, 'Sample2', '', '2026-03-24 06:59:13'),
+(9, 1, 'Sample3', '', '2026-03-25 13:54:22'),
+(13, 5, 'Emman', '', '2026-03-25 14:19:40'),
+(14, 5, 'Lenzey', '', '2026-03-25 14:19:45'),
+(15, 5, 'Mary Divine', '', '2026-03-25 14:19:52'),
+(16, 5, 'Lloyd Junrex', '', '2026-03-25 14:22:48'),
+(17, 1, 'OA', '', '2026-04-02 07:16:42'),
+(18, 1, 'HAHAHHAHA', '', '2026-04-02 07:21:39'),
+(21, 1, 'Bag o', 'bag0@gmail.com', '2026-04-07 05:54:58');
 
 -- --------------------------------------------------------
 
@@ -324,18 +444,23 @@ CREATE TABLE `scheduled_payments` (
 --
 
 INSERT INTO `scheduled_payments` (`id`, `user_id`, `payment_name`, `amount`, `due_date`, `paid_date`, `payment_method_id`, `due_status_id`, `created_at`, `updated_at`) VALUES
-(11, 1, 'Load', 100.00, '2026-02-21', NULL, NULL, 3, '2026-02-21 12:49:21', '2026-02-21 12:49:21'),
+(11, 1, 'Load', 100.00, '2026-02-21', '2026-04-01', 8, 2, '2026-02-21 12:49:21', '2026-02-21 12:49:21'),
 (13, 1, 'sample', 100.00, '2026-02-20', '2026-02-14', 1, 2, '2026-02-21 12:53:24', '2026-02-21 12:53:24'),
 (14, 1, '25', 100.00, '2026-02-27', NULL, NULL, 3, '2026-02-21 12:54:53', '2026-02-21 12:54:53'),
 (15, 1, 'data', 40.00, '2026-02-21', '2026-02-22', 1, 2, '2026-02-21 12:55:05', '2026-02-21 12:55:05'),
 (16, 1, '28', 28.00, '2026-02-28', '2026-02-21', 1, 2, '2026-02-21 13:00:07', '2026-02-21 13:00:07'),
 (19, 1, 'Loklok', 149.00, '2026-02-22', NULL, NULL, 3, '2026-02-21 14:45:12', '2026-02-21 14:45:12'),
 (20, 1, '280', 280.00, '2026-02-28', '2026-02-22', 2, 2, '2026-02-21 15:11:01', '2026-02-21 15:11:01'),
-(22, 1, '4', 4.00, '2026-02-04', NULL, NULL, 3, '2026-02-22 04:45:24', '2026-02-22 04:45:24'),
+(22, 1, '4', 4.00, '2026-02-04', '2026-04-01', 7, 2, '2026-02-22 04:45:24', '2026-02-22 04:45:24'),
 (24, 1, 'sample', 100.00, '2026-03-01', '2026-02-22', 1, 2, '2026-02-22 08:09:48', '2026-02-22 08:09:48'),
-(29, 1, 'Water Bill', 143.00, '2026-03-28', NULL, NULL, 1, '2026-03-11 10:09:32', '2026-03-11 10:09:32'),
-(31, 1, 'Sample', 10.00, '2026-03-25', NULL, NULL, 1, '2026-03-12 15:25:57', '2026-03-12 15:25:57'),
-(32, 1, '16', 160.00, '2026-03-16', NULL, NULL, 1, '2026-03-14 18:17:45', '2026-03-14 18:17:45');
+(29, 1, 'Water Bill', 143.00, '2026-03-28', NULL, NULL, 3, '2026-03-11 10:09:32', '2026-03-11 10:09:32'),
+(31, 1, 'Sample', 10.00, '2026-03-25', NULL, NULL, 3, '2026-03-12 15:25:57', '2026-03-12 15:25:57'),
+(32, 1, '16', 160.00, '2026-03-16', NULL, NULL, 3, '2026-03-14 18:17:45', '2026-03-14 18:17:45'),
+(36, 1, 'Holy Thursday', 10.00, '2026-04-02', NULL, NULL, 3, '2026-04-01 11:06:45', '2026-04-01 11:06:45'),
+(37, 1, 'Holy Friday', 50.00, '2026-04-03', NULL, NULL, 3, '2026-04-01 11:17:22', '2026-04-01 11:17:22'),
+(38, 1, 'Black Saturday', 70.00, '2026-04-04', NULL, NULL, 3, '2026-04-03 11:21:02', '2026-04-03 11:21:02'),
+(39, 1, 'Lunes', 10.00, '2026-04-05', NULL, NULL, 3, '2026-04-03 11:31:45', '2026-04-03 11:31:45'),
+(40, 1, 'Martes', 20.00, '2026-04-06', NULL, NULL, 3, '2026-04-03 11:54:56', '2026-04-03 11:54:56');
 
 -- --------------------------------------------------------
 
@@ -385,7 +510,7 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `fullname`, `email`, `password`, `role`, `phone`, `profile_pic`, `verification_code`, `is_verified`, `reset_token`, `reset_expiry`, `created_at`) VALUES
-(1, 'Lawrence Sumbi', 'guiansumbi@gmail.com', '$2y$10$cKIACjgglVTrRjDZaKSZjulwkdA0CIDUwOBkU12h2PPGKK03U0aT6', 'spender', '09223198120', 'profile/1773301216_69b26de0c5031.jpg', NULL, 1, NULL, NULL, '2026-02-07 17:08:23'),
+(1, 'Lawrence Sumbi', 'guiansumbi@gmail.com', '$2y$10$cKIACjgglVTrRjDZaKSZjulwkdA0CIDUwOBkU12h2PPGKK03U0aT6', 'spender', '09753140724', 'profile/1773301216_69b26de0c5031.jpg', NULL, 1, NULL, NULL, '2026-02-07 17:08:23'),
 (2, 'Patricia Ann Mae Obaob', 'patriciaannmaeobaob721@gmail.com', '$2y$10$gVokRQej23KaxSKKUZPiSOn/mL5IE0kvfoGyPRTZfN1in/ZpNAQku', 'sponsor', '09059641855', 'profile/1773380531_69b3a3b3f074d.jpg', NULL, 1, NULL, NULL, '2026-02-08 11:52:14'),
 (3, 'Dranreb Misa', 'draymisa@gmail.com', '$2y$10$Gw3YeLEMfsCIOPV3xFs5h.jClSQLC9rilddvuzZ063CceY9/IVgue', 'spender', '', '', NULL, 1, NULL, NULL, '2026-02-09 00:03:22'),
 (4, 'Aljon Paragoso', 'aljon@gmail.com', '$2y$10$Wt8Xf9aFRGG6zRdmdsfP1.bzpQS9xPfN/20Rsf.l7gb5ivx7H.t8u', 'spender', '', '', NULL, 1, NULL, NULL, '2026-02-10 02:32:42'),
@@ -502,7 +627,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `budget`
 --
 ALTER TABLE `budget`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=46;
 
 --
 -- AUTO_INCREMENT for table `category`
@@ -520,7 +645,7 @@ ALTER TABLE `due_status`
 -- AUTO_INCREMENT for table `expenses`
 --
 ALTER TABLE `expenses`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=91;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=98;
 
 --
 -- AUTO_INCREMENT for table `expense_shares`
@@ -532,13 +657,13 @@ ALTER TABLE `expense_shares`
 -- AUTO_INCREMENT for table `logs`
 --
 ALTER TABLE `logs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=126;
 
 --
 -- AUTO_INCREMENT for table `notifications`
 --
 ALTER TABLE `notifications`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=131;
 
 --
 -- AUTO_INCREMENT for table `payment_method`
@@ -550,13 +675,13 @@ ALTER TABLE `payment_method`
 -- AUTO_INCREMENT for table `people`
 --
 ALTER TABLE `people`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- AUTO_INCREMENT for table `scheduled_payments`
 --
 ALTER TABLE `scheduled_payments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
 
 --
 -- AUTO_INCREMENT for table `sponsor_spender`

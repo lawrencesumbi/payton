@@ -16,7 +16,7 @@ $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
 // Page routing
 $page = $_GET['page'] ?? 'dashboard';
-$allowed_pages = ['dashboard', 'manage_groups', 'manage_expenses', 'manage_payments', 'scheduler', 'manage_reminders', 'notifications', 'my_account', 'split_expense', 'view_split_expense', 'people', 'archive', 'activity_logs'];
+$allowed_pages = ['dashboard', 'manage_groups', 'manage_expenses', 'manage_payments', 'scheduler', 'manage_reminders', 'notifications', 'my_account', 'split_expense', 'view_split_expense', 'friends', 'archive', 'activity_logs'];
 
 if (!in_array($page, $allowed_pages)) { $page = 'dashboard'; }
 
@@ -300,8 +300,8 @@ $searchTerm = $_GET['search'] ?? '';
       <a href="?page=scheduler" class="<?= $page=='scheduler'?'active':'' ?>">
         <i class="fa-solid fa-calendar-days"></i> <span>Scheduler</span>
       </a>
-      <a href="?page=people" class="<?= $page=='people'?'active':'' ?>">
-        <i class="fa-solid fa-user-group"></i> <span>People</span>
+      <a href="?page=friends" class="<?= $page=='friends'?'active':'' ?>">
+        <i class="fa-solid fa-user-group"></i> <span>Friends</span>
       </a>
       <a href="?page=split_expense" class="<?= $page=='split_expense'?'active':'' ?>">
         <i class="fa-solid fa-layer-group"></i> <span>Split Expense</span>

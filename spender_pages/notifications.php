@@ -114,8 +114,11 @@ $notifications = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         body { background: var(--bg-body); color: var(--text-main); transition: background 0.3s ease; }
         /* ... existing styles ... */
-        .notif-container { max-width: 800px; margin: 20px auto; padding: 0 20px; height: 75vh; overflow-y: auto; }
+        .notif-container { max-width: 800px; margin: 15px auto; padding: 0 20px; height: 75vh; overflow-y: auto; }
         .notification-card { background: var(--bg-card); padding: 20px; border-radius: 16px; margin-bottom: 12px; border: 1px solid var(--border); display: flex; gap: 16px; position: relative; transition: background 0.3s ease; box-shadow: 0 2px 4px var(--shadow); }
+        .page-header {display: flex;justify-content: space-between;align-items: center;margin-bottom: 20px;}
+        .mark-read {font-size: 0.9rem;color: var(--accent-purple);text-decoration: none; font-weight: 600;}
+        .mark-read:hover {text-decoration: underline;}
         .notification-card.unread { background: var(--unread-bg); border-color: #dbeafe; }
         .icon-box { width: 44px; height: 44px; background: var(--primary-light); color: var(--primary); border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
         .btn { padding: 8px 16px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer; border: none; }
@@ -128,10 +131,13 @@ $notifications = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <div class="notif-container">
     <div class="page-header">
         <h1>Notifications</h1>
+        
         <?php 
         $hasUnread = array_filter($notifications, fn($n) => $n['status'] == 'unread');
         if($hasUnread): ?>
-            <a href="?page=notifications&action=mark_all_read" class="mark-read">Mark all as read</a>
+            <a href="?page=notifications&action=mark_all_read" class="mark-read">
+                Mark all as read
+            </a>
         <?php endif; ?>
     </div>
 

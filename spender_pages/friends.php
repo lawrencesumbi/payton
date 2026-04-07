@@ -32,7 +32,7 @@ $people = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Manage People</title>
+    <title>Manage Friends</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 
     <style>
@@ -189,8 +189,8 @@ $people = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 <div class="container">
     <div class="header">
-        <h2>Manage People</h2>
-        <button class="btn btn-primary" onclick="openModal()">+ Add Person</button>
+        <h2>Manage Friends</h2>
+        <button class="btn btn-primary" onclick="openModal()">+ Add Friend</button>
     </div>
 
     <div class="card">
@@ -199,6 +199,7 @@ $people = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <thead>
                     <tr>
                         <th>Name</th>
+                        <th>Email</th>
                         <th>Date Added</th>
                         <th style="text-align:right">Action</th>
                     </tr>
@@ -208,6 +209,7 @@ $people = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <?php foreach($people as $p): ?>
                         <tr>
                             <td><?= htmlspecialchars($p['name']) ?></td>
+                            <td><?= htmlspecialchars($p['email']) ?></td>
                             <td><?= date("M d, Y", strtotime($p['created_at'])) ?></td>
                             <td style="text-align:right">
                                 <form method="POST" action="add_delete_people.php" onsubmit="return confirm('Remove this person?');">
@@ -220,7 +222,7 @@ $people = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <?php else: ?>
                         <tr>
                             <td colspan="3" style="text-align:center; padding:40px; color:gray">
-                                No people found.
+                                No friends found.
                             </td>
                         </tr>
                     <?php endif; ?>
@@ -236,6 +238,7 @@ $people = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <h3>Add New Person</h3>
         <form method="POST" action="add_delete_people.php">
             <input type="text" name="person_name" placeholder="Full Name" class="input-box" required>
+            <input type="text" name="person_email" placeholder="Email" class="input-box" required>
             <button name="add_person" class="btn btn-primary">Save</button>
             <button type="button" onclick="closeModal()" class="btn">Cancel</button>
         </form>

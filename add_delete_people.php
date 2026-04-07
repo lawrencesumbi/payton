@@ -13,11 +13,12 @@ $user_id = $_SESSION['user_id'];
 /* ADD PERSON */
 if(isset($_POST['add_person'])){
     $name = trim($_POST['person_name']);
+    $email = trim($_POST['person_email']); 
 
-    if(!empty($name)){
-        $stmt = $conn->prepare("INSERT INTO people (user_id, name) VALUES (?, ?)");
+    if(!empty($name)&& !empty($email)){
+        $stmt = $conn->prepare("INSERT INTO people (user_id, name, email) VALUES (?, ?, ?)");
         
-        if($stmt->execute([$user_id, $name])){
+        if($stmt->execute([$user_id, $name, $email])){
             $_SESSION['success_msg'] = "Person added successfully.";
         } else {
             $_SESSION['error_msg'] = "Error adding person.";
@@ -46,5 +47,5 @@ if(isset($_POST['delete_person'])){
 
 
 // ✅ Redirect back to main page
-header("Location: http://localhost/payton/spender.php?page=people");
+header("Location: http://localhost/payton/spender.php?page=friends");
 exit();
