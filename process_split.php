@@ -89,27 +89,59 @@ if (isset($_POST['save_expense'])) {
     exit();
 }
 
-// --- ACTION HANDLER: MARK AS PAID ---
-if (isset($_POST['mark_paid'])) {
+// --- ACTION HANDLER: PARTIAL OR FULL SETTLE ---
+if (isset($_POST['partial_settle'])) {
     $person_id = intval($_POST['person_id']); 
     $target_expense_id = intval($_POST['expense_id']);
+    $settle_amount = floatval($_POST['settle_amount']);
 
-    $update_stmt = $conn->prepare("
-        UPDATE expense_shares 
-        SET status = 'Paid' 
-        WHERE expense_id = ? AND people_id = ?
-    ");
-    
-    if($update_stmt->execute([$target_expense_id, $person_id])) {
-        $_SESSION['success_msg'] = "Payment marked as settled!";
-    } else {
-        $_SESSION['error_msg'] = "Failed to update payment status.";
+    try {
+        $conn->beginTransaction();
+
+        // 1. Get current balance and description for logging
+        $stmt = $conn->prepare("
+            SELECT es.amount_owed, e.description 
+            FROM expense_shares es
+            JOIN expenses e ON e.id = es.expense_id
+            WHERE es.expense_id = ? AND es.people_id = ?
+        ");
+        $stmt->execute([$target_expense_id, $person_id]);
+        $data = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($data) {
+            $current_owed = floatval($data['amount_owed']);
+            $description = $data['description'];
+
+            // 2. Calculate new balance
+            $new_balance = $current_owed - $settle_amount;
+            if ($new_balance < 0) $new_balance = 0; // Prevent negative balance
+
+            // 3. Determine status (Paid if balance is effectively 0)
+            $new_status = ($new_balance <= 0.01) ? 'Paid' : 'Unpaid';
+
+            // 4. Update the database
+            $update_stmt = $conn->prepare("
+                UPDATE expense_shares 
+                SET amount_owed = ?, status = ? 
+                WHERE expense_id = ? AND people_id = ?
+            ");
+            $update_stmt->execute([$new_balance, $new_status, $target_expense_id, $person_id]);
+
+            // 5. Log the action
+            $logAction = $_SESSION['fullname'] . " settled ₱" . number_format($settle_amount, 2) . " for '$description'. Remaining: ₱" . number_format($new_balance, 2);
+            addLog($conn, $user_id, $logAction);
+
+            $conn->commit();
+            $_SESSION['success_msg'] = "Payment processed! Remaining balance: ₱" . number_format($new_balance, 2);
+        } else {
+            throw new Exception("Record not found.");
+        }
+
+    } catch (Exception $e) {
+        $conn->rollBack();
+        $_SESSION['error_msg'] = "Error: " . $e->getMessage();
     }
-    
-     $logAction = $_SESSION['fullname'] . " Marked an Owe Expense as Paid/Settled: $description - ₱" . number_format($amount, 2);
-    addLog($conn, $user_id, $logAction);
 
-    // Redirect back to the view page
     header("Location: spender.php?page=view_split_expense&expense_id=" . $target_expense_id);
     exit();
 }

@@ -221,7 +221,7 @@ $people = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <?php endforeach; ?>
                     <?php else: ?>
                         <tr>
-                            <td colspan="3" style="text-align:center; padding:40px; color:gray">
+                            <td colspan="4" style="text-align:center; padding:40px; color:gray">
                                 No friends found.
                             </td>
                         </tr>

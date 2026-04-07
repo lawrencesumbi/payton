@@ -230,7 +230,7 @@
                     <tbody>
                         <tr>
                             <td style="font-weight: 700;">You</td>
-                            <td style="font-weight: 700;">₱<?= number_format($your_share, 2) ?></td>
+                            <td style="font-weight: 700;">₱0.00</td>
                             <td><span class="badge" style="background: #e0e7ff; color: #4338ca;">Paid</span></td>
                             <td style="text-align: right; color: #cbd5e1;">—</td>
                         </tr>
@@ -246,11 +246,10 @@
                             </td>
                             <td style="text-align: right;">
                                 <?php if (strtolower($p['status']) === 'unpaid'): ?>
-                                    <form method="POST" action="process_split.php" style="margin:0;">
-                                        <input type="hidden" name="person_id" value="<?= $p['person_id'] ?>">
-                                        <input type="hidden" name="expense_id" value="<?= $expense_id ?>">
-                                        <button type="submit" name="mark_paid" class="btn-pay">Settle</button>
-                                    </form>
+                                    <button type="button" class="btn-pay" 
+                                        onclick="openSettleModal(<?= $p['person_id'] ?>, '<?= htmlspecialchars($p['name']) ?>', <?= $p['amount_owed'] ?>)">
+                                        Settle
+                                    </button>
                                 <?php else: ?>
                                     <span style="color: var(--success); font-weight: bold;">✓ Settled</span>
                                 <?php endif; ?>
@@ -263,6 +262,29 @@
         </div>
     </div>
 
+    <div id="settleModal" style="display:none; position:fixed; z-index:10000; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.5); align-items:center; justify-content:center;">
+        <div style="background:var(--card); padding:30px; border-radius:16px; width:90%; max-width:400px; box-shadow:0 20px 25px -5px rgba(0,0,0,0.2);">
+            <h2 style="margin-top:0;">Settle Payment</h2>
+            <p id="modalParticipantName" style="color:var(--text-muted);"></p>
+            
+            <form method="POST" action="process_split.php">
+                <input type="hidden" name="expense_id" value="<?= $expense_id ?>">
+                <input type="hidden" name="person_id" id="modalPersonId">
+                
+                <div style="margin-bottom: 20px;">
+                    <label style="display:block; font-size:0.8rem; margin-bottom:8px;">Amount to Pay (Max: ₱<span id="maxAmountText"></span>)</label>
+                    <input type="number" name="settle_amount" id="settleAmountInput" step="0.01" min="0.01" required 
+                        style="width:100%; padding:12px; border-radius:8px; border:1px solid var(--border); background:var(--bg); color:var(--text-main); font-size:1rem;">
+                </div>
+
+                <div style="display:flex; gap:10px;">
+                    <button type="button" onclick="closeModal()" style="flex:1; padding:12px; border-radius:8px; border:1px solid var(--border); background:none; cursor:pointer; color:var(--text-muted);">Cancel</button>
+                    <button type="submit" name="partial_settle" style="flex:1; padding:12px; border-radius:8px; background:var(--primary); color:white; border:none; font-weight:600; cursor:pointer;">Confirm</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
         // Auto-hide toast logic
         setTimeout(() => {
@@ -271,6 +293,31 @@
                 setTimeout(() => t.remove(), 300);
             });
         }, 4000);
+
+        function openSettleModal(id, name, remaining) {
+            const modal = document.getElementById('settleModal');
+            document.getElementById('modalPersonId').value = id;
+            document.getElementById('modalParticipantName').innerText = "Settling for " + name;
+            document.getElementById('maxAmountText').innerText = remaining.toFixed(2);
+            
+            const input = document.getElementById('settleAmountInput');
+            input.max = remaining;
+            input.value = remaining; // Default to full amount
+            
+            modal.style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('settleModal').style.display = 'none';
+        }
+
+        // Close modal if user clicks outside of the box
+        window.onclick = function(event) {
+            const modal = document.getElementById('settleModal');
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
     </script>
 
     </body>

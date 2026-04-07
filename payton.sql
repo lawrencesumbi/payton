@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 07, 2026 at 07:55 AM
+-- Generation Time: Apr 07, 2026 at 06:53 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -49,7 +49,8 @@ INSERT INTO `budget` (`id`, `budget_name`, `budget_amount`, `start_date`, `end_d
 (38, 'March 1-31', 1000.00, '2026-03-01', '2026-03-31', 5, 2, 'Inactive', '2026-03-12 05:39:40', '2026-03-12 05:39:40'),
 (39, 'March 25-30', 501.00, '2026-03-25', '2026-03-30', 1, 2, 'Inactive', '2026-03-20 17:08:26', '2026-03-20 17:08:26'),
 (41, 'February 1 - 15', 400.00, '2026-02-01', '2026-02-15', 1, 2, 'Inactive', '2026-02-14 02:14:43', '2026-02-14 02:14:43'),
-(43, 'April 1st Week', 1000.00, '2026-04-01', '2026-04-04', 1, 2, 'Inactive', '2026-04-01 12:41:34', '2026-04-01 12:41:34');
+(43, 'April 1st Week', 1000.00, '2026-04-01', '2026-04-04', 1, 2, 'Inactive', '2026-04-01 12:41:34', '2026-04-01 12:41:34'),
+(46, 'April 2nd Week', 1500.00, '2026-04-05', '2026-04-11', 1, 2, 'Active', '2026-04-07 15:21:00', '2026-04-07 15:21:00');
 
 -- --------------------------------------------------------
 
@@ -133,21 +134,19 @@ INSERT INTO `expenses` (`id`, `user_id`, `budget_id`, `category_id`, `descriptio
 (65, 1, 35, 10, 'Sample', 10.00, 1, NULL, '2026-03-12', '2026-03-12 14:42:26', '2026-03-12 14:42:26'),
 (66, 1, 35, 10, 'Sample 2', 10.00, 1, NULL, '2026-03-12', '2026-03-12 14:42:42', '2026-03-12 14:42:42'),
 (67, 1, 39, 1, 'Mang Inasal', 126.00, 1, NULL, '2026-03-25', '2026-03-24 17:09:54', '2026-03-28 15:08:52'),
-(76, 1, 35, 1, 'Mang Inasal', 100.00, 1, NULL, '2026-03-15', '2026-03-15 13:19:24', '2026-03-15 13:19:24'),
-(77, 1, 35, 1, 'Snack', 50.00, 1, NULL, '2026-03-15', '2026-03-15 13:24:15', '2026-03-15 13:24:15'),
-(79, 1, 35, 1, 'Softdrink', 25.00, 1, NULL, '2026-03-15', '2026-03-15 13:51:26', '2026-03-15 13:51:26'),
 (83, 1, 35, 1, 'Jollibee', 10.00, 1, NULL, '2026-03-16', '2026-03-16 04:39:29', '2026-03-16 04:39:29'),
 (84, 1, 41, 1, 'Chicken Joy', 99.00, 1, NULL, '2026-02-11', '2026-02-11 02:15:22', '2026-02-11 02:15:22'),
 (85, 1, 41, 1, 'Taxi', 200.00, 1, NULL, '2026-02-11', '2026-02-11 02:15:43', '2026-02-11 02:15:43'),
 (86, 1, 35, 8, 'Purchased items from SM Department Store', 20.00, 1, NULL, '2026-03-19', '2026-03-18 16:24:35', '2026-03-18 16:24:35'),
 (87, 5, 38, 2, 'Nagpa Gas ko sa Shell sa akong motor', 86.00, 1, NULL, '2026-03-24', '2026-03-24 06:55:59', '2026-03-24 06:55:59'),
-(90, 5, 38, 1, 'Chowking', 300.00, 1, NULL, '2026-03-25', '2026-03-25 14:23:17', '2026-03-25 14:23:17'),
 (91, 1, 43, 1, 'Rice', 70.00, 1, NULL, '2026-04-01', '2026-04-01 13:54:19', '2026-04-01 13:54:19'),
 (92, 1, 43, 4, 'Internet', 99.00, 3, NULL, '2026-04-02', '2026-04-02 07:31:29', '2026-04-02 07:31:29'),
 (93, 1, 43, 2, 'Gas', 50.00, 6, NULL, '2026-04-02', '2026-04-02 07:31:51', '2026-04-02 07:31:51'),
 (94, 1, 43, 6, 'Book', 30.00, 5, 'uploads/69ce72088abe9-b811fa4ddaa6e2793d2cb22171686ea2.jpg', '2026-04-02', '2026-04-02 07:32:30', '2026-04-02 13:41:28'),
 (95, 1, 43, 2, 'Jollibee', 10.00, 1, 'uploads/1775136547_mtlqh1hgajq91.jpg', '2026-04-02', '2026-04-02 13:29:07', '2026-04-02 13:29:46'),
-(97, 1, 43, 10, 'Pacifica Agrivet Supplies, Inc.', 416.00, 1, 'uploads/1775139752_1278048_orig.jpg', '2026-04-02', '2026-04-02 14:22:32', '2026-04-02 14:22:32');
+(97, 1, 43, 10, 'Pacifica Agrivet Supplies, Inc.', 416.00, 1, 'uploads/1775139752_1278048_orig.jpg', '2026-04-02', '2026-04-02 14:22:32', '2026-04-02 14:22:32'),
+(99, 1, 46, 1, 'Manok', 100.00, 1, NULL, '2026-04-08', '2026-04-07 16:28:12', '2026-04-07 16:28:12'),
+(100, 1, 46, 1, 'Chicken', 300.00, 6, NULL, '2026-04-07', '2026-04-07 16:51:56', '2026-04-07 16:51:56');
 
 -- --------------------------------------------------------
 
@@ -170,15 +169,10 @@ CREATE TABLE `expense_shares` (
 --
 
 INSERT INTO `expense_shares` (`id`, `expense_id`, `user_id`, `people_id`, `amount_owed`, `status`, `created_at`) VALUES
-(11, 76, 1, 1, 25.00, 'paid', '2026-03-15 13:19:24'),
-(12, 76, 1, 2, 25.00, 'paid', '2026-03-15 13:19:24'),
-(13, 76, 1, 3, 25.00, 'paid', '2026-03-15 13:19:24'),
-(14, 77, 1, 5, 16.67, 'unpaid', '2026-03-15 13:24:15'),
-(15, 77, 1, 4, 16.67, 'paid', '2026-03-15 13:24:15'),
-(18, 79, 1, 1, 10.00, 'unpaid', '2026-03-15 13:51:26'),
-(19, 79, 1, 4, 10.00, 'unpaid', '2026-03-15 13:51:26'),
-(29, 90, 5, 14, 50.00, 'paid', '2026-03-25 14:23:17'),
-(30, 90, 5, 16, 150.00, 'unpaid', '2026-03-25 14:23:17');
+(33, 99, 1, 1, 0.00, 'paid', '2026-04-07 16:28:12'),
+(34, 99, 1, 5, 50.00, 'unpaid', '2026-04-07 16:28:12'),
+(35, 100, 1, 2, 100.00, 'unpaid', '2026-04-07 16:51:56'),
+(36, 100, 1, 3, 100.00, 'unpaid', '2026-04-07 16:51:56');
 
 -- --------------------------------------------------------
 
@@ -313,7 +307,27 @@ INSERT INTO `logs` (`id`, `user_id`, `action`, `created_at`) VALUES
 (122, 1, 'Lawrence Sumbi Deleted a Person: ', '2026-04-07 13:48:34'),
 (123, 1, 'Lawrence Sumbi Added a Person: Bag o', '2026-04-07 13:49:07'),
 (124, 1, 'Lawrence Sumbi Deleted a Person: ', '2026-04-07 13:54:41'),
-(125, 1, 'Lawrence Sumbi Added a Person: Bag o', '2026-04-07 13:54:58');
+(125, 1, 'Lawrence Sumbi Added a Person: Bag o', '2026-04-07 13:54:58'),
+(126, 1, 'Lawrence Sumbi Logged in As Spender', '2026-04-07 22:37:30'),
+(127, 4, 'Aljon Paragoso Logged in As Spender', '2026-04-07 22:49:36'),
+(128, 1, 'Lawrence Sumbi Logged in As Spender', '2026-04-07 22:52:53'),
+(129, 2, 'Patricia Ann Mae Obaob Logged in As Sponsor', '2026-04-07 23:20:30'),
+(130, 2, 'Patricia Ann Mae Obaob Added or Updated an Allowance: April 2nd Week', '2026-04-07 23:21:00'),
+(131, 1, 'Lawrence Sumbi Logged in As Spender', '2026-04-07 23:21:15'),
+(132, 1, 'Lawrence Sumbi Added or Updated an Expense: Manok - ?100.00', '2026-04-07 23:41:15'),
+(133, 1, 'Lawrence Sumbi settled ?20.00 for \'Manok\'. Remaining: ?30.00', '2026-04-08 00:23:34'),
+(134, 1, 'Lawrence Sumbi settled ?10.00 for \'Manok\'. Remaining: ?20.00', '2026-04-08 00:24:10'),
+(135, 1, 'Lawrence Sumbi Deleted an Expense:  - ?0.00', '2026-04-08 00:26:50'),
+(136, 1, 'Lawrence Sumbi Added or Updated an Expense: Manok - ?100.00', '2026-04-08 00:28:12'),
+(137, 1, 'Lawrence Sumbi settled ?20.00 for \'Manok\'. Remaining: ?30.00', '2026-04-08 00:47:21'),
+(138, 1, 'Lawrence Sumbi settled ?30.00 for \'Manok\'. Remaining: ?0.00', '2026-04-08 00:48:12'),
+(139, 1, 'Lawrence Sumbi Deleted an Expense:  - ?0.00', '2026-04-08 00:48:27'),
+(140, 1, 'Lawrence Sumbi Deleted an Expense:  - ?0.00', '2026-04-08 00:48:29'),
+(141, 1, 'Lawrence Sumbi Deleted an Expense:  - ?0.00', '2026-04-08 00:48:31'),
+(142, 5, 'King James Logged in As Spender', '2026-04-08 00:49:04'),
+(143, 5, 'King James Deleted an Expense:  - ?0.00', '2026-04-08 00:49:22'),
+(144, 1, 'Lawrence Sumbi Logged in As Spender', '2026-04-08 00:49:31'),
+(145, 1, 'Lawrence Sumbi Added or Updated an Expense: Chicken - ?300.00', '2026-04-08 00:51:56');
 
 -- --------------------------------------------------------
 
@@ -404,21 +418,21 @@ CREATE TABLE `people` (
 --
 
 INSERT INTO `people` (`id`, `user_id`, `name`, `email`, `created_at`) VALUES
-(1, 1, 'Dray Misa', '', '2026-03-15 12:36:14'),
-(2, 1, 'Jaylon Mantillas', '', '2026-03-15 12:39:38'),
-(3, 1, 'Jaymaica Narvasa', '', '2026-03-15 12:59:43'),
-(4, 1, 'Jay Cabatuan', '', '2026-03-15 13:23:43'),
-(5, 1, 'Ivan Laluna', '', '2026-03-15 13:23:50'),
-(7, 1, 'Sample', '', '2026-03-24 05:00:58'),
-(8, 1, 'Sample2', '', '2026-03-24 06:59:13'),
-(9, 1, 'Sample3', '', '2026-03-25 13:54:22'),
-(13, 5, 'Emman', '', '2026-03-25 14:19:40'),
-(14, 5, 'Lenzey', '', '2026-03-25 14:19:45'),
-(15, 5, 'Mary Divine', '', '2026-03-25 14:19:52'),
-(16, 5, 'Lloyd Junrex', '', '2026-03-25 14:22:48'),
-(17, 1, 'OA', '', '2026-04-02 07:16:42'),
-(18, 1, 'HAHAHHAHA', '', '2026-04-02 07:21:39'),
-(21, 1, 'Bag o', 'bag0@gmail.com', '2026-04-07 05:54:58');
+(1, 1, 'Dray Misa', 'draymisa@gmail.com', '2026-03-15 12:36:14'),
+(2, 1, 'Jaylon Mantillas', 'jaylonmantillas@gmail.com', '2026-03-15 12:39:38'),
+(3, 1, 'Jaymaica Narvasa', 'jaymaicanarvasa@gmail.com', '2026-03-15 12:59:43'),
+(4, 1, 'Jay Cabatuan', 'jaycabatuan@gmail.com', '2026-03-15 13:23:43'),
+(5, 1, 'Ivan Laluna', 'ivanlaluna@gmail.com', '2026-03-15 13:23:50'),
+(7, 1, 'Sample', 'sample@gmail.com', '2026-03-24 05:00:58'),
+(8, 1, 'Sample2', 'sample2@gmail.com', '2026-03-24 06:59:13'),
+(9, 1, 'Sample3', 'sample3@gmail.com', '2026-03-25 13:54:22'),
+(13, 5, 'Emman', 'emman@gmail.com', '2026-03-25 14:19:40'),
+(14, 5, 'Lenzey', 'lenzey@gmail.com', '2026-03-25 14:19:45'),
+(15, 5, 'Mary Divine', 'marydivine@gmail.com', '2026-03-25 14:19:52'),
+(16, 5, 'Lloyd Junrex', 'lloydjunrex@gmail.com', '2026-03-25 14:22:48'),
+(17, 1, 'OA', 'oa@gmail.com', '2026-04-02 07:16:42'),
+(18, 1, 'HAHAHHAHA', 'hahah@gmail.com', '2026-04-02 07:21:39'),
+(21, 1, 'Bag o', 'bago@gmail.com', '2026-04-07 05:54:58');
 
 -- --------------------------------------------------------
 
@@ -627,7 +641,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `budget`
 --
 ALTER TABLE `budget`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=46;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=47;
 
 --
 -- AUTO_INCREMENT for table `category`
@@ -645,19 +659,19 @@ ALTER TABLE `due_status`
 -- AUTO_INCREMENT for table `expenses`
 --
 ALTER TABLE `expenses`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=98;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=101;
 
 --
 -- AUTO_INCREMENT for table `expense_shares`
 --
 ALTER TABLE `expense_shares`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
 
 --
 -- AUTO_INCREMENT for table `logs`
 --
 ALTER TABLE `logs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=126;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=146;
 
 --
 -- AUTO_INCREMENT for table `notifications`
