@@ -1437,6 +1437,15 @@ tr:hover {
         margin-top: 5px;
     }
 
+    .disabled-fab {
+        cursor: not-allowed !important;
+        box-shadow: none !important;
+    }
+
+    .disabled-fab:hover {
+        transform: none !important; /* Prevent the pop-up effect */
+    }
+
   </style>
 </head>
 <body>
@@ -1626,10 +1635,13 @@ tr:hover {
 
 
 
-<button class="fab" title="Add Expense">
+<button class="fab <?= (!$activeBudget || $budgetExpired) ? 'disabled-fab' : '' ?>" 
+        title="Add Expense" 
+        onclick="handleAddExpenseClick()">
     <i class="fa-solid fa-plus"></i>
 </button>
 
+<?php if ($activeBudget && !$budgetExpired): ?>
 <div class="modal-overlay" id="choiceModal">
     <div class="choice-container">
         <div class="choice-card" onclick="openManualEntry()">
@@ -1637,7 +1649,6 @@ tr:hover {
             <h3>Manual Input</h3>
             <p>Type details & AI categorize</p>
         </div>
-
         <div class="choice-card" onclick="triggerReceiptUpload()">
             <i class="fa-solid fa-receipt"></i>
             <h3>Scan Receipt</h3>
@@ -1646,6 +1657,7 @@ tr:hover {
         </div>
     </div>
 </div>
+<?php endif; ?>
 
 <div class="modal-overlay" id="modalOverlay">
     <div class="expense-area">
@@ -2245,6 +2257,67 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
+
+function toggleChoiceModal() {
+    const modal = document.getElementById('choiceModal');
+    modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
+}
+
+function showNoBudgetWarning() {
+    // This uses your existing toast logic to show an error
+    const container = document.getElementById('toastContainer');
+    const warning = `
+        <div class="custom-toast toast-error">
+            <div class="toast-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+            <div class="toast-content">
+                <div class="toast-title">ACTION REQUIRED</div>
+                <div class="toast-message">Please set an active Allowance period before adding expenses.</div>
+            </div>
+            <button class="toast-close" onclick="closeToast(this)"><i class="fa-solid fa-xmark"></i></button>
+        </div>`;
+    
+    container.insertAdjacentHTML('beforeend', warning);
+    
+    // Auto-remove the toast after 4 seconds
+    setTimeout(() => {
+        const lastToast = container.lastElementChild;
+        if(lastToast) lastToast.remove();
+    }, 4000);
+}
+
+function handleAddExpenseClick() {
+    // Check if the modal exists in the DOM (we wrap the modal in PHP later)
+    const choiceModal = document.getElementById('choiceModal');
+    
+    if (choiceModal) {
+        // Budget is active: Proceed to show the 2 options
+        choiceModal.style.display = 'flex';
+    } else {
+        // Budget is missing or expired: Show the error toast
+        showWarningToast("Please set an active Allowance first! <br> (You should link to a Sponsor)");
+    }
+}
+
+function showWarningToast(message) {
+    const container = document.getElementById('toastContainer');
+    const warning = `
+        <div class="custom-toast toast-error">
+            <div class="toast-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+            <div class="toast-content">
+                <div class="toast-title">ACTION BLOCKED</div>
+                <div class="toast-message">${message}</div>
+            </div>
+            <button class="toast-close" onclick="this.parentElement.remove()"><i class="fa-solid fa-xmark"></i></button>
+        </div>`;
+    
+    container.insertAdjacentHTML('beforeend', warning);
+    
+    // Auto-remove after 4 seconds
+    setTimeout(() => {
+        const toasts = container.querySelectorAll('.toast-error');
+        if (toasts.length > 0) toasts[toasts.length - 1].remove();
+    }, 4000);
+}
 </script>
 
 </body>

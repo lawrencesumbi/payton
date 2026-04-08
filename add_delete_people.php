@@ -47,5 +47,5 @@ if(isset($_POST['delete_person'])){
 
 
 // ✅ Redirect back to main page
-header("Location: http://localhost/payton/spender.php?page=friends");
+header("Location: spender.php?page=friends");
 exit();

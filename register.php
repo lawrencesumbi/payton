@@ -167,20 +167,27 @@ body {min-height:100vh; background:linear-gradient(135deg, #6f47fd, #f7f7f7); di
 <?php endif; ?>
 
 <div class="modal-overlay" id="verifyModal" style="<?= isset($_SESSION['pending_email']) ? 'display:flex;' : '' ?>">
-    <div class="verify-modal">
+    <div class="verify-modal" style="position: relative;">
+        <a href="cancel_verification.php" style="position: absolute; top: 15px; right: 20px; color: #ccc; text-decoration: none; font-size: 20px;">&times;</a>
+
         <h2>Verify Email</h2>
         <p>We sent a 6-digit code to <br><strong><?= htmlspecialchars($_SESSION['pending_email'] ?? '') ?></strong></p>
         
         <?php if($error): ?>
-        <div class="session-error"><?= htmlspecialchars($error) ?></div>
+            <div class="session-error"><?= htmlspecialchars($error) ?></div>
         <?php endif; ?>
 
         <form action="verify_logic.php" method="POST">
-            <input type="text" name="otp" class="otp-input" placeholder="000000" maxlength="6" required>
+            <input type="text" name="otp" class="otp-input" placeholder="000000" maxlength="6" inputmode="numeric" required>
             <button type="submit" class="verify-btn">Verify Account</button>
         </form>
         
-        <p style="margin-top: 20px; font-size: 12px;">
+        <p style="margin-top: 20px; font-size: 13px;">
+            <span style="color: #666;">Mistyped your email?</span> 
+            <a href="cancel_verification.php" style="color: #e74c3c; font-weight: 700; text-decoration: none;">Go Back</a>
+        </p>
+
+        <p style="margin-top: 10px; font-size: 12px;">
             Didn't get a code? 
             <a href="resend_code.php" style="color: #7f308f; font-weight: 700;">Resend Code</a>
         </p>
