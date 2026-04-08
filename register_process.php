@@ -79,13 +79,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $mail->isSMTP();
             $mail->Host       = 'smtp.gmail.com';
             $mail->SMTPAuth   = true;
-            $mail->Username   = 'guiansumbi@gmail.com';     
-            $mail->Password   = 'qvuq rtbg syud xwfu';      
+            $mail->Username   = 'payton.support@gmail.com';     
+            $mail->Password   = 'mmvq ebkg ctww kirs';      
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
             $mail->Port       = 587;
 
             // Recipients
-            $mail->setFrom('guiansumbi@gmail.com', 'Payton Support');
+            $mail->setFrom('payton.support@gmail.com', 'Payton Support');
             $mail->addAddress($email, $fullname);
 
             // Content

@@ -8,6 +8,7 @@ require 'vendor/autoload.php';
 
 session_start();
 require_once "db.php";
+require_once "log_helper.php";
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $email = trim($_POST["email"]);
@@ -30,12 +31,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $mail->isSMTP();
             $mail->Host       = 'smtp.gmail.com';
             $mail->SMTPAuth   = true;
-            $mail->Username   = 'guiansumbi@gmail.com'; // Your Gmail
-            $mail->Password   = 'qvuq rtbg syud xwfu';    // Your 16-character App Password
+            $mail->Username   = 'payton.support@gmail.com'; // Your Gmail
+            $mail->Password   = 'mmvq ebkg ctww kirs';    // Your 16-character App Password
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
             $mail->Port       = 587;
 
-            $mail->setFrom('your-gmail@gmail.com', 'Payton Support');
+            $mail->setFrom('payton.support@gmail.com', 'Payton Support');
             $mail->addAddress($email);
 
             $resetLink = "http://localhost/payton/reset_password.php?token=" . $token;

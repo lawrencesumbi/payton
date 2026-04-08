@@ -242,7 +242,7 @@
             </div>
 
             <div class="max-w-3xl mx-auto p-8 rounded-[2.5rem] bg-brand-dark text-white flex flex-col md:flex-row justify-between items-center gap-6 shadow-2xl transition-transform hover:scale-[1.02]">
-                <div class="flex items-center gap-4"><i data-lucide="mail"></i> <span>payton@gmail.com</span></div>
+                <div class="flex items-center gap-4"><i data-lucide="mail"></i> <span>payton.support@gmail.com</span></div>
                 <div class="flex items-center gap-4"><i data-lucide="phone"></i> <span>+63 975 314 0724</span></div>
                 <div class="flex items-center gap-4"><i data-lucide="map-pin"></i> <span>Cebu, PH</span></div>
             </div>

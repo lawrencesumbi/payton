@@ -37,12 +37,12 @@ try {
     $mail->isSMTP();
     $mail->Host       = 'smtp.gmail.com';
     $mail->SMTPAuth   = true;
-    $mail->Username   = 'guiansumbi@gmail.com'; 
-    $mail->Password   = 'qvuq rtbg syud xwfu'; // Use your 16-char App Password
+    $mail->Username   = 'payton.support@gmail.com'; 
+    $mail->Password   = 'mmvq ebkg ctww kirs'; // Use your 16-char App Password
     $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
     $mail->Port       = 587;
 
-    $mail->setFrom('guiansumbi@gmail.com', 'Payton Support');
+    $mail->setFrom('payton.support@gmail.com', 'Payton Support');
     $mail->addAddress($email);
 
     $mail->isHTML(true);

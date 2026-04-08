@@ -241,7 +241,7 @@ $percChange = ($trends['lm'] > 0) ? (($trends['tm'] - $trends['lm']) / $trends['
     <div class="stats-grid">
         <div class="stat-card">
             <div>
-                <p class="stat-label">Available</p>
+                <p class="stat-label">Available Balance</p>
                 <h3 class="stat-value">₱ <?= number_format($availableBalance, 2) ?></h3>
                 <span style="font-size:11px; color:#22c55e; font-weight:700;">
                     <?= $activeBudget ? htmlspecialchars($activeBudget['budget_name']) : 'No active budget' ?>
@@ -252,7 +252,7 @@ $percChange = ($trends['lm'] > 0) ? (($trends['tm'] - $trends['lm']) / $trends['
 
         <div class="stat-card">
             <div>
-                <p class="stat-label">Total Owed</p>
+                <p class="stat-label">Total People Owed</p>
                 <h3 class="stat-value">₱ <?= number_format($totalOwed, 2) ?></h3>
                 <span style="font-size:11px; color:#f59e0b; font-weight:700;">From Shared Expenses</span>
             </div>

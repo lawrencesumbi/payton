@@ -36,13 +36,13 @@ foreach ($reminders as $row) {
         $mail->isSMTP();
         $mail->Host       = 'smtp.gmail.com';
         $mail->SMTPAuth   = true;
-        $mail->Username   = 'guiansumbi@gmail.com'; // YOUR GMAIL
-        $mail->Password   = 'qvuq rtbg syud xwfu'; // YOUR GMAIL APP PASSWORD
+        $mail->Username   = 'payton.support@gmail.com'; // YOUR GMAIL
+        $mail->Password   = 'mmvq ebkg ctww kirs'; // YOUR GMAIL APP PASSWORD
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port       = 587;
 
         // --- EMAIL HEADER ---
-        $mail->setFrom('no-reply@payton.com', 'Payton Smart Reminders');
+        $mail->setFrom('payton.support@gmail.com', 'Payton Smart Reminders');
         $mail->addAddress($row['email'], $row['fullname']);
 
         // --- DYNAMIC CONTENT BASED ON URGENCY ---
