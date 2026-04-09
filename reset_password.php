@@ -2,6 +2,7 @@
 date_default_timezone_set('Asia/Manila');
 session_start();
 require_once "db.php"; // Using $conn from your db.php
+require_once "log_helper.php";
 
 $token = $_GET['token'] ?? $_POST['token'] ?? '';
 $error = $_SESSION['error'] ?? '';

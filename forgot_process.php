@@ -39,7 +39,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $mail->setFrom('payton.support@gmail.com', 'Payton Support');
             $mail->addAddress($email);
 
-            $resetLink = "http://localhost/payton/reset_password.php?token=" . $token;
+            // 1. Detect the protocol (http or https)
+            $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? "https" : "http";
+            // 2. Detect the host (localhost OR karan-unrevolved-unconcretely.ngrok-free.dev)
+            $host = $_SERVER['HTTP_HOST'];
+            // 3. Combine them to create the base URL
+            $baseUrl = $protocol . "://" . $host . "/payton/";
+            // 4. Create your link
+            $resetLink = $baseUrl . "reset_password.php?token=" . $token;
 
             $mail->isHTML(true);
             $mail->Subject = 'Reset Your Payton Password';
