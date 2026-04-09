@@ -15,145 +15,126 @@ unset($_SESSION['error'], $_SESSION['success']);
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
 
 <style>
-/* ... same styles as before ... */
-* {margin:0; padding:0; box-sizing:border-box; font-family:'Inter', sans-serif;}
-body {min-height:100vh; background:linear-gradient(135deg, #6f47fd, #f7f7f7); display:flex; justify-content:center; align-items:center; padding:20px;}
-.register-container {background: #fff;
-      width: 100%;
-      max-width: 900px;
-      height: 600px;
-      display: flex;
-      border-radius: 20px;
-      overflow: hidden;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    * {margin:0; padding:0; box-sizing:border-box; font-family:'Inter', sans-serif;}
+    body {min-height:100vh; background:linear-gradient(135deg, #6f47fd, #f7f7f7); display:flex; justify-content:center; align-items:center; padding:20px;}
+    
+    .register-container {
+        background: #fff;
+        width: 100%;
+        max-width: 900px;
+        min-height: 600px;
+        display: flex;
+        flex-direction: column; /* Mobile stack */
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
     }
-.register-left, .register-right {flex:1; padding:45px;justify-content:center; display:flex; flex-direction:column;}
-.form-header{text-align:center;}
-.form-header h2{margin-bottom:8px;color:#000;font-weight:800;font-size:28px;}
-.form-header p{font-size:14px;color:#666;margin-bottom:25px;}
-.form-header a{color:#7f308f;text-decoration:none;font-weight:700;}
-.form-group{margin-bottom:22px;position:relative;}
-.form-group label{display:block;margin-bottom:6px;font-size:13px;font-weight:600;color:#777;}
-.form-group input{width:100%;padding:10px 2px;border:none;border-bottom:2px solid #ddd;font-size:14px;background:transparent;outline:none;transition:.3s;}
-.form-group input:focus{border-bottom:2px solid #7f308f;}
-.register-btn{width:100%;padding:12px;border:none;border-radius:20px;background:#7f308f;color:#fff;font-weight:700;cursor:pointer;margin-top:10px;}
-.register-btn:hover{background:#9357f5;}
-.center-divider{width:1px;background:#ddd;}
-.icon-area{text-align:center;}
-.right-title{font-size:26px;font-weight:800;}
-.big-icon{width:300px;margin:20px auto;}
-.desc{font-size:14px;color:#666;}
-.error-msg{font-size:12px;color:#e74c3c;margin-top:5px; display:none;}
-.input-error{border-bottom:2px solid #e74c3c !important;}
-.show-hide{position:absolute; top:30px; right:10px; cursor:pointer; color:#777;}
-.success-popup{display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%);  color:#fff; padding:20px 30px; border-radius:10px; font-weight:700; font-size:16px; box-shadow:0 4px 15px rgba(0,0,0,0.3); z-index:999;}
-.session-error{display:block; color:#e74c3c; font-size:14px; margin-bottom:15px;}
-@media(max-width:900px){.register-container{flex-direction:column;}}
-/* Modal Overlay */
-.modal-overlay {
-    display: none; /* Hidden by default */
-    position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(5px);
-    z-index: 1000;
-    justify-content: center;
-    align-items: center;
-}
 
-/* Modal Box */
-.verify-modal {
-    background: #fff;
-    padding: 40px;
-    border-radius: 20px;
-    width: 100%;
-    max-width: 400px;
-    text-align: center;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-}
+    /* Mobile Layout Order */
+    .register-right { background: #f5f3f5; padding: 30px; order: 1; text-align: center; display: flex; flex-direction: column; justify-content: center; width: 100%; }
+    .register-left { background: #fff; padding: 30px; order: 2; display: flex; flex-direction: column; justify-content: center; width: 100%; }
 
-.verify-modal h2 { color: #7f308f; margin-bottom: 15px; font-weight: 800; }
-.verify-modal p { font-size: 14px; color: #666; margin-bottom: 20px; }
+    .form-header{text-align:center;}
+    .form-header h2{margin-bottom:8px;color:#000;font-weight:800;font-size:28px;}
+    .form-header p{font-size:14px;color:#666;margin-bottom:25px;}
+    .form-header a{color:#7f308f;text-decoration:none;font-weight:700;}
+    .form-header a:hover {text-decoration:underline;}
 
-.otp-input {
-    width: 100%;
-    padding: 15px;
-    border: 2px solid #ddd;
-    border-radius: 10px;
-    font-size: 20px;
-    text-align: center;
-    letter-spacing: 5px;
-    margin-bottom: 20px;
-    outline: none;
-}
+    .form-group{margin-bottom:22px; position:relative;}
+    .form-group label{display:block;margin-bottom:6px;font-size:13px;font-weight:600;color:#777;}
+    .form-group input{width:100%;padding:10px 30px 10px 2px; border:none; border-bottom:2px solid #ddd; font-size:14px; background:transparent; outline:none; transition:.3s;}
+    .form-group input:focus{border-bottom:2px solid #7f308f;}
 
-.otp-input:focus { border-color: #7f308f; }
+    .register-btn{width:100%;padding:12px;border:none;border-radius:20px;background:#7f308f;color:#fff;font-weight:700;cursor:pointer;margin-top:10px; transition: 0.3s;}
+    .register-btn:hover{background:#9357f5;}
 
-.verify-btn {
-    width: 100%;
-    padding: 12px;
-    background: #7f308f;
-    color: #fff;
-    border: none;
-    border-radius: 20px;
-    font-weight: 700;
-    cursor: pointer;
-}
+    .center-divider{display:none;} /* Hidden on mobile */
+    .icon-area{text-align:center;}
+    .right-title{font-size:26px;font-weight:800; margin-bottom:10px;}
+    .big-icon { width: 200px; height: auto; margin: 10px auto; }
+    .desc{font-size:14px;color:#666;}
+
+    /* Eye Icon Original Position Logic - Unchanged */
+    .show-hide { position:absolute; top:32px; right:10px; cursor:pointer; color:#777; }
+
+    .error-msg{font-size:12px;color:#e74c3c;margin-top:5px; display:none;}
+    .input-error{border-bottom:2px solid #e74c3c !important;}
+    .success-popup{display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); color:#fff; padding:20px 30px; border-radius:10px; font-weight:700; font-size:16px; box-shadow:0 4px 15px rgba(0,0,0,0.3); z-index:999; background:#27ae60;}
+    .session-error{display:block; color:#e74c3c; font-size:14px; margin-bottom:15px; text-align:center;}
+
+    /* Desktop View Responsiveness (Matched to Login) */
+    @media (min-width: 768px) {
+        .register-container { flex-direction: row; }
+        .register-left { width: 50%; padding: 45px; order: 1; }
+        .register-right { width: 50%; padding: 45px; order: 2; }
+        .center-divider { display: block; width: 1px; background: #ddd; height: 80%; align-self: center; }
+        .big-icon { width: 350px; height: 350px; margin-top: 20px;}
+    }
+
+    /* Modal Styling */
+    .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(5px); z-index: 1000; justify-content: center; align-items: center; }
+    .verify-modal { background: #fff; padding: 40px; border-radius: 20px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+    .verify-modal h2 { color: #7f308f; margin-bottom: 15px; font-weight: 800; }
+    .verify-modal p { font-size: 14px; color: #666; margin-bottom: 20px; }
+    .otp-input { width: 100%; padding: 15px; border: 2px solid #ddd; border-radius: 10px; font-size: 20px; text-align: center; letter-spacing: 5px; margin-bottom: 20px; outline: none; }
+    .verify-btn { width: 100%; padding: 12px; background: #7f308f; color: #fff; border: none; border-radius: 20px; font-weight: 700; cursor: pointer; }
 </style>
 </head>
 <body>
 
 <div class="register-container">
 
-<div class="register-left">
-<div class="form-header">
-  <h2>Create Account</h2>
-  <p>Already have an account? <a href="login.php">Sign In</a></p>
-</div>
+    <div class="register-left">
+        <div class="form-header">
+            <h2>Create Account</h2>
+            <p>Already have an account? <a href="login.php">Sign In</a></p>
+        </div>
 
-<?php if($error): ?>
-<div class="session-error"><?= htmlspecialchars($error) ?></div>
-<?php endif; ?>
+        <?php if($error): ?>
+            <div class="session-error"><?= htmlspecialchars($error) ?></div>
+        <?php endif; ?>
 
-<form id="registerForm" action="register_process.php" method="POST">
-  <div class="form-group">
-    <label>Full Name</label>
-    <input type="text" name="fullname" id="fullname">
-    <div class="error-msg" id="fullnameError">Full name is required</div>
-  </div>
+        <form id="registerForm" action="register_process.php" method="POST">
+            <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" name="fullname" id="fullname" required>
+                <div class="error-msg" id="fullnameError">Full name is required</div>
+            </div>
 
-  <div class="form-group">
-    <label>Email</label>
-    <input type="email" name="email" id="email">
-    <div class="error-msg" id="emailError">Valid Gmail address is required</div>
-  </div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" name="email" id="email" required>
+                <div class="error-msg" id="emailError">Valid Gmail address is required</div>
+            </div>
 
-  <div class="form-group">
-    <label>Password</label>
-    <input 
-        type="password" 
-        name="password" 
-        id="password" 
-        pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&.]).{8,}"
-        title="Must contain at least one uppercase, one lowercase, one number, and one special character."
-    >
-    <i class="fa-solid fa-eye show-hide" id="togglePassword"></i>
-    <div class="error-msg" id="passwordError">Password must be at least 8 characters</div>
-  </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input 
+                    type="password" 
+                    name="password" 
+                    id="password" 
+                    pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&.]).{8,}"
+                    title="Must contain at least one uppercase, one lowercase, one number, and one special character."
+                    required
+                >
+                <i class="fa-solid fa-eye show-hide" id="togglePassword"></i>
+                <div class="error-msg" id="passwordError">Password must be at least 8 characters</div>
+                <small id="pass-msg" style="font-size: 11px; display: block; margin-top: 5px;"></small>
+            </div>
 
-  <button type="submit" class="register-btn">Register</button>
-</form>
-</div>
+            <button type="submit" class="register-btn">Register</button>
+        </form>
+    </div>
 
-<div class="center-divider"></div>
+    <div class="center-divider"></div>
 
-<div class="register-right">
-  <div class="icon-area">
-    <h1 class="right-title">Welcome to Payton!</h1>
-    <img src="img/register-icon.jpg" class="big-icon">
-    <p class="desc">Create your account to explore Payton services.</p>
-  </div>
-</div>
+    <div class="register-right">
+        <div class="icon-area">
+            <h1 class="right-title">Welcome to Payton!</h1>
+            <img src="img/register-icon.jpg" class="big-icon" alt="Register Icon">
+            <p class="desc">Create your account to explore Payton services.</p>
+        </div>
+    </div>
 
 </div>
 
