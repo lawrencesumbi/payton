@@ -407,11 +407,7 @@ body::-webkit-scrollbar {
             </div>
         </div>
 
-        <div class="info-box">
-            <h4>AI Suggested Due</h4>
-            
-        </div>
-
+       
 
 </div>
 

@@ -72,7 +72,7 @@ $people = $stmt->fetchAll(PDO::FETCH_ASSOC);
         .container{ width: 100%; padding:20px; }
         .header{ display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
 
-        .btn{ padding:10px 18px; border:none; border-radius:8px; cursor:pointer; font-weight:500; }
+        .btn{margin-top: 10px; padding:10px 18px; border:none; border-radius:8px; cursor:pointer; font-weight:500; }
         .btn-primary{ background: var(--accent-purple); color:white; }
         .btn-danger{ background: var(--accent-red-light); color: var(--accent-red); border: 1px solid var(--accent-red-border); }
 
@@ -134,7 +134,7 @@ $people = $stmt->fetchAll(PDO::FETCH_ASSOC);
         .input-box{
             width:100%;
             padding:12px;
-            margin:15px 0;
+            margin:7px 0;
             border:1px solid var(--border-color);
             border-radius:8px;
             background: var(--bg-card);
