@@ -267,7 +267,7 @@ if (!empty($searchTerm)) {
             <table>
                 <thead>
                     <tr>
-                        <th>Date</th>
+                        <th>No.</th> <th>Date</th>
                         <th>Description</th>
                         <th>Category</th>
                         <th>Amount</th>
@@ -275,11 +275,14 @@ if (!empty($searchTerm)) {
                 </thead>
                 <tbody>
                     <?php if (empty($expenses)): ?>
-                        <tr><td colspan="4" style="text-align:center; color: var(--text-muted);">No expenses recorded for this period.</td></tr>
+                        <tr><td colspan="5" style="text-align:center; color: var(--text-muted);">No expenses recorded for this period.</td></tr>
                     <?php else: ?>
-                        <?php foreach ($expenses as $e): ?>
+                        <?php 
+                            $num = 1; // Initialize counter
+                            foreach ($expenses as $e): 
+                        ?>
                         <tr>
-                            <td><?= date('d M Y', strtotime($e['expense_date'])) ?></td>
+                            <td style="color: var(--text-muted);"><?= $num++ ?>.</td> <td><?= date('d M Y', strtotime($e['expense_date'])) ?></td>
                             <td style="font-weight: 600; color: var(--text-main);"><?= htmlspecialchars($e['description']) ?></td>
                             <td><span class="category-badge"><?= htmlspecialchars($e['category_name'] ?? 'Uncategorized') ?></span></td>
                             <td style="font-weight: 800; color: var(--text-main);">₱<?= number_format($e['amount'], 2) ?></td>

@@ -42,7 +42,7 @@ try {
     $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
     $mail->Port       = 587;
 
-    $mail->setFrom('payton.support@gmail.com', 'Payton Support');
+    $mail->setFrom('payton.support@gmail.com', 'Payton');
     $mail->addAddress($email);
 
     $mail->isHTML(true);

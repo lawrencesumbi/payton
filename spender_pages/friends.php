@@ -24,7 +24,7 @@ if (!empty($searchTerm)) {
     $params[] = $searchWildcard;
 }
 
-$stmt = $conn->prepare("SELECT * FROM people $whereClause ORDER BY name ASC");
+$stmt = $conn->prepare("SELECT * FROM people $whereClause ORDER BY id DESC");
 $stmt->execute($params);
 $people = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
@@ -75,6 +75,17 @@ $people = $stmt->fetchAll(PDO::FETCH_ASSOC);
         .btn{margin-top: 10px; padding:10px 18px; border:none; border-radius:8px; cursor:pointer; font-weight:500; }
         .btn-primary{ background: var(--accent-purple); color:white; }
         .btn-danger{ background: var(--accent-red-light); color: var(--accent-red); border: 1px solid var(--accent-red-border); }
+
+        .btn-edit {
+            background: var(--border-light); /* Subtle background */
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-edit:hover {
+            background: var(--border-color);
+            border-color: var(--text-muted);
+        }
 
         .card {
             background: var(--bg-card);
@@ -198,7 +209,7 @@ $people = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <table>
                 <thead>
                     <tr>
-                        <th>Name</th>
+                        <th>No.</th> <th>Name</th>
                         <th>Email</th>
                         <th>Date Added</th>
                         <th style="text-align:right">Action</th>
@@ -206,23 +217,30 @@ $people = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 </thead>
                 <tbody>
                     <?php if(!empty($people)): ?>
-                        <?php foreach($people as $p): ?>
+                        <?php 
+                            $num = 1; // Initialize counter
+                            foreach($people as $p): 
+                        ?>
                         <tr>
-                            <td><?= htmlspecialchars($p['name']) ?></td>
+                            <td style="color: var(--text-muted); font-size: 0.9rem;"><?= $num++ ?>.</td> <td><?= htmlspecialchars($p['name']) ?></td>
                             <td><?= htmlspecialchars($p['email']) ?></td>
                             <td><?= date("M d, Y", strtotime($p['created_at'])) ?></td>
-                            <td style="text-align:right">
+                            <td style="text-align:right; display: flex; justify-content: flex-end; gap: 10px;">
+                                <button class="btn btn-edit" style="margin-top:0;" onclick='openEditModal(<?= json_encode($p) ?>)'>
+                                    Edit
+                                </button>
+
                                 <form method="POST" action="add_delete_people.php" onsubmit="return confirm('Remove this person?');">
                                     <input type="hidden" name="person_id" value="<?= $p['id'] ?>">
-                                    <button name="delete_person" class="btn btn-danger">Remove</button>
+                                    <button name="delete_person" class="btn btn-danger" style="margin-top:0;">Remove</button>
                                 </form>
                             </td>
                         </tr>
                         <?php endforeach; ?>
                     <?php else: ?>
                         <tr>
-                            <td colspan="4" style="text-align:center; padding:40px; color:gray">
-                                No friends found.
+                            <td colspan="5" style="text-align:center; padding:40px; color:gray">
+                                No friends found. Click the button to add one.
                             </td>
                         </tr>
                     <?php endif; ?>
@@ -235,11 +253,14 @@ $people = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <!-- MODAL -->
 <div id="modal" class="modal">
     <div class="modal-card">
-        <h3>Add New Person</h3>
+        <h3 id="modal-title">Add New Friend</h3>
         <form method="POST" action="add_delete_people.php">
-            <input type="text" name="person_name" placeholder="Full Name" class="input-box" required>
-            <input type="text" name="person_email" placeholder="Email" class="input-box" required>
-            <button name="add_person" class="btn btn-primary">Save</button>
+            <input type="hidden" name="person_id" id="edit_person_id">
+            
+            <input type="text" name="person_name" id="edit_person_name" placeholder="Full Name" class="input-box" required>
+            <input type="text" name="person_email" id="edit_person_email" placeholder="Email" class="input-box" required>
+            
+            <button type="submit" name="save_person" id="submit-btn" class="btn btn-primary">Save</button>
             <button type="button" onclick="closeModal()" class="btn">Cancel</button>
         </form>
     </div>
@@ -271,11 +292,27 @@ $people = $stmt->fetchAll(PDO::FETCH_ASSOC);
 </div>
 
 <script>
-function openModal(){
+function openModal() {
+    // Reset form for "Add" mode
+    document.getElementById("modal-title").innerText = "Add New Friend";
+    document.getElementById("edit_person_id").value = "";
+    document.getElementById("edit_person_name").value = "";
+    document.getElementById("edit_person_email").value = "";
+    document.getElementById("submit-btn").name = "add_person"; // Action for PHP
     document.getElementById("modal").style.display = "flex";
 }
 
-function closeModal(){
+function openEditModal(person) {
+    // Fill form for "Edit" mode
+    document.getElementById("modal-title").innerText = "Edit Friend";
+    document.getElementById("edit_person_id").value = person.id;
+    document.getElementById("edit_person_name").value = person.name;
+    document.getElementById("edit_person_email").value = person.email;
+    document.getElementById("submit-btn").name = "edit_person"; // Action for PHP
+    document.getElementById("modal").style.display = "flex";
+}
+
+function closeModal() {
     document.getElementById("modal").style.display = "none";
 }
 

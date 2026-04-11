@@ -345,7 +345,7 @@ function getStatusBadge($status) {
             <table class="table">
                 <thead>
                     <tr>
-                        <th>Reference</th>
+                        <th>No.</th> <th>Reference</th>
                         <th>Spender</th>
                         <th>Status</th>
                         <th>Amount</th>
@@ -353,46 +353,55 @@ function getStatusBadge($status) {
                     </tr>
                 </thead>
                 <tbody>
-                    <?php if(!empty($allBudgets)): foreach($allBudgets as $budget): ?>
-                    <tr>
-                        <td>
-                            <span class="budget-name"><?= htmlspecialchars($budget['budget_name']) ?></span>
-                            <span class="date-range"><?= date("M d", strtotime($budget['start_date'])) ?> — <?= date("M d, Y", strtotime($budget['end_date'])) ?></span>
-                        </td>
-                        <td>
-                            <div class="d-flex align-items-center">
-                                <div class="bg-light rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px; font-size: 0.7rem; font-weight: 800; color: var(--brand-purple);">
-                                    <?= strtoupper(substr($budget['spender_name'] ?? 'NA', 0, 2)) ?>
-                                </div>
-                                <span class="fw-medium"><?= htmlspecialchars($budget['spender_name'] ?? 'N/A') ?></span>
-                            </div>
-                        </td>
-                        <td><?= getStatusBadge($budget['status']) ?></td>
-                        <td><span class="amount-text">₱<?= number_format($budget['budget_amount'], 2) ?></span></td>
-                        <td class="text-end">
-                            <a href="sponsor.php?page=monitoring_page&spender_id=<?= $budget['user_id'] ?>&allowance_id=<?= $budget['id'] ?>" class="btn-action">
-                                <i class="bi bi-eye"></i>
-                            </a>
+                    <?php if(!empty($allBudgets)): ?>
+                        <?php 
+                            $count = 1; // Initialize the counter
+                            foreach($allBudgets as $budget): 
+                        ?>
+                        <tr>
+                            <td style="color: var(--text-muted); font-size: 0.9rem; vertical-align: middle;">
+                                <?= $count++ ?>.
+                            </td>
                             
-                            <button class="btn-action" onclick="editBudget(
-                                <?= $budget['id'] ?>,
-                                '<?= addslashes($budget['budget_name']) ?>',
-                                <?= $budget['budget_amount'] ?>,
-                                '<?= $budget['start_date'] ?>',
-                                '<?= $budget['end_date'] ?>',
-                                <?= $budget['user_id'] ?>
-                            )"><i class="bi bi-pencil"></i></button>
+                            <td>
+                                <span class="budget-name"><?= htmlspecialchars($budget['budget_name']) ?></span>
+                                <span class="date-range"><?= date("M d", strtotime($budget['start_date'])) ?> — <?= date("M d, Y", strtotime($budget['end_date'])) ?></span>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-light rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px; font-size: 0.7rem; font-weight: 800; color: var(--brand-purple);">
+                                        <?= strtoupper(substr($budget['spender_name'] ?? 'NA', 0, 2)) ?>
+                                    </div>
+                                    <span class="fw-medium"><?= htmlspecialchars($budget['spender_name'] ?? 'N/A') ?></span>
+                                </div>
+                            </td>
+                            <td><?= getStatusBadge($budget['status']) ?></td>
+                            <td><span class="amount-text">₱<?= number_format($budget['budget_amount'], 2) ?></span></td>
+                            <td class="text-end">
+                                <a href="sponsor.php?page=monitoring_page&spender_id=<?= $budget['user_id'] ?>&allowance_id=<?= $budget['id'] ?>" class="btn-action">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                
+                                <button class="btn-action" onclick="editBudget(
+                                    <?= $budget['id'] ?>,
+                                    '<?= addslashes($budget['budget_name']) ?>',
+                                    <?= $budget['budget_amount'] ?>,
+                                    '<?= $budget['start_date'] ?>',
+                                    '<?= $budget['end_date'] ?>',
+                                    <?= $budget['user_id'] ?>
+                                )"><i class="bi bi-pencil"></i></button>
 
-                            <form method="POST" action="allowance_process.php" style="display:inline;">
-                                <input type="hidden" name="budget_id" value="<?= $budget['id'] ?>">
-                                <button type="submit" name="delete_budget" class="btn-action" onclick="return confirm('Delete this allowance?');">
-                                    <i class="bi bi-trash text-danger"></i>
-                                </button>
-                            </form>
-                        </td>
-                    </tr>
-                    <?php endforeach; else: ?>
-                    <tr><td colspan="5" class="text-center py-5 text-muted">No allowance found.</td></tr>
+                                <form method="POST" action="allowance_process.php" style="display:inline;">
+                                    <input type="hidden" name="budget_id" value="<?= $budget['id'] ?>">
+                                    <button type="submit" name="delete_budget" class="btn-action" onclick="return confirm('Delete this allowance?');">
+                                        <i class="bi bi-trash text-danger"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <tr><td colspan="6" class="text-center py-5 text-muted">No allowance found.</td></tr>
                     <?php endif; ?>
                 </tbody>
             </table>

@@ -146,7 +146,7 @@ $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
         /* TOAST STYLES */
         .toast-container { position:fixed; top:20px; right:20px; z-index:10000; }
         .custom-toast { 
-            display:flex; align-items:flex-start; gap:10px; background:white; 
+            display:flex; align-items:flex-start; gap:10px; background: var(--bg-card); 
             padding:15px; border-radius:10px; margin-bottom:10px; min-width:280px; 
             box-shadow:0 10px 25px rgba(0,0,0,0.1); animation: slideIn 0.3s ease;
             transition: opacity 0.3s ease;
@@ -194,29 +194,48 @@ $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <div class="card">
         <table>
             <thead>
-                <tr><th>Description</th><th>Category</th><th>Total</th><th>Date</th><th style="text-align:right">Actions</th></tr>
+                <tr>
+                    <th>No.</th>
+                    <th>Description</th>
+                    <th>Category</th>
+                    <th>Total</th>
+                    <th>Date</th>
+                    <th style="text-align:right">Actions</th>
+                </tr>
             </thead>
             <tbody>
-                <?php foreach($expenses as $e): 
-                    $sStmt = $conn->prepare("SELECT people_id, amount_owed FROM expense_shares WHERE expense_id = ?");
-                    $sStmt->execute([$e['id']]);
-                    $shares = $sStmt->fetchAll(PDO::FETCH_KEY_PAIR);
-                ?>
-                <tr>
-                    <td style="font-weight:600;"><?= htmlspecialchars($e['description']) ?></td>
-                    <td><?= htmlspecialchars($e['category_name']) ?></td>
-                    <td style="font-weight:700;">₱<?= number_format($e['amount'], 2) ?></td>
-                    <td><?= date("M d, Y", strtotime($e['expense_date'])) ?></td>
-                    <td style="text-align:right; display:flex; justify-content:flex-end; gap:8px;">
-                        <a href="spender.php?page=view_split_expense&expense_id=<?= $e['id'] ?>" class="btn btn-icon">👁</a>
-                        <button class="btn btn-icon" onclick='openEditModal(<?= json_encode($e) ?>, <?= json_encode($shares) ?>)'>✏️</button>
+                <?php if(!empty($expenses)): ?>
+                    <?php 
+                        $count = 1; // 1. Initialize the counter 
+                        foreach($expenses as $e): 
+                            $sStmt = $conn->prepare("SELECT people_id, amount_owed FROM expense_shares WHERE expense_id = ?");
+                            $sStmt->execute([$e['id']]);
+                            $shares = $sStmt->fetchAll(PDO::FETCH_KEY_PAIR);
+                    ?>
+                    <tr>
+                        <td style="color: var(--text-muted); font-size: 0.9rem;"><?= $count++ ?>.</td>
                         
-                        <a href="process_split.php?delete_id=<?= $e['id'] ?>" 
-                           class="btn btn-icon btn-delete" 
-                           onclick="return confirm('Delete this split?')">🗑</a>
-                    </td>
-                </tr>
-                <?php endforeach; ?>
+                        <td style="font-weight:600;"><?= htmlspecialchars($e['description']) ?></td>
+                        <td><?= htmlspecialchars($e['category_name']) ?></td>
+                        <td style="font-weight:700;">₱<?= number_format($e['amount'], 2) ?></td>
+                        <td><?= date("M d, Y", strtotime($e['expense_date'])) ?></td>
+                        <td style="text-align:right; display:flex; justify-content:flex-end; gap:8px;">
+                            <a href="spender.php?page=view_split_expense&expense_id=<?= $e['id'] ?>" class="btn btn-icon">👁</a>
+                            <button class="btn btn-icon" onclick='openEditModal(<?= json_encode($e) ?>, <?= json_encode($shares) ?>)'>✏️</button>
+                            
+                            <a href="process_split.php?delete_id=<?= $e['id'] ?>" 
+                            class="btn btn-icon btn-delete" 
+                            onclick="return confirm('Delete this split?')">🗑</a>
+                        </td>
+                    </tr>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                        <tr>
+                            <td colspan="6" style="text-align:center; padding:40px; color:gray">
+                                No split expenses found. Click the button to add one.
+                            </td>
+                        </tr>
+                <?php endif; ?>
             </tbody>
         </table>
     </div>

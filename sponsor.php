@@ -210,13 +210,261 @@ $searchTerm = $_GET['search'] ?? '';
     .sidebar-footer .user-email { font-size: 12px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .sidebar-footer .user-role { font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--accent-purple); background: var(--sidebar-active); padding: 2px 8px; border-radius: 10px; width: fit-content; margin-top: 5px; }
 
-    @media (max-width: 1000px) { 
-        .sidebar { width: 80px; }
-        .sidebar .left-nav h3, .sidebar .menu a span, .sidebar-footer span { display: none; }
-        .sidebar .menu a { justify-content: center; padding: 15px; border-radius: 10px; margin: 0 10px; }
-        .footer-avatar { display: block; }
+    /* ... Keep your existing CSS variables and base styles ... */
+
+/* ===== RESPONSIVE BOTTOM NAV ===== */
+/* Optimized specifically for 720 x 1612 mobile dimensions */
+@media (max-width: 768px) {
+    /* 1. Force the App to stack vertically */
+    .app {
+        flex-direction: column;
     }
 
+    /* 2. Transform Sidebar into a Fixed Bottom Bar */
+    .sidebar {
+        width: 100% !important;
+        height: 70px !important; 
+        position: fixed;
+        bottom: 0;
+        top: auto;
+        left: 0;
+        flex-direction: row !important;
+        background: var(--bg-sidebar);
+        border-right: none;
+        border-top: 1px solid var(--border-color);
+        padding: 0 !important;
+        z-index: 2000;
+        box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    /* 3. Hide Branding and Footer (Desktop only elements) */
+    .left-nav, 
+    .sidebar-footer, 
+    #sidebarToggle {
+        display: none !important;
+    }
+
+    /* 4. Center the Menu across the 720px width */
+    .menu {
+        flex-direction: row !important;
+        width: 100%;
+        height: 100%;
+        padding: 0 !important;
+        margin: 0 !important;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+    }
+
+    /* 5. Adjust Individual Nav Items */
+    .menu a {
+        display: flex !important;
+        flex-direction: column !important; /* Icon on top, Text on bottom */
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        flex: 1;
+        height: 100%;
+        border-radius: 0 !important;
+        gap: 4px !important;
+        text-decoration: none;
+        background: transparent !important;
+    }
+
+    /* 6. Icon and Text Sizing for 720px width */
+    .menu a i {
+        font-size: 20px !important;
+        margin: 0 !important;
+        min-width: unset !important;
+        color: var(--text-muted);
+    }
+
+    .menu a span {
+        display: block !important; /* Show labels */
+        font-size: 10px !important;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    /* 7. Active State (Indicator line on top) */
+    .menu a.active {
+        color: var(--accent-purple) !important;
+    }
+
+    .menu a.active i {
+        color: var(--accent-purple) !important;
+    }
+
+    .menu a.active::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        width: 40px;
+        height: 3px;
+        background: var(--accent-purple);
+        border-radius: 0 0 4px 4px;
+    }
+
+    /* 8. Fix Content Overlap */
+    .main {
+        margin-bottom: 70px; /* Space for the bottom nav */
+    }
+
+    .content {
+        padding: 15px !important; /* Tighter padding for mobile */
+    }
+
+    /* 9. Topbar Search Adjustments */
+    .topbar-right {
+        gap: 12px;
+    }
+
+    .search-wrapper input {
+        width: 60px; /* Small search by default */
+    }
+
+    .search-wrapper input:focus {
+        width: 130px; /* Expand without hitting profile icon */
+    }
+}
+
+/* Optimized for 720 x 1612 - No elements removed, only adjusted */
+@media (max-width: 768px) {
+    /* ===== APP LAYOUT ===== */
+    .app { flex-direction: column; }
+
+    /* ===== TOPBAR ADJUSTMENTS ===== */
+    .topbar {
+        height: 60px;
+        padding: 0 10px; /* Reduced padding to fit more elements */
+        gap: 5px;
+    }
+
+    .topbar-left {
+        gap: 4px; /* Tightened gaps between breadcrumbs */
+        font-size: 11px; /* Smaller font for narrow width */
+        flex-shrink: 1;
+        min-width: 0;
+    }
+
+    /* Keep the toggle visible but smaller */
+    #sidebarToggle {
+        font-size: 16px;
+        padding-right: 5px;
+    }
+
+    .topbar-left .sep { margin: 0 2px; }
+    
+    /* Ensure the page title doesn't push icons off-screen */
+    .topbar-left .current-page {
+        font-size: 12px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 80px; 
+    }
+
+    .topbar-right {
+        gap: 10px;
+        flex-shrink: 0;
+    }
+
+    .header-icons { gap: 10px; }
+
+    /* Compact Search Wrapper to prevent layout breaking */
+    .search-wrapper {
+        padding: 5px 8px;
+        border-radius: 15px;
+    }
+
+    .search-wrapper input {
+        width: 60px; /* Slim default width */
+        font-size: 12px;
+    }
+
+    .search-wrapper input:focus {
+        width: 110px; /* Controlled expansion for 720px width */
+    }
+
+    /* ===== BOTTOM SIDEBAR TRANSFORMATION ===== */
+    .sidebar {
+        width: 100% !important;
+        height: 65px !important;
+        position: fixed;
+        bottom: 0;
+        top: auto;
+        left: 0;
+        flex-direction: row !important;
+        border-right: none;
+        border-top: 1px solid var(--border-color);
+        padding: 0 !important;
+        z-index: 2000;
+        box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+    }
+
+    /* Hide text/info in footer but keep the avatar if needed, 
+       or simply hide footer to prioritize nav icons */
+    .sidebar-footer {
+        display: none !important; 
+    }
+    
+    .left-nav {
+        display: none !important; /* Logo usually moves to Topbar or is hidden on mobile */
+    }
+
+    .menu {
+        flex-direction: row !important;
+        width: 100%;
+        justify-content: space-around;
+        align-items: center;
+        padding: 0 !important;
+    }
+
+    .menu a {
+        flex-direction: column !important; /* Stack Icon & Text */
+        padding: 8px 0 !important;
+        gap: 3px !important;
+        flex: 1;
+        border-radius: 0 !important;
+        font-size: 10px !important;
+        background: transparent !important;
+        justify-content: center;
+    }
+
+    .menu a i {
+        font-size: 18px !important;
+        min-width: unset !important;
+        margin: 0 !important;
+    }
+
+    .menu a span {
+        display: block !important; /* Keep labels visible */
+    }
+
+    /* Active Indicator for Bottom Nav */
+    .menu a.active {
+        color: var(--accent-purple) !important;
+        border-top: 3px solid var(--accent-purple);
+        margin-top: -3px; /* Prevent shifting */
+    }
+
+    /* ===== CONTENT SPACING ===== */
+    .main {
+        margin-bottom: 65px; /* Ensure content clears the bottom bar */
+    }
+
+    .content {
+        padding: 15px;
+    }
+
+    /* Adjust profile menu to be more tap-friendly on tall screens */
+    .profile-menu {
+        right: 10px;
+        width: 200px;
+    }
+}
     /* Notification Badge */
 .notif-wrapper {
     position: relative;

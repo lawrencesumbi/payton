@@ -2,12 +2,28 @@
 require_once "db.php";
 
 $expense_id = $_GET['id'] ?? null;
+$pid = $_GET['pid'] ?? null; // Get the specific person ID
 $auth_hash = $_GET['auth'] ?? null;
 $secret_key = "Karan_Secret_789"; // MUST match the one in process_split.php
 
 // 1. VALIDATION: Check if the hash matches
 if (!$expense_id || !$auth_hash || md5($expense_id . $secret_key) !== $auth_hash) {
     die("Invalid or expired access link.");
+}
+
+// FETCH THE SPECIFIC SHARE (This creates the $my_share variable)
+$userShareStmt = $conn->prepare("
+    SELECT es.*, p.name 
+    FROM expense_shares es 
+    JOIN people p ON es.people_id = p.id 
+    WHERE es.expense_id = ? AND es.people_id = ?
+"); 
+$userShareStmt->execute([$expense_id, $pid]);
+$my_share = $userShareStmt->fetch(PDO::FETCH_ASSOC);
+
+// If $my_share is still null, it means the pid in the URL doesn't exist for this expense
+if (!$my_share) {
+    die("Error: No share found for this person on this expense. Check your URL parameters.");
 }
 
 // 2. FETCH EXPENSE DATA
@@ -59,7 +75,7 @@ $shares = $shareStmt->fetchAll(PDO::FETCH_ASSOC);
 <div class="container">
     <div class="header">
         <h1>Expense Details</h1>
-        <p>Created by <strong><?= htmlspecialchars($expense['owner_name']) ?></strong></p>
+        <p>Paid by <strong><?= htmlspecialchars($expense['owner_name']) ?></strong></p>
     </div>
 
     <div class="amount-card">
@@ -86,13 +102,61 @@ $shares = $shareStmt->fetchAll(PDO::FETCH_ASSOC);
         <?php endforeach; ?>
     </table>
 
+    <button class="btn-settle" onclick="openSettleModal()">Settle Up My Share</button>
+
+    <div id="settleModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); justify-content:center; align-items:center; z-index:1000;">
+        <div style="background:white; padding:25px; border-radius:15px; width:300px;">
+            <h3>Settle Amount</h3>
+            <form method="POST" action="process_split.php">
+                <p>Settling for: <strong><?= htmlspecialchars($my_share['name']) ?></strong></p>
+                
+                <input type="hidden" name="person_id" value="<?= $pid ?>">
+                <input type="hidden" name="expense_id" value="<?= $expense_id ?>">
+                <input type="hidden" name="is_public_settle" value="1">
+
+                <label>Amount to Pay (Max: ₱<?= $my_share['amount_owed'] ?>):</label>
+                <input type="number" 
+                    name="settle_amount" 
+                    step="0.01" 
+                    min="0.01" 
+                    max="<?= $my_share['amount_owed'] ?>" 
+                    value="<?= $my_share['amount_owed'] ?>"
+                    oninput="validateAmount(this, <?= $my_share['amount_owed'] ?>)"
+                    required 
+                    style="width:100%; padding:12px; margin:10px 0; border:1px solid #ddd; border-radius:8px;">
+                
+                <button name="partial_settle" id="confirmBtn" class="btn-settle">Confirm Payment</button>
+                <button type="button" onclick="closeSettleModal()" style="width:100%; background:none; border:none; color:gray; cursor:pointer; padding:10px;">Cancel</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function openSettleModal() { document.getElementById('settleModal').style.display = 'flex'; }
+        function closeSettleModal() { document.getElementById('settleModal').style.display = 'none'; }
+    </script>
+
     <div style="margin-top: 30px; border-top: 2px dashed #eee; padding-top: 20px;">
         <p style="text-align: center; font-size: 14px; color: #64748b;">
             To settle your share, please contact <strong><?= $expense['owner_name'] ?></strong> 
-            or use their preferred payment method.
         </p>
         </div>
 </div>
+
+<script>
+    function validateAmount(input, maxAmount) {
+        const btn = document.getElementById('confirmBtn');
+        if (parseFloat(input.value) > maxAmount) {
+            input.style.borderColor = "red";
+            btn.disabled = true;
+            btn.style.opacity = "0.5";
+        } else {
+            input.style.borderColor = "#ddd";
+            btn.disabled = false;
+            btn.style.opacity = "1";
+        }
+    }
+</script>
 
 </body>
 </html>

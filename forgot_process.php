@@ -36,7 +36,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
             $mail->Port       = 587;
 
-            $mail->setFrom('payton.support@gmail.com', 'Payton Support');
+            $mail->setFrom('payton.support@gmail.com', 'Payton');
             $mail->addAddress($email);
 
             // 1. Detect the protocol (http or https)

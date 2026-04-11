@@ -363,7 +363,7 @@ if ($selected_spender && $selected_allowance) {
                 <table class="table align-middle mb-0">
                     <thead>
                         <tr>
-                            <th class="ps-4">Date</th>
+                            <th class="ps-4">No.</th> <th>Date</th>
                             <th>Category</th>
                             <th>Payment Method</th>
                             <th>Description</th>
@@ -373,9 +373,14 @@ if ($selected_spender && $selected_allowance) {
                     </thead>
                     <tbody>
                         <?php if(!empty($expenses)): ?>
-                            <?php foreach($expenses as $expense): ?>
+                            <?php 
+                                $count = 1; // Initialize the counter
+                                foreach($expenses as $expense): 
+                            ?>
                                 <tr>
-                                    <td class="ps-4 fw-semibold"><?= date("M d, Y", strtotime($expense['expense_date'])) ?></td>
+                                    <td class="ps-4 text-muted" style="font-size: 0.85rem;"><?= $count++ ?>.</td>
+                                    
+                                    <td class="fw-semibold"><?= date("M d, Y", strtotime($expense['expense_date'])) ?></td>
                                     <td><span class="badge badge-category rounded-pill p-2"><?= htmlspecialchars($expense['category_name'] ?? 'General') ?></span></td>
                                     <td><i class="bi bi-wallet2 me-1"></i><?= htmlspecialchars($expense['payment_method_name'] ?? 'Cash') ?></td>
                                     <td class="text-muted small"><?= htmlspecialchars($expense['description']) ?></td>
@@ -392,7 +397,7 @@ if ($selected_spender && $selected_allowance) {
                                 </tr>
                             <?php endforeach; ?>
                         <?php else: ?>
-                            <tr><td colspan="6" class="text-center py-5 text-muted">No expenses recorded for this allowance.</td></tr>
+                            <tr><td colspan="7" class="text-center py-5 text-muted">No expenses recorded for this allowance.</td></tr>
                         <?php endif; ?>
                     </tbody>
                 </table>

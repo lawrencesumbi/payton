@@ -137,16 +137,19 @@ $students = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <table>
             <thead>
                 <tr>
-                    <th>Member Details</th>
+                    <th>No.</th> <th>Member Details</th>
                     <th>Email Address</th>
                     <th style="text-align: right;">Actions</th>
                 </tr>
             </thead>
             <tbody>
                 <?php if(!empty($students)): ?>
-                    <?php foreach($students as $s): ?>
+                    <?php 
+                        $count = 1; // Initialize the counter
+                        foreach($students as $s): 
+                    ?>
                         <tr>
-                            <td><div style="font-weight:600;"><?= htmlspecialchars($s['fullname']); ?></div></td>
+                            <td style="color: var(--text-muted); font-size: 0.9rem;"><?= $count++ ?>.</td> <td><div style="font-weight:600;"><?= htmlspecialchars($s['fullname']); ?></div></td>
                             <td><div style="color:var(--text-muted);"><?= htmlspecialchars($s['email']); ?></div></td>
                             <td style="text-align: right;">
                                 <button type="button" class="btn btn-danger" onclick="confirmDelete(<?= $s['id']; ?>, '<?= htmlspecialchars($s['fullname'], ENT_QUOTES); ?>')">
@@ -157,7 +160,7 @@ $students = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <?php endforeach; ?>
                 <?php else: ?>
                     <tr>
-                        <td colspan="3" style="text-align:center; padding: 40px; color: var(--text-muted);">
+                        <td colspan="4" style="text-align:center; padding: 40px; color: var(--text-muted);">
                             No members found. Invite someone to get started.
                         </td>
                     </tr>

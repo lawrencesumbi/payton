@@ -189,86 +189,73 @@ function getStatusBadge($status) {
 
 <div class="table-responsive">
 <table class="table">
+    <thead>
+        <tr>
+            <th>No.</th> <th>Reference</th>
+            <th>Spender</th>
+            <th>Status</th>
+            <th>Amount</th>
+            <th class="text-end">Actions</th>
+        </tr>
+    </thead>
 
-<thead>
-<tr>
-<th>Reference</th>
-<th>Spender</th>
-<th>Status</th>
-<th>Amount</th>
-<th class="text-end">Actions</th>
-</tr>
-</thead>
+    <tbody>
+        <?php if(!empty($archivedBudgets)): ?>
+            <?php 
+                $count = 1; // Initialize the counter
+                foreach($archivedBudgets as $budget): 
+            ?>
+                <tr>
+                    <td style="color: var(--text-muted); font-size: 0.9rem; vertical-align: middle;">
+                        <?= $count++ ?>.
+                    </td>
 
-<tbody>
+                    <td>
+                        <span class="budget-name">
+                            <?= htmlspecialchars($budget['budget_name']) ?>
+                        </span>
+                        <div class="date-range">
+                            <?= date("M d",strtotime($budget['start_date'])) ?>
+                            —
+                            <?= date("M d, Y",strtotime($budget['end_date'])) ?>
+                        </div>
+                    </td>
 
-<?php if(!empty($archivedBudgets)): ?>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <div class="bg-light rounded-circle d-flex align-items-center justify-content-center me-2"
+                                 style="width:32px;height:32px;font-size:11px;font-weight:800;color:#6f42c1;">
+                                <?= strtoupper(substr($budget['spender_name'],0,2)) ?>
+                            </div>
+                            <?= htmlspecialchars($budget['spender_name'] ?? 'N/A') ?>
+                        </div>
+                    </td>
 
-<?php foreach($archivedBudgets as $budget): ?>
+                    <td>
+                        <?= getStatusBadge($budget['status']) ?>
+                    </td>
 
-<tr>
+                    <td>
+                        <span class="amount">
+                            ₱<?= number_format($budget['budget_amount'],2) ?>
+                        </span>
+                    </td>
 
-<td>
-<span class="budget-name">
-<?= htmlspecialchars($budget['budget_name']) ?>
-</span>
-
-<div class="date-range">
-<?= date("M d",strtotime($budget['start_date'])) ?>
-—
-<?= date("M d, Y",strtotime($budget['end_date'])) ?>
-</div>
-</td>
-
-<td>
-
-<div class="d-flex align-items-center">
-
-<div class="bg-light rounded-circle d-flex align-items-center justify-content-center me-2"
-style="width:32px;height:32px;font-size:11px;font-weight:800;color:#6f42c1;">
-
-<?= strtoupper(substr($budget['spender_name'],0,2)) ?>
-
-</div>
-
-<?= htmlspecialchars($budget['spender_name'] ?? 'N/A') ?>
-
-</div>
-
-</td>
-
-<td>
-<?= getStatusBadge($budget['status']) ?>
-</td>
-
-<td>
-<span class="amount">
-₱<?= number_format($budget['budget_amount'],2) ?>
-</span>
-</td>
-
-<td class="text-end">
+                    <td class="text-end">
                         <a href="sponsor.php?page=monitoring_page&spender_id=<?= $budget['user_id'] ?>&allowance_id=<?= $budget['id'] ?>" class="btn-action">
                             <i class="bi bi-eye"></i>
-                        </a>                         
-                           
-                        </td>
-
-</tr>
-
-<?php endforeach; ?>
-
-<?php else: ?>
-
-<tr>
-<td colspan="4" class="text-center text-muted py-5">
-No archived allowances found.
-</td>
-</tr>
-
-<?php endif; ?>
-
-</tbody>
+                        </a>                        
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+        <?php else: ?>
+            <tr>
+                <td colspan="6" class="text-center text-muted py-5">
+                    No archived allowances found.
+                </td>
+            </tr>
+        <?php endif; ?>
+    </tbody>
 </table>
 </div>
 

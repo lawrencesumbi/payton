@@ -100,16 +100,35 @@ $all_budgets = $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     /* ===== 3. CONTAINER & CARD FIXES ===== */
-    .stat-card, .chart-container {
-        background: var(--card-bg) !important;
-        border: 1px solid var(--border-color) !important;
-        border-radius: var(--radius) !important; /* Soft edges restored */
-        padding: 24px !important; /* Proper padding restored */
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-        overflow: hidden; /* Ensures table doesn't bleed over rounded corners */
-        height: 100%;
-    }
+  /* ===== GLOBAL CARD STYLING ===== */
+.stat-card, .chart-container {
+    background: var(--card-bg) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: var(--radius) !important;
+    padding: 24px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    height: 100%;
+}
 
+/* Specifically for Stat Cards - Ensuring Desktop spacing */
+.stat-card {
+    display: flex;
+    align-items: center; /* Vertical center */
+    justify-content: flex-start;
+}
+
+/* Fix the "too close" issue on Desktop icons */
+.stat-card .icon-shape {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    margin-right: 20px !important; /* Spacing for Desktop */
+    flex-shrink: 0;
+}
     /* ===== 4. TABLE VISIBILITY FIXES ===== */
     /* This target prevents the "white background" issue from your screenshots */
     [data-theme="dark"] .table {
@@ -209,6 +228,151 @@ $all_budgets = $stmt->fetchAll(PDO::FETCH_ASSOC);
     z-index: 10;
     background-color: var(--card-bg) !important;
 }
+
+
+/* Optimized for 720 x 1612 Stat Cards */
+@media (max-width: 768px) {
+    /* Force the "Total Capital" card to stay solo */
+    .row.g-4.mb-4 > .col-md-4:first-child {
+        width: 100% !important;
+        margin-bottom: 15px;
+    }
+
+    /* Force "Managed Spenders" and "Active Allowances" to share the row */
+    .row.g-4.mb-4 > .col-md-4:not(:first-child) {
+        width: 50% !important;
+        float: left;
+    }
+
+    /* Make the shared cards more "square-like" and adjust padding */
+    .stat-card {
+        padding: 15px !important;
+        flex-direction: column; /* Stack icon on top of text for the small squares */
+        justify-content: center;
+        text-align: center;
+        min-height: 140px; /* Ensures a square appearance */
+    }
+
+    /* Reset the first card (Solo) to stay horizontal for readability */
+    .row.g-4.mb-4 > .col-md-4:first-child .stat-card {
+        flex-direction: row;
+        text-align: left;
+        min-height: auto;
+    }
+
+    /* Adjust icon spacing for the square cards */
+    .stat-card .icon-shape {
+        margin-right: 0 !important;
+        margin-bottom: 10px;
+    }
+
+    .row.g-4.mb-4 > .col-md-4:first-child .icon-shape {
+        margin-bottom: 0;
+        margin-right: 15px !important;
+    }
+
+    /* Shrink numbers slightly so they don't break on narrow 720px screens */
+    .stat-card h3 {
+        font-size: 1.25rem !important;
+    }
+}
+
+/* ===== SLIDESHOW / TABLE RESPONSIVE LOGIC ===== */
+/* --- Desktop Reset / Defaults --- */
+.table-responsive-wrapper {
+    width: 100%;
+}
+
+/* --- Mobile Only: 720 x 1612 Optimization --- */
+@media (max-width: 768px) {
+    /* 1. Hide the table header on mobile only */
+    .table thead { 
+        display: none !important; 
+    }
+
+    /* 2. Turn the container into a horizontal slider */
+    .table-responsive-wrapper {
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        scrollbar-width: none;
+        display: block;
+    }
+    .table-responsive-wrapper::-webkit-scrollbar { display: none; }
+
+    /* 3. Force Table and Body into Flex mode */
+    .table { 
+        display: block !important; 
+        border: none !important;
+        margin: 0 !important;
+    }
+
+    .table tbody {
+        display: flex !important;
+        flex-direction: row !important; /* Forces side-by-side cards */
+    }
+
+    /* 4. Each Row becomes a full-width Slide Card */
+    .table tr {
+        display: block !important;
+        min-width: 100% !important; 
+        scroll-snap-align: center;
+        background: var(--card-bg);
+        border: 1px solid var(--border-color) !important;
+        border-radius: 15px;
+        padding: 10px;
+        margin-right: 15px; /* Gap between slides */
+    }
+
+    /* 5. Cells stack vertically inside the card */
+    .table td {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center;
+        padding: 12px 10px !important;
+        border-bottom: 1px solid var(--border-color) !important;
+        width: 100% !important;
+    }
+    
+    .table td:last-child { 
+        border-bottom: none !important; 
+    }
+
+    /* 6. Inject Labels on the left */
+    .table td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: var(--text-muted);
+        font-size: 12px;
+        text-align: left;
+    }
+
+    /* --- Visual Tweaks for Controls --- */
+    .slideshow-controls {
+        display: flex !important;
+        align-items: center;
+        gap: 8px;
+    }
+}
+
+/* --- Desktop Specific Override --- */
+@media (min-width: 769px) {
+    .slideshow-controls {
+        display: none !important;
+    }
+    /* Ensure table behaves exactly like a standard table on desktop */
+    .table {
+        display: table !important;
+    }
+    .table tbody {
+        display: table-row-group !important;
+    }
+    .table tr {
+        display: table-row !important;
+    }
+    .table td {
+        display: table-cell !important;
+    }
+}
 </style>
 </head>
 <body>
@@ -219,35 +383,37 @@ $all_budgets = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
     </div>
 
-    <div class="row g-4 mb-4">
-        <div class="col-md-4">
-            <div class="stat-card d-flex align-items-center">
-                <div class="icon-shape me-3"><i class="bi bi-bank"></i></div>
-                <div>
-                    <p class="text-muted small mb-0">Total Capital Allocated</p>
-                    <h3 class="fw-bold mb-0">₱<?= number_format($total_allocated, 2) ?></h3>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="stat-card d-flex align-items-center">
-                <div class="icon-shape me-3" style="background:#e0f2fe; color:#0369a1;"><i class="bi bi-people"></i></div>
-                <div>
-                    <p class="text-muted small mb-0">Managed Spenders</p>
-                    <h3 class="fw-bold mb-0"><?= $total_spenders ?></h3>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="stat-card d-flex align-items-center">
-                <div class="icon-shape me-3" style="background:#dcfce7; color:#15803d;"><i class="bi bi-check2-circle"></i></div>
-                <div>
-                    <p class="text-muted small mb-0">Active Allowances</p>
-                    <h3 class="fw-bold mb-0"><?= $active_budgets ?></h3>
-                </div>
+   <div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="stat-card d-flex align-items-center">
+            <div class="icon-shape me-3"><i class="bi bi-bank"></i></div>
+            <div>
+                <p class="text-muted small mb-0">Total Capital Allocated</p>
+                <h3 class="fw-bold mb-0">₱<?= number_format($total_allocated, 2) ?></h3>
             </div>
         </div>
     </div>
+
+    <div class="col-md-4">
+        <div class="stat-card d-flex align-items-center">
+            <div class="icon-shape" style="background:#e0f2fe; color:#0369a1;"><i class="bi bi-people"></i></div>
+            <div>
+                <p class="text-muted small mb-0">Managed Spenders</p>
+                <h3 class="fw-bold mb-0"><?= $total_spenders ?></h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="stat-card d-flex align-items-center">
+            <div class="icon-shape" style="background:#dcfce7; color:#15803d;"><i class="bi bi-check2-circle"></i></div>
+            <div>
+                <p class="text-muted small mb-0">Active Allowances</p>
+                <h3 class="fw-bold mb-0"><?= $active_budgets ?></h3>
+            </div>
+        </div>
+    </div>
+</div>
 
     <div class="row g-4 mb-4">
         <div class="col-lg-4">
@@ -257,23 +423,31 @@ $all_budgets = $stmt->fetchAll(PDO::FETCH_ASSOC);
             </div>
         </div>
 
-        <div class="col-lg-8">
-            <div class="chart-container shadow-sm">
-                <h6 class="fw-bold mb-4">Manage Allowances</h6>
-                <div class="table-scroll-container">
-                    <table class="table align-middle">
-                        <thead class="table-light sticky-top">
-                            <tr>
-                                <th>Spender</th>
-                                <th>Budget Name</th>
-                                <th>Amount</th>
-                                <th>End Date</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach($all_budgets as $b): ?>
-                            <tr>
+      <div class="col-lg-8">
+    <div class="chart-container shadow-sm">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h6 class="fw-bold mb-0">Manage Allowances</h6>
+            <div class="slideshow-controls d-md-none">
+                <button class="ss-btn" onclick="moveSlide(-1)"><i class="bi bi-chevron-left"></i></button>
+                <span id="ss-counter" class="ss-counter">1 / <?= count($all_budgets) ?></span>
+                <button class="ss-btn" onclick="moveSlide(1)"><i class="bi bi-chevron-right"></i></button>
+            </div>
+        </div>
+
+        <div class="table-responsive-wrapper">
+    <table class="table align-middle">
+        <thead class="table-light sticky-top">
+            <tr>
+                <th>Spender</th>
+                <th>Budget Name</th>
+                <th>Amount</th>
+                <th>End Date</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+                <tbody>
+                    <?php foreach($all_budgets as $b): ?>
+                    <tr>
                                 <td><span class="fw-semibold"><?= htmlspecialchars($b['fullname']) ?></span></td>
                                 <td><?= htmlspecialchars($b['budget_name']) ?></td>
                                 <td class="fw-bold">₱<?= number_format($b['budget_amount'], 2) ?></td>
@@ -284,11 +458,9 @@ $all_budgets = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                     </span>
                                 </td>
                             </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+                    <?php endforeach; ?>
+                </tbody>
+             </table>
         </div>
     </div>
 </div>
@@ -313,6 +485,21 @@ $all_budgets = $stmt->fetchAll(PDO::FETCH_ASSOC);
             cutout: '70%'
         }
     });
+
+    const tableWrapper = document.querySelector('.table-responsive-wrapper');
+const ssCounter = document.getElementById('ss-counter');
+const totalSlides = document.querySelectorAll('.slide-card').length;
+
+function moveSlide(dir) {
+    const width = tableWrapper.offsetWidth;
+    tableWrapper.scrollBy({ left: dir * width, behavior: 'smooth' });
+}
+
+// Update counter when user swipes manually
+tableWrapper.addEventListener('scroll', () => {
+    const index = Math.round(tableWrapper.scrollLeft / tableWrapper.offsetWidth);
+    if(ssCounter) ssCounter.innerText = `${index + 1} / ${totalSlides}`;
+});
 </script>
 </body>
 </html>

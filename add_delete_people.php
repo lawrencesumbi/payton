@@ -31,6 +31,23 @@ if(isset($_POST['add_person'])){
     addLog($conn, $user_id, $logAction);
 }
 
+/* DELETE PERSON */
+if (isset($_POST['edit_person'])) {
+    $id = $_POST['person_id'];
+    $name = $_POST['person_name'];
+    $email = $_POST['person_email'];
+
+    $stmt = $conn->prepare("UPDATE people SET name = ?, email = ? WHERE id = ? AND user_id = ?");
+    if ($stmt->execute([$name, $email, $id, $_SESSION['user_id']])) {
+        $_SESSION['success_msg'] = "Friend updated successfully!";
+    } else {
+        $_SESSION['error_msg'] = "Failed to update friend.";
+    }
+
+    $logAction = $_SESSION['fullname'] . " Updated a Person: $name";
+    addLog($conn, $user_id, $logAction);
+}
+
 
 /* DELETE PERSON */
 if(isset($_POST['delete_person'])){

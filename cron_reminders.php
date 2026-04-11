@@ -42,7 +42,7 @@ foreach ($reminders as $row) {
         $mail->Port       = 587;
 
         // --- EMAIL HEADER ---
-        $mail->setFrom('payton.support@gmail.com', 'Payton Smart Reminders');
+        $mail->setFrom('payton.support@gmail.com', 'Payton');
         $mail->addAddress($row['email'], $row['fullname']);
 
         // --- DYNAMIC CONTENT BASED ON URGENCY ---
