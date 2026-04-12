@@ -209,7 +209,7 @@ $all_budgets = $stmt->fetchAll(PDO::FETCH_ASSOC);
 .table-scroll-container {
     max-height: 350px; /* Adjust this height as needed */
     overflow-y: auto;
-    scrollbar-width: thin; /* Clean look for Firefox */
+    scrollbar-width: none; /* Clean look for Firefox */
     position: relative;
 }
 
@@ -283,7 +283,11 @@ $all_budgets = $stmt->fetchAll(PDO::FETCH_ASSOC);
 /* --- Desktop Reset / Defaults --- */
 .table-responsive-wrapper {
     width: 100%;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
 }
+
+.table-responsive-wrapper::-webkit-scrollbar { display: none; }
 
 /* --- Mobile Only: 720 x 1612 Optimization --- */
 @media (max-width: 768px) {
