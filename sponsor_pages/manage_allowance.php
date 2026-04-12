@@ -293,6 +293,129 @@ function getStatusBadge($status) {
         padding: 0;
         line-height: 1;
     }
+
+/* Target screens 767px and below (Mobile/720px) */
+@media (max-width: 767px) {
+    /* Hide the 4th column (Amount) and 5th column (Actions) */
+    .table th:nth-child(4), 
+    .table td:nth-child(4),
+    .table th:nth-child(5), 
+    .table td:nth-child(5) {
+        display: none !important;
+    }
+
+    /* Optional: Expand the remaining columns to fill space */
+    .table-container {
+        padding: 15px; /* Slightly tighter padding for mobile */
+    }
+}
+/* Specific adjustments for mobile screens (767px and below) */
+@media (max-width: 767px) {
+    /* 1. Hide the Amount and Action columns */
+    .table th:nth-child(4), 
+    .table td:nth-child(4),
+    .table th:nth-child(5), 
+    .table td:nth-child(5) {
+        display: none !important;
+    }
+
+    /* 2. Adjust Header Section */
+    .header-section {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    .header-section h1 {
+        font-size: 1.4rem; /* Slightly smaller title */
+    }
+
+    /* 3. Make Buttons and Inputs Full Width for easier tapping */
+    .header-section button, 
+    #budgetSubmitBtn {
+        width: 100% !important;
+        padding: 12px !important;
+    }
+
+    /* 4. Refine Table Container Padding */
+    .main-content {
+        padding: 0 12px; /* Reduce side gutter */
+    }
+
+    .table-container {
+        padding: 15px;
+        border-radius: 16px;
+    }
+
+    .table tbody td {
+        padding: 12px 10px; /* Tighter rows for vertical space */
+        font-size: 13px;
+    }
+
+    /* 5. Calendar & Form Adjustments */
+    .modal-dialog {
+        margin: 10px; /* Prevent modal from hitting screen edges */
+    }
+
+    .day {
+        width: 32px; /* Smaller calendar days to prevent horizontal overflow */
+        height: 32px;
+        line-height: 32px;
+        font-size: 12px;
+    }
+
+    .custom-input {
+        font-size: 16px !important; /* Prevents iOS/Android auto-zoom on focus */
+        padding: 10px;
+    }
+}
+@media (max-width: 767px) {
+    /* Ensure the modal is on top of the bottom sidebar/nav */
+    .modal {
+        z-index: 9999 !important; 
+    }
+    
+    .modal-backdrop {
+        z-index: 9998 !important;
+    }
+
+    /* Fix the modal height and allow it to scroll above the bottom bar */
+    .modal-dialog {
+        margin: 10px auto !important;
+        display: block !important; /* Reset the flex alignment */
+        max-width: 95%;
+    }
+
+    .modal-content {
+        max-height: 85vh !important; /* Leave room for the bottom sidebar */
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .modal-body {
+        overflow-y: auto !important;
+        padding-bottom: 80px !important; /* Pushes content up so the bottom bar doesn't hide it */
+    }
+
+    /* Reset the button so it's just a normal part of the scrollable form */
+    #budgetSubmitBtn {
+        position: relative !important;
+        bottom: 0 !important;
+        margin-top: 30px !important;
+        width: 100% !important;
+        display: block !important;
+    }
+
+    /* Shrink the calendar further to reduce scrolling effort */
+    .day {
+        width: 26px !important;
+        height: 26px !important;
+        line-height: 26px !important;
+    }
+}
+
 </style>
 </head>
 <body>
@@ -345,7 +468,7 @@ function getStatusBadge($status) {
             <table class="table">
                 <thead>
                     <tr>
-                        <th>No.</th> <th>Reference</th>
+                        <th>Reference</th>
                         <th>Spender</th>
                         <th>Status</th>
                         <th>Amount</th>
@@ -353,55 +476,46 @@ function getStatusBadge($status) {
                     </tr>
                 </thead>
                 <tbody>
-                    <?php if(!empty($allBudgets)): ?>
-                        <?php 
-                            $count = 1; // Initialize the counter
-                            foreach($allBudgets as $budget): 
-                        ?>
-                        <tr>
-                            <td style="color: var(--text-muted); font-size: 0.9rem; vertical-align: middle;">
-                                <?= $count++ ?>.
-                            </td>
-                            
-                            <td>
-                                <span class="budget-name"><?= htmlspecialchars($budget['budget_name']) ?></span>
-                                <span class="date-range"><?= date("M d", strtotime($budget['start_date'])) ?> — <?= date("M d, Y", strtotime($budget['end_date'])) ?></span>
-                            </td>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    <div class="bg-light rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px; font-size: 0.7rem; font-weight: 800; color: var(--brand-purple);">
-                                        <?= strtoupper(substr($budget['spender_name'] ?? 'NA', 0, 2)) ?>
-                                    </div>
-                                    <span class="fw-medium"><?= htmlspecialchars($budget['spender_name'] ?? 'N/A') ?></span>
+                    <?php if(!empty($allBudgets)): foreach($allBudgets as $budget): ?>
+                    <tr>
+                        <td>
+                            <span class="budget-name"><?= htmlspecialchars($budget['budget_name']) ?></span>
+                            <span class="date-range"><?= date("M d", strtotime($budget['start_date'])) ?> — <?= date("M d, Y", strtotime($budget['end_date'])) ?></span>
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div class="bg-light rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px; font-size: 0.7rem; font-weight: 800; color: var(--brand-purple);">
+                                    <?= strtoupper(substr($budget['spender_name'] ?? 'NA', 0, 2)) ?>
                                 </div>
-                            </td>
-                            <td><?= getStatusBadge($budget['status']) ?></td>
-                            <td><span class="amount-text">₱<?= number_format($budget['budget_amount'], 2) ?></span></td>
-                            <td class="text-end">
-                                <a href="sponsor.php?page=monitoring_page&spender_id=<?= $budget['user_id'] ?>&allowance_id=<?= $budget['id'] ?>" class="btn-action">
-                                    <i class="bi bi-eye"></i>
-                                </a>
-                                
-                                <button class="btn-action" onclick="editBudget(
-                                    <?= $budget['id'] ?>,
-                                    '<?= addslashes($budget['budget_name']) ?>',
-                                    <?= $budget['budget_amount'] ?>,
-                                    '<?= $budget['start_date'] ?>',
-                                    '<?= $budget['end_date'] ?>',
-                                    <?= $budget['user_id'] ?>
-                                )"><i class="bi bi-pencil"></i></button>
+                                <span class="fw-medium"><?= htmlspecialchars($budget['spender_name'] ?? 'N/A') ?></span>
+                            </div>
+                        </td>
+                        <td><?= getStatusBadge($budget['status']) ?></td>
+                        <td><span class="amount-text">₱<?= number_format($budget['budget_amount'], 2) ?></span></td>
+                        <td class="text-end">
+                            <a href="sponsor.php?page=monitoring_page&spender_id=<?= $budget['user_id'] ?>&allowance_id=<?= $budget['id'] ?>" class="btn-action">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                            
+                            <button class="btn-action" onclick="editBudget(
+                                <?= $budget['id'] ?>,
+                                '<?= addslashes($budget['budget_name']) ?>',
+                                <?= $budget['budget_amount'] ?>,
+                                '<?= $budget['start_date'] ?>',
+                                '<?= $budget['end_date'] ?>',
+                                <?= $budget['user_id'] ?>
+                            )"><i class="bi bi-pencil"></i></button>
 
-                                <form method="POST" action="allowance_process.php" style="display:inline;">
-                                    <input type="hidden" name="budget_id" value="<?= $budget['id'] ?>">
-                                    <button type="submit" name="delete_budget" class="btn-action" onclick="return confirm('Delete this allowance?');">
-                                        <i class="bi bi-trash text-danger"></i>
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-                        <?php endforeach; ?>
-                    <?php else: ?>
-                        <tr><td colspan="6" class="text-center py-5 text-muted">No allowance found.</td></tr>
+                            <form method="POST" action="allowance_process.php" style="display:inline;">
+                                <input type="hidden" name="budget_id" value="<?= $budget['id'] ?>">
+                                <button type="submit" name="delete_budget" class="btn-action" onclick="return confirm('Delete this allowance?');">
+                                    <i class="bi bi-trash text-danger"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    <?php endforeach; else: ?>
+                    <tr><td colspan="5" class="text-center py-5 text-muted">No allowance found.</td></tr>
                     <?php endif; ?>
                 </tbody>
             </table>
@@ -433,7 +547,7 @@ function getStatusBadge($status) {
                         </div>
                         <div class="col-md-7">
                             <label class="form-label small fw-700 text-muted">ALLOWANCE NAME</label>
-                            <input type="text" name="budget_name" id="budget_name" class="form-control custom-input" required>
+                               <input type="text" name="budget_name" id="budget_name" class="form-control custom-input" required>
                         </div>
                         <div class="col-md-5">
                             <label class="form-label small fw-700 text-muted">AMOUNT</label>

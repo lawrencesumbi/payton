@@ -310,24 +310,28 @@ td { padding: 12px; border-bottom: .5px solid var(--border-table); text-align: c
                 <tr><th>No.</th><th>Payment Name</th><th>Amount</th><th>Due Date</th><th>Paid Date</th><th>Method</th><th>Status</th><th>Action</th></tr>
             </thead>
             <tbody>
-            <?php $no = 1; foreach ($payments as $p): ?>
-            <tr>
-                <td><?= $no++ ?></td>
-                <td><?= htmlspecialchars($p['payment_name']) ?></td>
-                <td>₱<?= number_format($p['amount'], 2) ?></td>
-                <td><?= $p['due_date'] ?></td>
-                <td><?= $p['paid_date'] ?? '-' ?></td>
-                <td><?= $p['payment_method'] ?? '-' ?></td>
-                <td class="<?= strtolower($p['status'] ?? '') ?>"><?= ucfirst($p['status'] ?? '') ?></td>
-                <td class="actions"> 
-                    <?php if (strtolower($p['status']) !== 'paid'): ?>
-                        <a href="javascript:void(0);" class="btn-edit" onclick="openEditModal(<?= $p['id'] ?>)">✏️ Update</a>
-                    <?php endif; ?>
-                    
-                    <a href="delete_payment.php?id=<?= $p['id'] ?>" class="btn-delete" onclick="return confirm('Delete?');">🗑 Delete</a>
-                </td>
-            </tr>
-            <?php endforeach; ?>
+                <?php if (!empty($payments)): ?>
+                    <?php $no = 1; foreach ($payments as $p): ?>
+                    <tr>
+                        <td><?= $no++ ?></td>
+                        <td><?= htmlspecialchars($p['payment_name']) ?></td>
+                        <td>₱<?= number_format($p['amount'], 2) ?></td>
+                        <td><?= $p['due_date'] ?></td>
+                        <td><?= $p['paid_date'] ?? '-' ?></td>
+                        <td><?= $p['payment_method'] ?? '-' ?></td>
+                        <td class="<?= strtolower($p['status'] ?? '') ?>"><?= ucfirst($p['status'] ?? '') ?></td>
+                        <td class="actions"> 
+                            <?php if (strtolower($p['status']) !== 'paid'): ?>
+                                <a href="javascript:void(0);" class="btn-edit" onclick="openEditModal(<?= $p['id'] ?>)">✏️ Update</a>
+                            <?php endif; ?>
+                            
+                            <a href="delete_payment.php?id=<?= $p['id'] ?>" class="btn-delete" onclick="return confirm('Delete?');">🗑 Delete</a>
+                        </td>
+                    </tr>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <tr><td colspan="8" style="text-align:center;">No payments recorded yet. Click + to add one.</td></tr>
+                <?php endif; ?>    
             </tbody>
         </table>
     </div>

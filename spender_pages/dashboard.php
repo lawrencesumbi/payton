@@ -224,6 +224,32 @@ $percChange = ($trends['lm'] > 0) ? (($trends['tm'] - $trends['lm']) / $trends['
         .p-sub { font-size: 12px; color: var(--text-muted); margin: 3px 0 0; }
         .p-price { font-weight: 900; color: var(--primary); font-size: 15px; }
 
+        .payment-list {
+            /* Set the maximum height you want before it starts scrolling */
+            max-height: 400px; 
+            
+            /* Enable vertical scrolling */
+            overflow-y: auto;
+            
+            /* Optional: Smooth scrolling */
+            scroll-behavior: smooth;
+            
+            /* Optional: Hide scrollbar for a cleaner look (Chrome/Safari) */
+            &::-webkit-scrollbar {
+                width: 6px;
+            }
+            &::-webkit-scrollbar-thumb {
+                background: var(--border-color);
+                border-radius: 10px;
+            }
+        }
+
+        /* Ensure the panel doesn't stretch awkwardly */
+        .panel {
+            display: flex;
+            flex-direction: column;
+        }
+
         @media (max-width: 1000px) { 
             .dashboard-container { grid-template-columns: 1fr; } 
             .panel { min-height: auto; }
@@ -281,7 +307,7 @@ $percChange = ($trends['lm'] > 0) ? (($trends['tm'] - $trends['lm']) / $trends['
 
         <div class="panel">
             <div class="panel-header">Upcoming Payments</div>
-            <div class="payment-list">
+            <div class="payment-list" style="max-height: 350px; overflow-y: auto; padding-right: 5px;">
                 <?php if (!empty($upcomingPayments)): ?>
                     <?php foreach ($upcomingPayments as $p): ?>
                         <div class="payment-row">

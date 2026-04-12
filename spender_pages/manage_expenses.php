@@ -1627,7 +1627,7 @@ tr:hover {
                     </tr>
                 <?php endforeach; ?>
             <?php else: ?>
-                <tr><td colspan="8" style="text-align:center;">No expenses recorded yet.</td></tr>
+                <tr><td colspan="8" style="text-align:center;">No expenses recorded yet. Click + to add one.</td></tr>
             <?php endif; ?>
         </tbody>
     </table>

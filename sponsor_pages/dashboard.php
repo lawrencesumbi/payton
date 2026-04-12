@@ -205,14 +205,15 @@ $all_budgets = $stmt->fetchAll(PDO::FETCH_ASSOC);
     color: #4ade80 !important;
 }
 
-/* Fix for scrollable table container */
+/* Container to limit the height and enable scrolling */
 .table-scroll-container {
-    height: 300px; /* Adjust this value (e.g., 300px, 500px) to your liking */
+    max-height: 350px; /* Adjust this height as needed */
     overflow-y: auto;
-    scrollbar-width: thin; /* Makes scrollbar less bulky in Firefox */
+    scrollbar-width: thin; /* Clean look for Firefox */
+    position: relative;
 }
 
-/* Custom scrollbar for Chrome/Edge/Safari to match your dark theme */
+/* Custom scrollbar for Chrome/Edge/Safari */
 .table-scroll-container::-webkit-scrollbar {
     width: 6px;
 }
@@ -221,12 +222,13 @@ $all_budgets = $stmt->fetchAll(PDO::FETCH_ASSOC);
     border-radius: 10px;
 }
 
-/* Keeps the header visible while scrolling */
-.sticky-top {
+/* Make the header stick to the top while scrolling */
+.table-scroll-container thead th {
     position: sticky;
     top: 0;
     z-index: 10;
     background-color: var(--card-bg) !important;
+    border-bottom: 2px solid var(--border-color) !important;
 }
 
 
@@ -296,6 +298,7 @@ $all_budgets = $stmt->fetchAll(PDO::FETCH_ASSOC);
         scroll-snap-type: x mandatory;
         scrollbar-width: none;
         display: block;
+        max-height: none !important;
     }
     .table-responsive-wrapper::-webkit-scrollbar { display: none; }
 
@@ -359,9 +362,21 @@ $all_budgets = $stmt->fetchAll(PDO::FETCH_ASSOC);
     .slideshow-controls {
         display: none !important;
     }
+    .table-responsive-wrapper {
+        max-height: 400px; /* Limitahan ang gitas-on sa desktop */
+        overflow-y: auto;  /* Vertical scroll mugawas kung daghan data */
+        display: block !important;
+    }
+    .table thead th {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        background-color: var(--card-bg) !important;
+    }
     /* Ensure table behaves exactly like a standard table on desktop */
     .table {
         display: table !important;
+        width: 100%;
     }
     .table tbody {
         display: table-row-group !important;
@@ -423,31 +438,26 @@ $all_budgets = $stmt->fetchAll(PDO::FETCH_ASSOC);
             </div>
         </div>
 
-      <div class="col-lg-8">
-    <div class="chart-container shadow-sm">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h6 class="fw-bold mb-0">Manage Allowances</h6>
-            <div class="slideshow-controls d-md-none">
-                <button class="ss-btn" onclick="moveSlide(-1)"><i class="bi bi-chevron-left"></i></button>
-                <span id="ss-counter" class="ss-counter">1 / <?= count($all_budgets) ?></span>
-                <button class="ss-btn" onclick="moveSlide(1)"><i class="bi bi-chevron-right"></i></button>
-            </div>
-        </div>
+        <div class="col-lg-8">
+            <div class="chart-container shadow-sm">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h6 class="fw-bold mb-0">Manage Allowances</h6>
+                </div>
 
-        <div class="table-responsive-wrapper">
-    <table class="table align-middle">
-        <thead class="table-light sticky-top">
-            <tr>
-                <th>Spender</th>
-                <th>Budget Name</th>
-                <th>Amount</th>
-                <th>End Date</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-                <tbody>
-                    <?php foreach($all_budgets as $b): ?>
-                    <tr>
+                <div class="table-scroll-container">
+                    <table class="table align-middle">
+                        <thead>
+                            <tr>
+                                <th>Spender</th>
+                                <th>Budget Name</th>
+                                <th>Amount</th>
+                                <th>End Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach($all_budgets as $b): ?>
+                            <tr>
                                 <td><span class="fw-semibold"><?= htmlspecialchars($b['fullname']) ?></span></td>
                                 <td><?= htmlspecialchars($b['budget_name']) ?></td>
                                 <td class="fw-bold">₱<?= number_format($b['budget_amount'], 2) ?></td>
@@ -458,12 +468,12 @@ $all_budgets = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                     </span>
                                 </td>
                             </tr>
-                    <?php endforeach; ?>
-                </tbody>
-             </table>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+                </div>
         </div>
-    </div>
-</div>
 
 <script>
     const ctx = document.getElementById('allocationChart').getContext('2d');

@@ -294,6 +294,52 @@ if ($selected_spender && $selected_allowance) {
         border-radius: 10px;
     }
 
+    /* Receipt Modal Styling */
+.modal-overlay {
+    display: none; /* Hidden by default */
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 10000;
+    justify-content: center;
+    align-items: center;
+}
+
+
+
+ #receiptModal {
+    display: none;
+    position: fixed;
+    top:0; left:0;
+    width:100%; height:100%;
+    background: rgba(0,0,0,0.7);
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+  }
+  .receipt-area {
+    background: #fff;
+    padding: 20px;
+    border-radius: 18px;
+    position: relative;
+    max-width: 90%;
+  }
+  .close-receipt-btn {
+    position: absolute;
+    top:10px;
+    right:10px;
+    font-size:24px;
+    background:#d9534f;
+    color:white;
+    border:none;
+    border-radius:50%;
+    width:40px;
+    height:40px;
+    cursor:pointer;
+  }
+
+
     /* 9. RESPONSIVE DESIGN */
     @media (max-width: 992px) {
         .top-row, .selection-form { flex-direction: column; }
@@ -387,9 +433,12 @@ if ($selected_spender && $selected_allowance) {
                                     <td class="text-end fw-bold">₱<?= number_format($expense['amount'], 2) ?></td>
                                     <td class="text-center">
                                         <?php if($expense['receipt_upload']): ?>
-                                            <a href="uploads/<?= $expense['receipt_upload'] ?>" target="_blank" class="btn btn-sm btn-outline-primary">
-                                                <i class="bi bi-eye"></i>
-                                            </a>
+                                            <button type="button" 
+                                                    class="btn-view-receipt" 
+                                                    style="background: none; border: 1px solid var(--primary); color: var(--primary); padding: 4px 12px; border-radius: 8px; cursor: pointer;"
+                                                    data-receipt="<?= htmlspecialchars($expense['receipt_upload']) ?>">
+                                                👁
+                                            </button>
                                         <?php else: ?>
                                             <span class="text-muted opacity-50">-</span>
                                         <?php endif; ?>
@@ -411,6 +460,49 @@ if ($selected_spender && $selected_allowance) {
         </div>
     <?php endif; ?>
 </div>
+
+<div class="modal-overlay" id="receiptModal">
+  <div class="receipt-area">
+    <button class="close-receipt-btn">&times;</button>
+    <img id="receiptImage" src="" alt="Receipt" style="max-width:100%; max-height:80vh; display:block; margin:auto; border-radius:12px;">
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('receiptModal');
+    const receiptImg = document.getElementById('receiptImage');
+    const closeBtn = document.querySelector('.close-receipt-btn');
+
+    // 1. Listen for clicks on the buttons
+    document.querySelectorAll('.btn-view-receipt').forEach(button => {
+        button.addEventListener('click', function() {
+            // Get path directly from data attribute
+            const fullPath = this.getAttribute('data-receipt'); 
+            
+            // Set the source
+            receiptImg.src = fullPath;
+
+            // Show modal
+            modal.style.display = 'flex';
+        });
+    });
+
+    // 2. Close modal when clicking (X)
+    if(closeBtn) {
+        closeBtn.addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
+    }
+
+    // 3. Close modal when clicking outside the box
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.style.display = 'none';
+        }
+    });
+});
+</script>
 
 </body>
 </html>

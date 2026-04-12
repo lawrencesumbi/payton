@@ -168,6 +168,55 @@ function getStatusBadge($status) {
         background: var(--primary);
         color: white !important;
     }
+
+    /* Specific adjustments for mobile screens (767px and below) */
+@media (max-width: 767px) {
+    /* 1. Hide the 3rd column (Status) and 4th column (Amount) */
+    .table th:nth-child(3), 
+    .table td:nth-child(3),
+    .table th:nth-child(4), 
+    .table td:nth-child(4) {
+        display: none !important;
+    }
+
+    /* 2. Adjust Header spacing */
+    .main-content {
+        padding: 0 12px;
+    }
+
+    .header h2 {
+        font-size: 1.4rem;
+        margin-bottom: 4px;
+    }
+
+    /* 3. Refine Table for narrower screen */
+    .table-container {
+        padding: 15px;
+        border-radius: 16px;
+    }
+
+    .table tbody td {
+        padding: 12px 8px;
+        font-size: 13px;
+    }
+
+    /* 4. Ensure the Spender column doesn't wrap awkwardly */
+    .d-flex.align-items-center {
+        font-size: 12px;
+    }
+
+    .bg-light.rounded-circle {
+        width: 28px !important;
+        height: 28px !important;
+        min-width: 28px; /* Prevents shrinking */
+    }
+
+    /* 5. Make Action buttons easier to tap */
+    .btn-action {
+        width: 40px;
+        height: 40px;
+    }
+}
 </style>
 </head>
 
@@ -189,73 +238,86 @@ function getStatusBadge($status) {
 
 <div class="table-responsive">
 <table class="table">
-    <thead>
-        <tr>
-            <th>No.</th> <th>Reference</th>
-            <th>Spender</th>
-            <th>Status</th>
-            <th>Amount</th>
-            <th class="text-end">Actions</th>
-        </tr>
-    </thead>
 
-    <tbody>
-        <?php if(!empty($archivedBudgets)): ?>
-            <?php 
-                $count = 1; // Initialize the counter
-                foreach($archivedBudgets as $budget): 
-            ?>
-                <tr>
-                    <td style="color: var(--text-muted); font-size: 0.9rem; vertical-align: middle;">
-                        <?= $count++ ?>.
-                    </td>
+<thead>
+<tr>
+<th>Reference</th>
+<th>Spender</th>
+<th>Status</th>
+<th>Amount</th>
+<th class="text-end">Actions</th>
+</tr>
+</thead>
 
-                    <td>
-                        <span class="budget-name">
-                            <?= htmlspecialchars($budget['budget_name']) ?>
-                        </span>
-                        <div class="date-range">
-                            <?= date("M d",strtotime($budget['start_date'])) ?>
-                            —
-                            <?= date("M d, Y",strtotime($budget['end_date'])) ?>
-                        </div>
-                    </td>
+<tbody>
 
-                    <td>
-                        <div class="d-flex align-items-center">
-                            <div class="bg-light rounded-circle d-flex align-items-center justify-content-center me-2"
-                                 style="width:32px;height:32px;font-size:11px;font-weight:800;color:#6f42c1;">
-                                <?= strtoupper(substr($budget['spender_name'],0,2)) ?>
-                            </div>
-                            <?= htmlspecialchars($budget['spender_name'] ?? 'N/A') ?>
-                        </div>
-                    </td>
+<?php if(!empty($archivedBudgets)): ?>
 
-                    <td>
-                        <?= getStatusBadge($budget['status']) ?>
-                    </td>
+<?php foreach($archivedBudgets as $budget): ?>
 
-                    <td>
-                        <span class="amount">
-                            ₱<?= number_format($budget['budget_amount'],2) ?>
-                        </span>
-                    </td>
+<tr>
 
-                    <td class="text-end">
+<td>
+<span class="budget-name">
+<?= htmlspecialchars($budget['budget_name']) ?>
+</span>
+
+<div class="date-range">
+<?= date("M d",strtotime($budget['start_date'])) ?>
+—
+<?= date("M d, Y",strtotime($budget['end_date'])) ?>
+</div>
+</td>
+
+<td>
+
+<div class="d-flex align-items-center">
+
+<div class="bg-light rounded-circle d-flex align-items-center justify-content-center me-2"
+style="width:32px;height:32px;font-size:11px;font-weight:800;color:#6f42c1;">
+
+<?= strtoupper(substr($budget['spender_name'],0,2)) ?>
+
+</div>
+
+<?= htmlspecialchars($budget['spender_name'] ?? 'N/A') ?>
+
+</div>
+
+</td>
+
+<td>
+<?= getStatusBadge($budget['status']) ?>
+</td>
+
+<td>
+<span class="amount">
+₱<?= number_format($budget['budget_amount'],2) ?>
+</span>
+</td>
+
+<td class="text-end">
                         <a href="sponsor.php?page=monitoring_page&spender_id=<?= $budget['user_id'] ?>&allowance_id=<?= $budget['id'] ?>" class="btn-action">
                             <i class="bi bi-eye"></i>
-                        </a>                        
-                    </td>
-                </tr>
-            <?php endforeach; ?>
-        <?php else: ?>
-            <tr>
-                <td colspan="6" class="text-center text-muted py-5">
-                    No archived allowances found.
-                </td>
-            </tr>
-        <?php endif; ?>
-    </tbody>
+                        </a>                         
+                           
+                        </td>
+
+</tr>
+
+<?php endforeach; ?>
+
+<?php else: ?>
+
+<tr>
+<td colspan="4" class="text-center text-muted py-5">
+No archived allowances found.
+</td>
+</tr>
+
+<?php endif; ?>
+
+</tbody>
 </table>
 </div>
 
