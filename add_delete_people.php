@@ -15,7 +15,7 @@ if(isset($_POST['add_person'])){
     $name = trim($_POST['person_name']);
     $email = trim($_POST['person_email']); 
 
-    if(!empty($name)&& !empty($email)){
+    if(!empty($name)){
         $stmt = $conn->prepare("INSERT INTO people (user_id, name, email) VALUES (?, ?, ?)");
         
         if($stmt->execute([$user_id, $name, $email])){
@@ -31,7 +31,7 @@ if(isset($_POST['add_person'])){
     addLog($conn, $user_id, $logAction);
 }
 
-/* DELETE PERSON */
+/* EDIT PERSON */
 if (isset($_POST['edit_person'])) {
     $id = $_POST['person_id'];
     $name = $_POST['person_name'];

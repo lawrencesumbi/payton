@@ -135,7 +135,7 @@ $all_budgets = $stmt->fetchAll(PDO::FETCH_ASSOC);
         --bs-table-bg: transparent !important;
         --bs-table-color: var(--text-main) !important;
         background-color: transparent !important;
-        margin-bottom: 0;
+        
     }
 
     /* Fix for the white strips in archive.PNG */
@@ -144,7 +144,7 @@ $all_budgets = $stmt->fetchAll(PDO::FETCH_ASSOC);
         background-color: transparent !important; 
         color: var(--text-main) !important;
         border-bottom: 1px solid var(--border-color) !important;
-        padding: 16px 12px !important; /* Vertical spacing for table rows */
+        padding: 8px 8px !important; /* Vertical spacing for table rows */
     }
 
     /* Header styling that stays dark */
@@ -152,9 +152,7 @@ $all_budgets = $stmt->fetchAll(PDO::FETCH_ASSOC);
     [data-theme="dark"] .table-light th {
         background-color: var(--bg-body) !important;
         color: var(--text-muted) !important;
-        text-transform: uppercase;
-        font-size: 0.75rem;
-        letter-spacing: 0.05em;
+        font-size: 1rem;
         border-bottom: 2px solid var(--border-color) !important;
     }
 

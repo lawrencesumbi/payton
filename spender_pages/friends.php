@@ -258,7 +258,7 @@ $people = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <input type="hidden" name="person_id" id="edit_person_id">
             
             <input type="text" name="person_name" id="edit_person_name" placeholder="Full Name" class="input-box" required>
-            <input type="text" name="person_email" id="edit_person_email" placeholder="Email" class="input-box" required>
+            <input type="text" name="person_email" id="edit_person_email" placeholder="Email" class="input-box">
             
             <button type="submit" name="save_person" id="submit-btn" class="btn btn-primary">Save</button>
             <button type="button" onclick="closeModal()" class="btn">Cancel</button>

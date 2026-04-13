@@ -423,15 +423,32 @@ function openEditModal(id) {
     document.getElementById("form_mode").value = "edit";
     document.getElementById("editFields").style.display = "block";
     document.getElementById("congratsPanel").style.display = "none";
-    fetch('get_payment.php?id=' + id).then(res => res.json()).then(data => {
-        document.getElementById("payment_id").value = data.id;
-        document.getElementById("payment_name").value = data.payment_name;
-        document.getElementById("amount").value = data.amount;
-        document.getElementById("due_date").value = data.due_date;
-        document.getElementById("paid_date").value = data.paid_date ?? "";
-        document.getElementById("payment_method").value = data.payment_method_id ?? "";
-        toggleInputs(true);
-    });
+
+    // 1. Pagkuha sa petsa karon para sa Completion Date
+    const today = new Date().toISOString().split('T')[0];
+
+    fetch('get_payment.php?id=' + id)
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById("payment_id").value = data.id;
+            document.getElementById("payment_name").value = data.payment_name;
+            document.getElementById("amount").value = data.amount;
+            document.getElementById("due_date").value = data.due_date;
+            
+            // 2. Prefill Completion Date (Today) kung wala pay sulod
+            document.getElementById("paid_date").value = data.paid_date ? data.paid_date : today;
+
+            // 3. Set Payment Channel to "Cash" (Assuming ID 1 ang Cash)
+            // Kung lahi ang ID sa Cash sa imong database, usba lang nang '1'
+            if (data.payment_method_id) {
+                document.getElementById("payment_method").value = data.payment_method_id;
+            } else {
+                document.getElementById("payment_method").value = "1"; // Default to Cash
+            }
+
+            toggleInputs(true);
+        });
+
     document.getElementById("saveBtn").style.display = "none";
     document.getElementById("markPaidBtn").style.display = "inline-block";
 }
@@ -447,8 +464,8 @@ function showCongrats() {
     document.getElementById("res_amount").innerText = "₱" + parseFloat(document.getElementById("amount").value).toLocaleString(undefined, {minimumFractionDigits: 2});
     const sel = document.getElementById("payment_method");
     document.getElementById("res_method").innerText = sel.options[sel.selectedIndex].text;
-    document.getElementById("congratsPanel").style.display = "flex";
-    setTimeout(() => { document.getElementById("paymentForm").submit(); }, 2000);
+    document.getElementById("congratsPanel").style.display = "none";
+    setTimeout(() => { document.getElementById("paymentForm").submit(); }, 0);
 }
 </script>
 </body>

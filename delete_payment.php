@@ -13,7 +13,7 @@ $user_id = $_SESSION['user_id'];
 // 2. Validate the ID from the URL
 if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
     $_SESSION['error_msg'] = "Invalid payment ID.";
-    header("Location: http://localhost/payton/spender.php?page=manage_payments");
+    header("Location: spender.php?page=manage_payments");
     exit;
 }
 
@@ -39,5 +39,5 @@ $logAction = $_SESSION['fullname'] . " Deleted a Scheduled Payment: $oldName";
 addLog($conn, $user_id, $logAction);
 
 // 4. Redirect back to the main page
-header("Location: http://localhost/payton/spender.php?page=manage_payments");
+header("Location: spender.php?page=manage_payments");
 exit;
