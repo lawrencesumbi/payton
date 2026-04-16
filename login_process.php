@@ -73,17 +73,18 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         // Redirect based on role
         if (!empty($user["role"])) {
-            if ($user["role"] === "spender") {
-                header("Location: spender.php");
-            } elseif ($user["role"] === "sponsor") {
-                header("Location: sponsor.php");
-            } else {
-                header("Location: option.php");
-            }
-        } else {
-            header("Location: option.php");
-        }
-        exit();
+    if ($user["role"] === "admin") {
+        header("Location: admin.php"); // 👈 create this page
+    } elseif ($user["role"] === "spender") {
+        header("Location: spender.php");
+    } elseif ($user["role"] === "sponsor") {
+        header("Location: sponsor.php");
+    } else {
+        header("Location: option.php");
+    }
+} else {
+    header("Location: option.php");
+}
 
 
 
