@@ -73,15 +73,12 @@ function getStatusBadge($status) {
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
 <style>
-    /* 1. THEME VARIABLES */
-    :host, body, .main-content, .container-fluid, .content-wrapper {
-        background-color: transparent !important;
-        background: transparent !important;
-    }
+    
 
     /* 2. THEME VARIABLES */
     :root {
         --primary: #a855f7;
+        --bg-body: #f8fafc; 
         --card-bg: #ffffff;
         --text-main: #334155;
         --text-muted: #64748b;
@@ -89,18 +86,18 @@ function getStatusBadge($status) {
     }
 
     [data-theme="dark"] {
+        --bg-body: #0f111a;
         --card-bg: #191c24; 
         --text-main: #f8fafc;
         --text-muted: #94a3b8;
         --border-color: #2a2e39;
     }
 
-    /* 2. GLOBAL TRANSPARENCY FIX */
-    html, body, .main-content {
-        background-color: transparent !important;
-        background: transparent !important;
+    body { 
+        background-color: var(--bg-body) !important; 
         color: var(--text-main);
         font-family: 'Inter', sans-serif;
+        transition: 0.3s ease;
     }
 
     /* 3. TABLE & CONTAINER FIXES */

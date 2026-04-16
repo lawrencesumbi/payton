@@ -67,7 +67,7 @@
         <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
         <style>
             :root {
-                --primary: #6366f1; --bg: #f8fafc; --card: #ffffff;
+                --primary: #7c3aed; --bg: #f8fafc; --card: #ffffff;
                 --text-main: #1e293b; --text-muted: #64748b;
                 --success: #22c55e; --danger: #ef4444; --border: #e2e8f0;
             }

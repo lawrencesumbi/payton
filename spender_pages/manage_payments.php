@@ -108,7 +108,7 @@ foreach ($allStats as $s) {
     --border-table: #ddd;
     --shadow: rgba(15, 23, 42, 0.05);
     --shadow-modal: rgba(0, 0, 0, 0.25);
-    --accent-purple: #8c3bf6;
+    --accent-purple: #7c3aed;
     --accent-purple-light: #f3eaff;
     --accent-red: #ef4444;
     --accent-red-light: #ffecec;

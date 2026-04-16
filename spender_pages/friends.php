@@ -44,7 +44,7 @@ $people = $stmt->fetchAll(PDO::FETCH_ASSOC);
             --text-muted: #6b7280;
             --border-color: #e5e7eb;
             --border-light: #eeeeee;
-            --accent-purple: #6f42c1;
+            --accent-purple: #7c3aed;
             --accent-purple-dark: #8c3bf6;
             --accent-red: #dc2626;
             --accent-red-light: #fef2f2;

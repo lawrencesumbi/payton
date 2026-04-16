@@ -59,7 +59,7 @@ $searchTerm = $_GET['search'] ?? '';
       --border-color: #eeeeee;
       --hover-bg: #f9f9f9;
       --sidebar-active: #ebe0f7;
-      --accent-purple: #7f308f;
+      --accent-purple: #7c3aed;
     }
 
     [data-theme="dark"] {

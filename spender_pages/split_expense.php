@@ -80,7 +80,7 @@ $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
             --danger-light: #fee2e2;
             --success: #22c55e; 
             --shadow: rgba(0,0,0,0.05);
-            --accent-purple: #6f42c1;
+            --accent-purple: #7c3aed;
             --accent-purple-dark: #8c3bf6;
         }
 

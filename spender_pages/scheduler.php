@@ -44,7 +44,7 @@ foreach ($payments as $payment) {
     --text-main: #333333;
     --text-muted: #666666;
     --border-color: #e0e0e0;
-    --accent-purple: #8c15ec;
+    --accent-purple: #7c3aed;
     --accent-purple-light: #aa6af3;
     --success: #22c55e;
     --error: #ef4444;

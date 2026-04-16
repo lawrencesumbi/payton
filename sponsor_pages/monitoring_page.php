@@ -112,8 +112,8 @@ if ($selected_spender && $selected_allowance) {
 <style>
     /* 1. ROOT & THEME VARIABLES */
     :root {
-        background-color: transparent !important;
-        --primary: #7f308f;
+        --bg-body: #f8fafc; 
+        --primary: #7c3aed;
         --card-bg: #ffffff;
         --text-main: #334155;
         --text-muted: #64748b;
@@ -123,6 +123,7 @@ if ($selected_spender && $selected_allowance) {
     }
 
     [data-theme="dark"] {
+        --bg-body: #0f111a;
         --card-bg: #191c24; 
         --text-main: #f8fafc;
         --text-muted: #94a3b8;
@@ -131,18 +132,11 @@ if ($selected_spender && $selected_allowance) {
         --input-bg: #242833;
     }
 
-    /* 2. GLOBAL RESET & BASE STYLES */
-    html, body, .main-wrapper, .content-wrapper, #main-content {
-        background-color: transparent !important;
-        background: transparent !important;
-    }   
-
-    body {
-        font-family: 'Inter', sans-serif;
+    body { 
+        background-color: var(--bg-body) !important; 
         color: var(--text-main);
-        margin: 0;
-        padding: 0;
-        transition: all 0.3s ease;
+        font-family: 'Inter', sans-serif;
+        transition: 0.3s ease;
     }
 
     html::-webkit-scrollbar, 
@@ -391,11 +385,11 @@ if ($selected_spender && $selected_allowance) {
             </div>
             <div class="stat-card">
                 <span class="stat-label">Total Spent</span>
-                <h5 class="stat-value text-danger">₱<?= number_format($total_spent, 2) ?></h5>
+                <h5 class="stat-value">₱<?= number_format($total_spent, 2) ?></h5>
             </div>
-            <div class="stat-card" style="border-left-color: #10b981;">
+            <div class="stat-card">
                 <span class="stat-label">Allowance Left</span>
-                <h5 class="stat-value text-success">₱<?= number_format($allowance_left, 2) ?></h5>
+                <h5 class="stat-value">₱<?= number_format($allowance_left, 2) ?></h5>
             </div>
         </div>
     </div>
