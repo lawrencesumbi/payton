@@ -165,27 +165,34 @@ body::-webkit-scrollbar {
 }
 .stat-card::before { content: ""; position: absolute; top: 0; left: 0; height: 100%; width: 4px; }
 .stat-blue::before { background: #2f7cff; }
-.stat-purple::before { background: #2a7a31; }
+.stat-purple::before { background: #7c3aed; }
 .stat-orange::before { background: #f8bf5c; }
 .stat-red::before { background: var(--accent-red); }
 .stat-label { font-size: 10px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
 .stat-value { font-size: 17px; font-weight: 900; color: var(--text-main); margin-top: 4px; }
 
-/* --- SCROLLABLE TABLE CONTAINER --- */
-.container { 
-    width: 100%; 
-    margin-top: 20px;
-    background: var(--bg-card); 
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.03);
-    overflow: hidden; /* Clips the internal scroll box border-radius */
-    transition: background 0.3s ease;
+.main-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  
 }
 
+
 .table-wrapper {
-    max-height: 500px; /* Adjust this height as needed */
-    overflow-y: auto;
-    width: 100%;
+    flex: 1;
+  max-height: calc(100vh - 230px); /* viewport - topbar - margin/padding */
+  overflow-y: auto;
+  overflow-x: auto;
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 0; /* important for sticky header alignment */
+  margin-top: 20px;
+  box-shadow: 0 6px 15px var(--shadow);
+  border: 1px solid var(--border-color);
+  transition: background 0.3s ease;
+  -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
 }
 
 /* Custom Scrollbar for the right border */
@@ -224,19 +231,14 @@ td { padding: 12px; border-bottom: .5px solid var(--border-table); text-align: c
     animation: slideInUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; 
     transition: background 0.3s ease;
 }
-.modal-right { 
-    width: 380px; flex-shrink: 0; background: var(--bg-modal); border-radius: 20px; padding: 40px; display: none; 
-    flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 25px 50px -12px var(--shadow-modal);
-    animation: slideInUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; 
-    transition: background 0.3s ease;
-}
+
 
 .title-payment h3 { margin: 0; color: var(--text-main); font-size: 24px; font-weight: 800; }
 .form-subtitle { color: var(--text-light); font-size: 13px; margin-bottom: 25px; margin-top: 5px; }
 .modal label { display: block; font-size: 11px; font-weight: 800; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase; }
 .modal input, .modal select { width: 100%; padding: 12px 16px; margin-bottom: 20px; border: 2px solid var(--border-light); border-radius: 12px; box-sizing: border-box; background: var(--bg-card); color: var(--text-main); transition: border-color 0.3s ease; }
 .modal input:focus, .modal select:focus { border-color: var(--accent-purple); outline: none; }
-.modal-footer { display: flex; justify-content: flex-end; gap: 12px; margin-top: 10px; padding-top: 20px; border-top: 1px solid var(--border-light); }
+.modal-footer { display: flex; justify-content: flex-end; gap: 12px; margin-top: 10px;}
 .save { background: var(--accent-purple); color: white; padding: 12px 28px; border-radius: 10px; border:none; cursor: pointer; font-weight: 700; }
 .mark-paid { background: var(--accent-purple); color: white; padding: 12px 28px; border-radius: 10px; border:none; cursor: pointer; font-weight: 700; }
 .cancel { background: var(--border-light); color: var(--text-muted); padding: 12px 24px; border-radius: 10px; cursor: pointer; font-weight: 700; border: none !important; }
@@ -289,11 +291,13 @@ td { padding: 12px; border-bottom: .5px solid var(--border-table); text-align: c
     <?php endif; ?>
 </div>
 
+<div class="main-content">
+
 <div class="analytics-row">
-    <div class="stat-card stat-blue"><div><div class="stat-label">Total Payments</div><div class="stat-value"><?= $totalCount ?></div></div><div class="stat-icon">📑</div></div>
-    <div class="stat-card stat-purple"><div><div class="stat-label">Total Paid</div><div class="stat-value">₱<?= number_format($totalPaid, 2) ?></div></div><div class="stat-icon">✅</div></div>
-    <div class="stat-card stat-orange"><div><div class="stat-label">Total Unpaid</div><div class="stat-value">₱<?= number_format($totalUnpaid, 2) ?></div></div><div class="stat-icon">⌛</div></div>
-    <div class="stat-card stat-red"><div><div class="stat-label">Total Overdue</div><div class="stat-value">₱<?= number_format($totalOverdue, 2) ?></div></div><div class="stat-icon">⚠️</div></div>
+    <div class="stat-card stat-purple"><div><div class="stat-label">Total Payments</div><div class="stat-value"><?= $totalCount ?></div></div></div>
+    <div class="stat-card stat-purple"><div><div class="stat-label">Total Paid</div><div class="stat-value">₱<?= number_format($totalPaid, 2) ?></div></div></div>
+    <div class="stat-card stat-purple"><div><div class="stat-label">Total Unpaid</div><div class="stat-value">₱<?= number_format($totalUnpaid, 2) ?></div></div></div>
+    <div class="stat-card stat-purple"><div><div class="stat-label">Total Overdue</div><div class="stat-value">₱<?= number_format($totalOverdue, 2) ?></div></div></div>
     <div class="filter-container">
         <label class="stat-label" style="margin-right: 5px;">Filter:</label>
         <select onchange="location.href='?page=manage_payments&filter=' + this.value">
@@ -303,7 +307,7 @@ td { padding: 12px; border-bottom: .5px solid var(--border-table); text-align: c
     </div>
 </div>
 
-<div class="container">
+
     <div class="table-wrapper">
         <table>
             <thead>
@@ -335,7 +339,7 @@ td { padding: 12px; border-bottom: .5px solid var(--border-table); text-align: c
             </tbody>
         </table>
     </div>
-</div>
+
 
 <button class="fab" onclick="openAddModal()">+</button>
 
@@ -382,6 +386,8 @@ td { padding: 12px; border-bottom: .5px solid var(--border-table); text-align: c
             </div>
         </div>
     </div>
+</div>
+
 </div>
 
 <script>

@@ -50,6 +50,7 @@ $people = $stmt->fetchAll(PDO::FETCH_ASSOC);
             --accent-red-light: #fef2f2;
             --accent-red-border: #fee2e2;
             --shadow: rgba(0,0,0,0.1);
+            --header-bg: #fafafa;
         }
 
         [data-theme="dark"] {
@@ -65,11 +66,20 @@ $people = $stmt->fetchAll(PDO::FETCH_ASSOC);
             --accent-red-light: #451a1a;
             --accent-red-border: #7f1d1d;
             --shadow: rgba(0,0,0,0.2);
+            --header-bg: #242833;
         }
 
         body{background: var(--bg-body); margin:0; font-family:'Inter', sans-serif; color: var(--text-main); transition: background 0.3s ease;}
 
-        .container{ width: 100%; padding:20px; }
+        
+
+        .container{ 
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            width: 100%;
+        }
+
         .header{ display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
 
         .btn{margin-top: 10px; padding:10px 18px; border:none; border-radius:8px; cursor:pointer; font-weight:500; }
@@ -93,12 +103,17 @@ $people = $stmt->fetchAll(PDO::FETCH_ASSOC);
             border: 1px solid var(--border-color);
             box-shadow: 0 4px 6px var(--shadow);
             display: flex;
-            flex-direction: column;
-            max-height: 500px; /* Adjust this height as needed */
+            flex-direction: column; 
             overflow: hidden;
+            height: 100%;
         }
+
         .table-scroll {
-            overflow-y: auto;
+            flex: 1;
+  max-height: calc(100vh - 200px); /* viewport - topbar - margin/padding */
+  overflow-y: auto;
+  overflow-x: auto;
+            
             flex-grow: 1;
             /* Hide scrollbar for Chrome, Safari and Opera */
             &::-webkit-scrollbar {
@@ -111,16 +126,9 @@ $people = $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
 
         table{ width:100%; border-collapse:collapse;}
-        thead th {
-            position: sticky;
-            top: 0;
-            z-index: 10;
-            background: var(--accent-purple); /* Or your preferred header color */
-            color: white;
-            padding: 12px;
-            text-align: left;
-        }
-        td{ padding:14px; border-top:1px solid var(--border-light); color: var(--text-main); }
+        th {position: sticky;top: 0;z-index: 10; background: var(--header-bg); padding: 12px 20px; text-align: left; font-size: 0.75rem; color: var(--text-muted); border-bottom: 1px solid var(--border-color); text-transform: uppercase; }
+        td { padding: 16px 20px; border-bottom: 1px solid var(--border-color); font-size: 0.9rem; color: var(--text-main); }
+        tr:hover { background: var(--table-hover); }
 
         /* MODAL */
         .modal{
@@ -198,7 +206,10 @@ $people = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 <body>
 
+
+
 <div class="container">
+
     <div class="header">
         <h2>Manage Friends</h2>
         <button class="btn btn-primary" onclick="openModal()">+ Add Friend</button>
@@ -265,6 +276,8 @@ $people = $stmt->fetchAll(PDO::FETCH_ASSOC);
         </form>
     </div>
 </div>
+
+
 
 <!-- TOAST -->
 <div class="toast-container">

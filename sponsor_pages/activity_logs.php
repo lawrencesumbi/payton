@@ -66,6 +66,8 @@ function timeAgo($datetime) {
 <meta charset="UTF-8">
 <title>Activity Logs</title>
 <style>
+
+    
 /* ===== THEME VARIABLES ===== */
 :root {
     --bg-body: #f1f5f9;
@@ -85,6 +87,24 @@ function timeAgo($datetime) {
     --border-shadow: rgba(0,0,0,0.2);
 }
 
+/* --- Hide Scrollbar Logic --- */
+html::-webkit-scrollbar, 
+body::-webkit-scrollbar {
+    display: none;
+    width: 0 !important;
+}
+
+html, body {
+    -ms-overflow-style: none;  
+    scrollbar-width: none;  
+    /* Keep your existing transitions/fonts */
+    font-family:'Segoe UI',sans-serif; 
+    background: var(--bg-body); 
+    margin:0; 
+    color: var(--text-main); 
+    transition: background 0.3s ease;
+}
+
 body {font-family:'Segoe UI',sans-serif; background: var(--bg-body); margin:0; color: var(--text-main); transition: background 0.3s ease;}
 .container {max-width:900px; margin:30px auto;}
 h2 {margin-bottom:20px; padding: 0 10px;}
@@ -101,11 +121,13 @@ h2 {margin-bottom:20px; padding: 0 10px;}
 .edit {background:#eff6ff; color:#1e40af;} /* Updated to match update/edit logic */
 .delete {background:#fee2e2; color:#991b1b;}
 .default {background:#f1f5f9; color:#475569;}
+
+
 </style>
 </head>
 <body>
 <div class="container">
-<h2>📊 Activity Logs</h2>
+<h2>Activity Logs</h2>
 
 <?php if(!empty($logs)): ?>
     <?php foreach($logs as $row): 

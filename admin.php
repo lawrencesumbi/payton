@@ -23,7 +23,7 @@ $allowed_pages = [
     'admin_expense_transaction_monitoring', 
     'admin_activity_logs',
     'notifications',
-    'my_account'
+    'admin_my_account'
 ];
 
 if (!in_array($page, $allowed_pages)) { $page = 'admin_dashboard'; }
@@ -81,6 +81,37 @@ $searchTerm = $_GET['search'] ?? '';
 
         [data-theme="dark"] .content { background-color: var(--bg-body); min-height: calc(100vh - 64px); }
 
+        /* Dark mode specific styles */
+        [data-theme="dark"] .search-wrapper { background: var(--bg-input); }
+        [data-theme="dark"] .search-wrapper:focus-within { background: var(--bg-topbar); border-color: var(--accent-purple); box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.1); }
+        [data-theme="dark"] .search-wrapper input { color: var(--text-main); }
+        [data-theme="dark"] .search-wrapper button { color: var(--text-muted); }
+        [data-theme="dark"] .search-wrapper button:hover { color: var(--accent-purple); }
+
+        /* Table dark mode styles */
+        [data-theme="dark"] .content table { color: var(--text-main); border-color: var(--border-color); }
+        [data-theme="dark"] .content thead th { background: var(--bg-topbar); color: var(--text-muted); border-color: var(--border-color); }
+        [data-theme="dark"] .content tbody td { color: var(--text-main); border-color: var(--border-color); }
+        [data-theme="dark"] .content tbody tr:hover { background: var(--hover-bg); }
+
+        /* Form dark mode styles */
+        [data-theme="dark"] .content input[type="text"], 
+        [data-theme="dark"] .content input[type="email"], 
+        [data-theme="dark"] .content input[type="password"], 
+        [data-theme="dark"] .content input[type="date"], 
+        [data-theme="dark"] .content select, 
+        [data-theme="dark"] .content textarea { 
+            background: var(--bg-input); 
+            color: var(--text-main); 
+            border-color: var(--border-color); 
+        }
+        [data-theme="dark"] .content input:focus, 
+        [data-theme="dark"] .content select:focus, 
+        [data-theme="dark"] .content textarea:focus { 
+            border-color: var(--accent-purple); 
+            box-shadow: 0 0 0 4px rgba(124,58,237,0.10); 
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', Arial, sans-serif; }
         body { background: var(--bg-body); color: var(--text-main); min-height: 100vh; line-height: 1.5; transition: background 0.3s ease; }
         .app { display: flex; min-height: 100vh; }
@@ -122,9 +153,12 @@ $searchTerm = $_GET['search'] ?? '';
         .topbar-right { display: flex; align-items: center; gap: 24px; }
         .header-icons { display: flex; align-items: center; gap: 18px; color: var(--text-muted); }
 
-        .search-wrapper { display: flex; align-items: center; background: var(--bg-input); padding: 6px 15px; border-radius: 20px; border: 1px solid var(--border-color); }
+        .search-wrapper { display: flex; align-items: center; background: var(--bg-input); padding: 6px 15px; border-radius: 20px; border: 1px solid var(--border-color); transition: all 0.3s ease; }
+        .search-wrapper:focus-within { background: var(--bg-topbar); border-color: var(--accent-purple); box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.1); }
         .search-wrapper input { border: none; background: transparent; outline: none; font-size: 14px; color: var(--text-main); width: 140px; transition: width 0.3s ease; }
         .search-wrapper input:focus { width: 220px; }
+        .search-wrapper button { background: none; border: none; cursor: pointer; color: var(--text-muted); display: flex; align-items: center; transition: color 0.2s; }
+        .search-wrapper button:hover { color: var(--accent-purple); }
 
         .profile-btn { background: var(--accent-purple); border: 2px solid #fff; width: 34px; height: 34px; border-radius: 50%; overflow: hidden; cursor: pointer; }
         .profile-btn img { width: 100%; height: 100%; object-fit: cover; }
@@ -138,7 +172,33 @@ $searchTerm = $_GET['search'] ?? '';
         .profile-menu a { display: flex; align-items: center; gap: 10px; padding: 10px 12px; text-decoration: none; font-size: 14px; color: var(--text-main); border-radius: 8px; }
         .profile-menu a:hover { background: var(--hover-bg); color: var(--accent-purple); }
 
-        .content { padding: 30px; }
+        html, body { height: 100%; scrollbar-width: none; -ms-overflow-style: none; }
+        html::-webkit-scrollbar, body::-webkit-scrollbar { display: none; width: 0; height: 0; }
+
+        .content { padding: 30px; min-height: calc(100vh - 64px); transition: background 0.3s ease; }
+
+        .content h2, .content h3 { color: var(--text-main); margin-bottom: 20px; font-weight: 700; }
+        .content p { color: var(--text-muted); }
+
+        .section-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 24px; padding: 24px; box-shadow: 0 16px 40px rgba(15,23,42,0.08); margin-bottom: 24px; }
+        .section-card.small { padding: 18px; }
+        .content .table-wrapper { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 24px; overflow: hidden; box-shadow: 0 14px 34px rgba(15,23,42,0.06); margin-bottom: 24px; }
+        .content table { width: 100%; border-collapse: collapse; min-width: 640px; }
+        .content thead th { padding: 16px 18px; text-align: left; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; font-size: 12px; border-bottom: 1px solid var(--border-color); background: var(--bg-topbar); }
+        .content tbody td { padding: 16px 18px; border-bottom: 1px solid var(--border-color); color: var(--text-main); }
+        .content tbody tr:hover { background: var(--hover-bg); }
+        .content a { color: var(--accent-purple); text-decoration: none; }
+        .content a:hover { text-decoration: underline; }
+        .content button, .content .btn, .content input[type="submit"] { border: none; border-radius: 12px; padding: 10px 18px; background: var(--accent-purple); color: #fff; font-weight: 700; cursor: pointer; transition: background 0.25s ease, transform 0.25s ease; }
+        .content button:hover, .content .btn:hover, .content input[type="submit"]:hover { background: #8f2fd4; transform: translateY(-1px); }
+        .content .danger { background: #ef4444; }
+        .content .danger:hover { background: #dc2626; }
+        .content label { display: block; margin-bottom: 8px; color: var(--text-main); font-weight: 600; }
+        .content input[type="text"], .content input[type="email"], .content input[type="password"], .content input[type="date"], .content select, .content textarea { width: 100%; padding: 12px 16px; border-radius: 14px; border: 1px solid var(--border-color); background: var(--bg-input); color: var(--text-main); font-size: 14px; margin-bottom: 16px; transition: border-color .25s ease, box-shadow .25s ease; }
+        .content input:focus, .content select:focus, .content textarea:focus { outline: none; border-color: var(--accent-purple); box-shadow: 0 0 0 4px rgba(124,58,237,0.10); }
+        .content .modal-content { border-radius: 20px; padding: 24px; }
+        .content .modal .close { color: var(--text-muted); }
+        .content .modal .close:hover { color: var(--text-main); }
 
         .sidebar-footer { padding: 20px; border-top: 1px solid var(--border-color); margin-top: auto; display: flex; flex-direction: column; gap: 4px; }
         .user-role { font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--accent-purple); background: var(--sidebar-active); padding: 2px 8px; border-radius: 10px; width: fit-content; }
@@ -232,7 +292,7 @@ $searchTerm = $_GET['search'] ?? '';
         <div class="profile-dropdown">
           <button class="profile-btn" id="profileBtn"><img src="<?= htmlspecialchars($profilePath) ?>"></button>
           <div class="profile-menu" id="profileMenu">
-            <a href="?page=my_account"><i class="fa-solid fa-gears"></i> Account</a>
+            <a href="?page=admin_my_account"><i class="fa-solid fa-gears"></i> Account</a>
             <div class="menu-divider" style="height:1px; background:var(--border-color); margin:5px 0;"></div>
             <a href="logout.php" class="danger" style="color:#ef4444;"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
           </div>

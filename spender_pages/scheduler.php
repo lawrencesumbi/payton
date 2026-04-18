@@ -44,7 +44,7 @@ foreach ($payments as $payment) {
     --text-main: #333333;
     --text-muted: #666666;
     --border-color: #e0e0e0;
-    --accent-purple: #7c3aed;
+    --accent-purple: #8549ec;
     --accent-purple-light: #aa6af3;
     --success: #22c55e;
     --error: #ef4444;
@@ -126,17 +126,15 @@ body::-webkit-scrollbar {
 }
 
 .header button {
-    background: var(--accent-purple);
+    background: var(--bg-day);
     border: none;
-    color: white;
+    color: var(--text-main);
     padding: 6px 12px;
     border-radius: 6px;
     cursor: pointer;
 }
 
-.header button:hover {
-    background: var(--accent-purple-light);
-}
+
 
 
 .grid {
@@ -246,9 +244,11 @@ body::-webkit-scrollbar {
 }
 
 .today {
-    background: var(--accent-purple) !important;
-    color: white;
     
+       /* Make the text purple instead of white */
+    box-shadow: inset 0 0 0 2px var(--accent-purple) !important; /* Inner border */
+    font-weight: 700;
+    border-radius: 8px; /* Optional: adds a slight curve to the highlight */
 }
 
 .today strong {
@@ -279,15 +279,17 @@ body::-webkit-scrollbar {
 
  /* Right Panel UI */
         .reminder-card {
-            background: var(--accent-purple);
-            padding: 20px;
+            background: var(--bg-card);
+            padding: 12px;
             border-radius: 20px;
-            color: white;
+            color: var(--text-main);
             position: relative;
-            
+            text-align: center;
+            border: 1px solid var(--border-color);
+            transition: background 0.3s ease;
         }
 
-        .reminder-card h3 { margin: 0 0 10px 0; font-size: 14px; }
+        .reminder-card h3 { font-size: 14px; }
 
         .info-box {
             background: var(--bg-card);
@@ -382,8 +384,7 @@ body::-webkit-scrollbar {
 
 <div class="reminders-section">
         <div class="reminder-card">
-            <h3>Upcoming Payments</h3>
-            <p style="font-size: 12px; opacity: 0.9;">Manage your schedules</p>
+            <h3>Schedule Management</h3>
         </div>
 
         <div class="info-box">
@@ -512,7 +513,7 @@ function renderCalendar() {
             <div style="
                 color: #ff5656;      /* Violet text */
                 font-size: 11px;
-                font-weight: 500;
+                font-weight: 1000;
                 overflow: hidden;
                 text-overflow: ellipsis;
                 white-space: nowrap;

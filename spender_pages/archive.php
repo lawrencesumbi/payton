@@ -45,7 +45,7 @@ if (!empty($searchTerm)) {
     <style>
         /* ===== THEME VARIABLES ===== */
         :root {
-            --bg-body: #f8fafc;
+            --bg-body: #f8fafc; 
             --bg-card: #ffffff;
             --text-main: #1e293b;
             --text-muted: #64748b;

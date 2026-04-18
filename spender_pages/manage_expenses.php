@@ -657,10 +657,7 @@ thead th:last-child {
   border-top-right-radius: 12px;
 }
 
-/* SAME */
-tr:hover {
-  background: var(--accent-purple-light);
-}
+
 
 .receipt-img {
     width: 60px;
