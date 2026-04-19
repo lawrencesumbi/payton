@@ -1,238 +1,224 @@
 <?php
 session_start();
-
-// Capture error or success messages from session
 $error = $_SESSION['error'] ?? '';
 unset($_SESSION['error']);
-
 $success = $_SESSION['success'] ?? '';
 unset($_SESSION['success']);
-
-if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
-    $token = $_COOKIE['remember_me'];
-
-    // Search for a user with this token
-    $stmt = $pdo->prepare("SELECT * FROM users WHERE remember_token = ?");
-    $stmt->execute([$token]);
-    $user = $stmt->fetch();
-
-    if ($user) {
-        // Log them in automatically
-        $_SESSION['user_id'] = $user['id'];
-        $_SESSION['fullname'] = $user['fullname'];
-        $_SESSION['role'] = $user['role'];
-
-        // Redirect to their dashboard
-        header("Location: " . ($user['role'] ?: 'option.php'));
-        exit();
-    }
-}
-
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Login</title>
+  <title>Login | Payton</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link
-  rel="stylesheet"
-  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-  />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    * {margin:0; padding:0; box-sizing:border-box; font-family:'Inter',sans-serif;}
+    :root {
+        --primary-purple: #7f308f;
+        --primary-hover: #6a257a;
+        --text-dark: #1a0b22;
+        --text-muted: #6b7280;
+        --input-border: #e5e7eb;
+    }
+
+    * { margin:0; padding:0; box-sizing:border-box; font-family:'Plus Jakarta Sans', sans-serif; }
     
     body {
-        min-height:100vh; 
-        display:flex; 
-        justify-content:center; 
-        align-items:center; 
-        background:linear-gradient(135deg,#f7f7f7,#6f47fd);
-        /* This creates the gap/margin around the container on mobile */
+        min-height: 100vh; 
+        display: flex; 
+        justify-content: center; 
+        align-items: center; 
+        background: linear-gradient(135deg, #f3e8ff 0%, #ffffff 100%);
         padding: 20px; 
     }
 
     .login-container {
-        background:#fff; 
-        width:100%; 
-        max-width:900px; 
-        min-height:600px; 
-        display:flex; 
-        flex-direction:column; /* Mobile stack */
-        border-radius:20px; 
-        overflow:hidden; 
-        box-shadow:0 10px 30px rgba(0,0,0,0.15);
+        background: #fff; 
+        width: 100%; 
+        max-width: 900px; 
+        display: flex; 
+        flex-direction: column; 
+        border-radius: 24px; 
+        overflow: hidden; 
+        box-shadow: 0 20px 50px rgba(0,0,0,0.08);
     }
 
-    /* Mobile Layout Order (Branding on top, Form on bottom) */
+    /* LEFT SECTION - BRANDING */
     .login-left {
-        width:100%; 
-        background:#fff; 
-        padding:30px; 
-        display:flex; 
-        flex-direction:column; 
-        justify-content:center; 
-        text-align:center;
-        order: 1;
+        width: 100%; 
+        padding: 40px 30px; 
+        background: #fff;
+        display: flex; 
+        flex-direction: column; 
+        justify-content: center; 
+        align-items: center;
+        text-align: center;
     }
 
+    /* ONE-LINE SMALLER HEADER */
+    .login-left h1 { 
+        font-size: 1.4rem; /* Smaller size */
+        font-weight: 700; 
+        color: var(--text-dark); 
+        white-space: nowrap; /* Forces one line */
+        letter-spacing: -0.5px;
+    }
+
+    /* IMAGE BLENDING EFFECT */
+    .image-box {
+        position: relative;
+        margin: 20px 0;
+        width: 100%;
+        max-width: 280px;
+        display: flex;
+        justify-content: center;
+    }
+
+    .big-icon {
+        width: 100%;
+        height: auto;
+        mix-blend-mode: multiply; /* Blends white background of JPG with the page */
+        position: relative;
+        z-index: 2;
+    }
+
+    .image-box::after {
+        content: '';
+        position: absolute;
+        width: 70%; height: 70%;
+        background: radial-gradient(circle, rgba(127, 48, 143, 0.15) 0%, transparent 70%);
+        top: 15%;
+        filter: blur(20px);
+        z-index: 1;
+    }
+
+    .desc { font-size: 14px; color: var(--text-muted); line-height: 1.5; max-width: 280px; }
+
+    /* RIGHT SECTION - FORM */
     .login-right {
-        width:100%; 
-        padding:30px; 
-        background:#f5f3f5; 
-        display:flex; 
-        flex-direction:column; 
-        justify-content:center; 
-        position:relative;
-        order: 2;
+        width: 100%; 
+        padding: 40px; 
+        background: #fafafa; 
+        position: relative;
     }
 
-    .login-left h1 {font-size:24px; font-weight:700; color:#353435; margin-bottom:10px;}
-    .login-left .desc {font-size:14px; color:#666; line-height:1.5;}
-    .big-icon {width:200px; height:auto; margin:20px auto;}
+    .form-header { margin-bottom: 25px; }
+    .form-header h2 { font-size: 24px; font-weight: 800; color: var(--text-dark); margin-bottom: 5px; }
+    .form-header p { font-size: 14px; color: var(--text-muted); }
+    .form-header a { color: var(--primary-purple); font-weight: 600; text-decoration: none; }
 
-    .form-header {margin-bottom: 15px;}
-    .form-header h2 {font-size:28px; font-weight:800; color:#222; text-align:center; margin-bottom:6px;}
-    .form-header p {font-size:13px; color:#777; text-align:center;}
-    .form-header a {color:#7f308f; font-weight:700; text-decoration:none;}
-    .form-header a:hover {text-decoration:underline;}
-
-    .form-group {margin-bottom:22px; position:relative;}
-    .form-group label {display:block; margin-bottom:6px; font-size:13px; font-weight:600; color:#777;}
+    .form-group { margin-bottom: 20px; }
+    .form-group label { display: block; margin-bottom: 6px; font-size: 13px; font-weight: 600; color: var(--text-dark); }
     
-    .password-wrapper { position: relative; width: 100%; display: flex; align-items: center; }
-    
-    /* Unified input styling */
-    .form-group input[type="text"], 
-    .form-group input[type="password"] {
-        width:100%; 
-        padding:10px 35px 10px 2px; 
-        border:none; 
-        border-bottom:2px solid #ddd; 
-        font-size:14px; 
-        background:transparent; 
-        outline:none; 
-        color:#333;
-        transition: 0.3s;
+    .input-wrapper { position: relative; width: 100%; }
+    .form-group input {
+        width: 100%; 
+        padding: 12px 16px; 
+        border: 1.5px solid var(--input-border);
+        border-radius: 12px; 
+        font-size: 14px; 
+        background: #fff; 
+        outline: none; 
+        transition: 0.2s;
     }
-    .form-group input:focus {border-bottom:2px solid #7f308f;}
+    .form-group input:focus { border-color: var(--primary-purple); box-shadow: 0 0 0 4px rgba(127, 48, 143, 0.08); }
 
     .show-hide {
-        position: absolute;
-        right: 10px;
-        bottom: 10px;
-        cursor: pointer;
-        color: #777;
-        z-index: 10;
+        position: absolute; right: 15px; top: 50%; transform: translateY(-50%);
+        cursor: pointer; color: var(--text-muted); font-size: 14px;
     }
 
     .form-forgot {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 30px;
+        display: flex; justify-content: space-between; align-items: center;
+        margin-bottom: 25px; font-size: 13px;
     }
+    .form-forgot label { display: flex; align-items: center; gap: 6px; cursor: pointer; color: var(--text-muted); }
+    .form-forgot input { accent-color: var(--primary-purple); }
+    .form-forgot a { color: var(--primary-purple); font-weight: 600; text-decoration: none; }
 
-    .form-forgot label { font-size: 13px; color: #444; cursor: pointer; display: flex; align-items: center; gap: 5px;}
-    .form-forgot p, .form-forgot a { font-size: 13px; text-decoration: none;}
-    .form-forgot a { color: #7f308f; font-weight: 700; }
+    .login-btn {
+        width: 100%; padding: 14px; border: none; border-radius: 12px;
+        background: var(--primary-purple); color: #fff; font-size: 15px; font-weight: 700;
+        cursor: pointer; transition: 0.3s;
+    }
+    .login-btn:hover { background: var(--primary-hover); transform: translateY(-1px); box-shadow: 0 10px 20px rgba(127, 48, 143, 0.2); }
 
-    .login-btn {width:100%; padding:13px; border:none; border-radius:20px; background:#7f308f; color:#fff; font-size:14px; font-weight:700; cursor:pointer; margin-top:5px; transition:0.3s;}
-    .login-btn:hover {background:#9357f5;}
+    .close-btn { position: absolute; top: 20px; right: 25px; font-size: 1.5rem; color: #ccc; text-decoration: none; transition: 0.2s; }
+    .close-btn:hover { color: var(--text-dark); }
 
-    .close-btn {position:absolute; top:20px; right:25px; font-size:1.5rem; font-weight:bold; color:#7f308f; text-decoration:none; z-index: 20;}
+    .alert { padding: 10px; border-radius: 8px; font-size: 13px; margin-bottom: 15px; text-align: center; }
+    .error-box { background: #fee2e2; color: #dc2626; border: 1px solid #fecaca; }
 
-    .error-box {color:#e74c3c; font-size:13px; margin-bottom:15px; text-align:center;}
-    .success-box {color:#27ae60; font-size:13px; margin-bottom:15px; text-align:center;}
-
-    /* DESKTOP VIEW */
+    /* DESKTOP STYLING */
     @media (min-width: 768px) {
-        .login-container {flex-direction:row;}
-        .login-left {width:50%; padding:45px; order: 1;}
-        .login-right {width:50%; padding:45px; order: 2;}
-        .login-left h1 {font-size:28px;}
-        .big-icon {width:350px; height:auto; margin-top:20px;}
+        .login-container { flex-direction: row; min-height: 550px; }
+        .login-left { width: 45%; padding: 50px; border-right: 1px solid #f3f4f6; }
+        .login-right { width: 55%; padding: 60px; }
+        .login-left h1 { font-size: 1.6rem; }
     }
-</style>
+  </style>
 </head>
 <body>
 
 <div class="login-container">
-
-  <!-- LEFT SECTION -->
+  
   <div class="login-left">
     <h1>Welcome to Payton!</h1>
-    <img src="img/login-icon.jpg" alt="Login Icon" class="big-icon">
-    <p class="desc">Welcome back! Please login to continue and access your account.</p>
+    <div class="image-box">
+        <img src="img/login-icon.jpg" alt="Login Icon" class="big-icon">
+    </div>
+    <p class="desc">Log in to your account to manage your settings and view your dashboard.</p>
   </div>
 
-  <!-- RIGHT SECTION -->
   <div class="login-right">
-
     <a href="index.php" class="close-btn">×</a>
 
     <div class="form-header">
-      <h2>Welcome Guest!</h2>
-      <p>Don't have an account? <a href="register.php">Sign Up</a></p>
+      <h2>Guest Login</h2>
+      <p>No account? <a href="register.php">Create one</a></p>
     </div>
 
-    <!-- DISPLAY ERRORS / SUCCESS -->
     <?php if($error): ?>
-      <div class="error-box"><?= htmlspecialchars($error) ?></div>
+      <div class="alert error-box"><?= htmlspecialchars($error) ?></div>
     <?php endif; ?>
 
-    <?php if($success): ?>
-      <div class="success-box"><?= htmlspecialchars($success) ?></div>
-    <?php endif; ?>
-
-    <!-- LOGIN FORM -->
     <form action="login_process.php" method="POST">
       <div class="form-group">
-          <label for="email">Email</label>
-          <input type="text" name="email" id="email" 
-                value="<?= $_COOKIE['user_email'] ?? '' ?>" required>
+          <label>Email Address</label>
+          <div class="input-wrapper">
+            <input type="text" name="email" value="<?= $_COOKIE['user_email'] ?? '' ?>" required placeholder="Enter your email">
+          </div>
       </div>
 
       <div class="form-group">
-          <label for="password">Password</label>
-          <div class="password-wrapper"> <input type="password" name="password" id="password" 
-                    value="<?= $_COOKIE['user_password'] ?? '' ?>" required>
-          <i class="fa-solid fa-eye show-hide" id="togglePassword"></i>          </div>
+          <label>Password</label>
+          <div class="input-wrapper">
+              <input type="password" name="password" id="password" required placeholder="••••••••">
+              <i class="fa-solid fa-eye show-hide" id="togglePassword"></i>
+          </div>
       </div>
 
       <div class="form-forgot">
-          <label>
-              <input type="checkbox" name="remember_me" <?= isset($_COOKIE['user_email']) ? 'checked' : '' ?>> 
-              Remember me
-          </label>
-          <p><a href="forgotpassword.php">Forgot Password?</a></p>
+          <label><input type="checkbox" name="remember_me" <?= isset($_COOKIE['user_email']) ? 'checked' : '' ?>> Remember me</label>
+          <a href="forgotpassword.php">Forgot Password?</a>
       </div>
 
       <button type="submit" class="login-btn">Login</button>
     </form>
-
   </div>
-
 </div>
-<script>
- const password = document.getElementById("password");
-const togglePassword = document.getElementById("togglePassword");
 
-togglePassword.addEventListener("click", () => {
-    // 1. Toggle the type first
-    if (password.type === "password") {
-        password.type = "text";
-        // Show the slash when text is visible
-        togglePassword.classList.remove("fa-eye");
-        togglePassword.classList.add("fa-eye-slash");
-    } else {
-        password.type = "password";
-        // Show the regular eye when text is hidden
-        togglePassword.classList.remove("fa-eye-slash");
-        togglePassword.classList.add("fa-eye");
-    }
-});
+<script>
+    const password = document.getElementById("password");
+    const togglePassword = document.getElementById("togglePassword");
+
+    togglePassword.addEventListener("click", () => {
+        const type = password.type === "password" ? "text" : "password";
+        password.type = type;
+        togglePassword.classList.toggle("fa-eye");
+        togglePassword.classList.toggle("fa-eye-slash");
+    });
 </script>
 </body>
 </html>

@@ -22,7 +22,7 @@ $allowed_pages = [
     'admin_scheduler_oversight', 
     'admin_expense_transaction_monitoring', 
     'admin_activity_logs',
-    'notifications',
+    'admin_notifications',
     'admin_my_account'
 ];
 
@@ -284,7 +284,7 @@ $searchTerm = $_GET['search'] ?? '';
             </button>
           </form>
           <i class="fa-solid fa-sun" id="themeToggle" style="cursor: pointer;"></i>
-          <a href="?page=notifications" class="notif-wrapper" style="color: inherit; position:relative;">
+          <a href="?page=admin_notifications" class="notif-wrapper" style="color: inherit; position:relative;">
               <i class="fa-solid fa-bell"></i>
               <?php if ($unreadCount > 0): ?><span class="notif-badge"><?= $unreadCount ?></span><?php endif; ?>
           </a>

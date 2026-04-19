@@ -94,6 +94,9 @@ $email = $userData['email'] ?? '';
 $phone = $userData['phone'] ?? '';
 $profilePath = (!empty($userData['profile_pic']) && file_exists($userData['profile_pic'])) ? $userData['profile_pic'] : 'profile/default.jpg';
 
+// --- ADDED PHILIPPINES PHONE VALIDATION LOGIC ---
+$is_valid_ph = preg_match('/^(09|\+639)\d{9}$/', $phone);
+
 $progress = 10;
 if (!empty($fullname)) $progress += 20;
 if (!empty($email)) $progress += 20;
@@ -111,11 +114,14 @@ $progress = min(100, $progress);
         --bg-main: #f8fafc;
         --card-bg: #ffffff;
         --primary: #6366f1;
+        --border: #e2e8f0;
+        --primary-hover: #943acf;
         --text-dark: #0f172a;
         --text-muted: #64748b;
         --border: #e2e8f0;
         --radius-lg: 24px;
         --shadow-md: 0 10px 15px -3px rgba(0,0,0,0.04);
+        --danger: #ef4444;
     }
 
     [data-theme="dark"] {
@@ -151,12 +157,10 @@ $progress = min(100, $progress);
     .form-group input { width: 100%; padding: 14px 16px; border-radius: 14px; border: 1px solid var(--border); background: var(--card-bg); color: var(--text-dark); transition: border-color 0.2s ease, box-shadow 0.2s ease; }
     .form-group input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.1); }
 
-    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 22px; border-radius: 14px; font-weight: 700; cursor: pointer; transition: transform 0.2s ease, background 0.2s ease; border: none; }
-    .btn-primary { background: var(--primary); color: #fff; }
-    .btn-primary:hover { background: #4f46e5; transform: translateY(-1px); }
-    .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-dark); }
-    .btn-outline:hover { background: var(--bg-main); }
-
+    .btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 10px; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.2s; border: none;}
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:hover { background: var(--primary-hover); transform: translateY(-1px); }
+    .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-main); }
     .sidebar-summary { display: grid; gap: 24px; }
     .summary-card { background: var(--card-bg); border-radius: 20px; border: 1px solid var(--border); padding: 24px; }
     .summary-card h3 { font-size: 16px; margin-bottom: 18px; color: var(--text-dark); }
@@ -187,18 +191,24 @@ $progress = min(100, $progress);
                             <form method="post" enctype="multipart/form-data" id="photoForm" style="display:inline-flex; gap:10px; flex-wrap:wrap;">
                                 <input type="hidden" name="update_photo" value="1">
                                 <input type="file" name="profile_pic" id="profilePicInput" accept=".jpg,.jpeg,.png" hidden onchange="document.getElementById('photoForm').submit();">
+                                
                                 <button type="button" class="btn btn-outline" onclick="document.getElementById('profilePicInput').click();">
                                     <i class="fa-solid fa-camera"></i> Change Photo
                                 </button>
+                                
                                 <button type="submit" class="btn btn-primary">Save Photo</button>
                             </form>
-                            <form method="post" style="display:inline-flex; align-items:center;">
-                                <button type="submit" name="remove_photo" class="btn btn-outline" style="color:#dc2626; border-color:#f7d3d3;">
-                                    <i class="fa-solid fa-trash-can"></i> Remove Photo
-                                </button>
-                            </form>
+
+                            <?php if (!empty($userData['profile_pic']) && file_exists($userData['profile_pic'])): ?>
+                                <form method="post" style="display:inline;">
+                                    <button type="submit" name="remove_photo" class="btn btn-outline" style="color: var(--danger); border-color: rgba(239, 68, 68, 0.3);"
+                                            onclick="return confirm('Are you sure you want to remove your profile picture?');">
+                                        <i class="fa-solid fa-trash-can"></i> Remove
+                                    </button>
+                                </form>
+                            <?php endif; ?>
                         </div>
-                    </div>
+                     </div>
                 </div>
             </div>
 
@@ -279,4 +289,46 @@ $progress = min(100, $progress);
             return;
         }
     });
+
+    // 1. LIVE PROFILE PHOTO PREVIEW
+    document.getElementById('profilePicInput').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            // Basic validation
+            const allowed = ['image/png', 'image/jpeg', 'image/jpg'];
+            if (!allowed.includes(file.type)) {
+                showNotif("Only JPG and PNG allowed", "error");
+                this.value = '';
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                document.getElementById('profilePreview').src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // 2. TOAST NOTIFICATION LOGIC
+    function showNotif(text, type) {
+        const toast = document.getElementById('notif-toast');
+        const icon = document.getElementById('notif-icon');
+        const msg = document.getElementById('notif-msg');
+
+        if (!toast) return; // Guard clause
+
+        msg.innerText = text;
+        toast.style.borderLeftColor = (type === 'success') ? '#10b981' : '#ef4444';
+        icon.className = (type === 'success') ? 'fa-solid fa-circle-check' : 'fa-solid fa-circle-exclamation';
+        icon.style.color = (type === 'success') ? '#10b981' : '#ef4444';
+
+        toast.classList.add('show');
+        setTimeout(() => { toast.classList.remove('show'); }, 3000);
+    }
+
+    // 3. TRIGGER TOAST FROM PHP SESSION
+    <?php if (isset($message)): ?>
+        showNotif("<?= $message['text'] ?>", "<?= $message['type'] ?>");
+    <?php endif; ?>
 </script>

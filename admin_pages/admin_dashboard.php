@@ -231,7 +231,7 @@ $recent_logs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 .stat-item { padding: 28px; display: flex; justify-content: space-between; align-items: flex-start; }
 .stat-label { color: var(--text-muted); font-size: 14px; font-weight: 500; margin: 0 0 8px 0; }
 .stat-value { font-size: 28px; margin: 0; font-weight: 800; letter-spacing: -0.02em; }
-.stat-value small { font-size: 18px; color: var(--border); margin: 0 4px; }
+.stat-value small { font-size: 18px; color: var(--text-muted); font-weight: 500; margin: 0 4px; }
 .trend-up { font-size: 14px; color: var(--text-muted); font-weight: 500; }
 .trend-label { font-size: 11px; color: var(--text-muted); display: block; margin-top: 4px; }
 
@@ -248,15 +248,45 @@ $recent_logs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 .dot-menu { color: var(--border); cursor: pointer; font-size: 18px; }
 
 /* Chart Styling */
-.chart-wrapper { position: relative; height: 320px; width: 100%; padding: 24px; display: flex; justify-content: center; align-items: center; }
+.chart-section, .activity-section {
+    height: 480px; /* Adjust this value to your preferred overall height */
+    display: flex;
+    flex-direction: column;
+}
+
+/* Ensure the wrapper and list take up the remaining space */
+.chart-wrapper {
+    flex: 1; 
+}
 #chart-fallback { color: var(--text-muted); font-size: 14px; }
 .hidden { display: none; }
 
 /* Activity List Styling */
-.activity-list { padding: 8px 0; }
-.activity-row { 
-    display: flex; align-items: center; gap: 16px; padding: 18px 24px;
-    border-bottom: 1px solid var(--border); transition: background 0.2s;
+.activity-list {
+    flex: 1;
+    overflow-y: auto; /* Enable scrolling */
+    padding: 8px 0;
+    
+    /* Hide scrollbar for Chrome, Safari and Opera */
+    -webkit-overflow-scrolling: touch;
+}
+
+.activity-list::-webkit-scrollbar {
+    display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.activity-list {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}.activity-row { 
+    flex-shrink: 0; /* Prevents rows from squishing to fit */
+    display: flex; 
+    align-items: center; 
+    gap: 16px; 
+    padding: 18px 24px;
+    border-bottom: 1px solid var(--border); 
+    transition: background 0.2s;
 }
 .activity-row:last-child { border-bottom: none; }
 .activity-row:hover { background: var(--bg-main); }

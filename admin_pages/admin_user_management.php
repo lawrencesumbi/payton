@@ -289,11 +289,25 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 .modal-header h3 { margin: 0; font-size: 18px; font-weight: 700; }
 .modal-close { 
-    background: none; border: none; font-size: 24px; cursor: pointer; 
-    color: var(--text-muted); padding: 0; width: 32px; height: 32px; 
-    display: grid; place-items: center; border-radius: 8px;
+    background: transparent !important; /* Force removal of the purple background */
+    border: none; 
+    font-size: 24px; 
+    cursor: pointer; 
+    color: var(--text-muted); 
+    padding: 0; 
+    width: 32px; 
+    height: 32px; 
+    display: grid; 
+    place-items: center; 
+    border-radius: 8px;
+    outline: none;
+    box-shadow: none !important; /* In case it's a shadow causing the shape */
 }
-.modal-close:hover { background: var(--bg-main); color: var(--text-dark); }
+
+.modal-close:hover { 
+    background: rgba(0, 0, 0, 0.05) !important; /* Subtle gray hover instead of purple */
+    color: var(--text-dark); 
+}
 
 .edit-form { padding: 24px; }
 .form-group { margin-bottom: 20px; }
