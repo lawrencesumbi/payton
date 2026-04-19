@@ -51,6 +51,7 @@ $people = $stmt->fetchAll(PDO::FETCH_ASSOC);
             --accent-red-border: #fee2e2;
             --shadow: rgba(0,0,0,0.1);
             --header-bg: #fafafa;
+            --accent-purple-light: #f5f0ff;
         }
 
         [data-theme="dark"] {
@@ -67,6 +68,7 @@ $people = $stmt->fetchAll(PDO::FETCH_ASSOC);
             --accent-red-border: #7f1d1d;
             --shadow: rgba(0,0,0,0.2);
             --header-bg: #242833;
+            --accent-purple-light: #373250;
         }
 
         body{background: var(--bg-body); margin:0; font-family:'Inter', sans-serif; color: var(--text-main); transition: background 0.3s ease;}
@@ -110,9 +112,9 @@ $people = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         .table-scroll {
             flex: 1;
-  max-height: calc(100vh - 200px); /* viewport - topbar - margin/padding */
-  overflow-y: auto;
-  overflow-x: auto;
+            max-height: calc(100vh - 225px); /* viewport - topbar - margin/padding */
+            overflow-y: auto;
+            overflow-x: auto;
             
             flex-grow: 1;
             /* Hide scrollbar for Chrome, Safari and Opera */
@@ -201,6 +203,22 @@ $people = $stmt->fetchAll(PDO::FETCH_ASSOC);
             background:none;
             font-size:16px;
         }
+        .header {
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            
+            
+        }
+
+        .header i {
+            font-size: 24px;
+            color: var(--accent-purple);
+            background: var(--accent-purple-light);
+            padding: 12px;
+            border-radius: 12px;
+        }
     </style>
 </head>
 
@@ -210,9 +228,16 @@ $people = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 <div class="container">
 
-    <div class="header">
-        <h2>Manage Friends</h2>
-        <button class="btn btn-primary" onclick="openModal()">+ Add Friend</button>
+    <div class="header" style="display: flex; align-items: center; width: 100%;">
+        <i class="fa-solid fa-user-group"></i>
+        <div>
+            <h1 style="font-size: 24px; font-weight: 900; color: var(--text-main); margin: 0;">Manage Friends</h1>
+            <p style="color: var(--text-muted); font-size: 14px; margin: 0;">Add your friend and start splitting expense.</p>
+        </div>
+
+        <div class="button" style="margin-left: auto;">
+            <button class="btn btn-primary" onclick="openModal()">+ Add Friend</button>
+        </div>
     </div>
 
     <div class="card">
@@ -236,16 +261,16 @@ $people = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             <td style="color: var(--text-muted); font-size: 0.9rem;"><?= $num++ ?>.</td> <td><?= htmlspecialchars($p['name']) ?></td>
                             <td><?= htmlspecialchars($p['email']) ?></td>
                             <td><?= date("M d, Y", strtotime($p['created_at'])) ?></td>
-                            <td style="text-align:right; display: flex; justify-content: flex-end; gap: 10px;">
-                                <button class="btn btn-edit" style="margin-top:0;" onclick='openEditModal(<?= json_encode($p) ?>)'>
-                                    Edit
-                                </button>
+                                <td style="text-align:right; display: flex; justify-content: flex-end; gap: 10px;">
+                                    <button class="btn btn-edit" style="margin-top:0;" onclick='openEditModal(<?= json_encode($p) ?>)'>
+                                        Edit
+                                    </button>
 
-                                <form method="POST" action="add_delete_people.php" onsubmit="return confirm('Remove this person?');">
-                                    <input type="hidden" name="person_id" value="<?= $p['id'] ?>">
-                                    <button name="delete_person" class="btn btn-danger" style="margin-top:0;">Remove</button>
-                                </form>
-                            </td>
+                                    <form method="POST" action="add_delete_people.php" onsubmit="return confirm('Remove this person?');">
+                                        <input type="hidden" name="person_id" value="<?= $p['id'] ?>">
+                                        <button name="delete_person" class="btn btn-danger" style="margin-top:0;">Remove</button>
+                                    </form>
+                                </td>
                         </tr>
                         <?php endforeach; ?>
                     <?php else: ?>

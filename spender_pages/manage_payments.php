@@ -114,6 +114,8 @@ foreach ($allStats as $s) {
     --accent-red-light: #ffecec;
     --success: #62C976;
     --success-bg: #fff;
+    --header-bg: #fafafa;
+    --accent-red-border: #fee2e2;
 }
 
 [data-theme="dark"] {
@@ -134,6 +136,8 @@ foreach ($allStats as $s) {
     --accent-red-light: #451a1a;
     --success: #22c55e;
     --success-bg: #191c24;
+    --header-bg: #242833;
+    --accent-red-border: #7f1d1d;
 }
 
 body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg-body); margin: 0; color: var(--text-main); transition: background 0.3s ease; }
@@ -202,11 +206,9 @@ body::-webkit-scrollbar {
 .table-wrapper::-webkit-scrollbar-thumb:hover { background: var(--accent-purple); }
 
 table { width: 100%; border-collapse: collapse; }
-th { 
-    background: var(--accent-purple); color: white; padding: 12px; 
-    position: sticky; top: 0; z-index: 10; /* Keeps header visible while scrolling */
-}
-td { padding: 12px; border-bottom: .5px solid var(--border-table); text-align: center; color: var(--text-main); }
+th {position: sticky; top: 0;z-index: 10; background: var(--header-bg); padding: 12px 20px; text-align: left; font-size: 0.75rem; color: var(--text-muted); border-bottom: 1px solid var(--border-color); text-transform: uppercase; }
+td { padding: 16px 20px; border-bottom: 1px solid var(--border-color); font-size: 0.9rem; color: var(--text-main); }
+tr:hover { background: var(--table-hover); }
 
 .paid { color: green; font-weight: bold; }
 .unpaid { color: orange; font-weight: bold; }
@@ -215,8 +217,21 @@ td { padding: 12px; border-bottom: .5px solid var(--border-table); text-align: c
 /* --- BUTTONS & ACTIONS --- */
 .actions { display: flex; justify-content: center; gap: 8px; }
 .btn-edit, .btn-delete { padding: 6px 10px; border-radius: 8px; font-size: 13px; font-weight: 700; text-decoration: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; height: 34px; }
-.btn-edit { background: var(--accent-purple-light); color: var(--accent-purple); }
-.btn-delete { background: var(--accent-red-light); color: var(--accent-red); }
+.btn-edit {
+            background: var(--border-light); /* Subtle background */
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-edit:hover {
+            background: var(--border-color);
+            border-color: var(--text-muted);
+        }
+.btn-delete {
+  background: var(--accent-red-light);
+  color: var(--accent-red);
+  border: 1px solid var(--accent-red-border);
+}
 .fab { position: fixed; bottom: 30px; right: 30px; background: var(--accent-purple); color: white; font-size: 26px; border: none; width: 60px; height: 60px; border-radius: 50%; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
 
 /* --- MODAL --- */
@@ -326,10 +341,10 @@ td { padding: 12px; border-bottom: .5px solid var(--border-table); text-align: c
                         <td class="<?= strtolower($p['status'] ?? '') ?>"><?= ucfirst($p['status'] ?? '') ?></td>
                         <td class="actions"> 
                             <?php if (strtolower($p['status']) !== 'paid'): ?>
-                                <a href="javascript:void(0);" class="btn-edit" onclick="openEditModal(<?= $p['id'] ?>)">✏️ Update</a>
+                                <a href="javascript:void(0);" class="btn-edit" onclick="openEditModal(<?= $p['id'] ?>)">Update</a>
                             <?php endif; ?>
                             
-                            <a href="delete_payment.php?id=<?= $p['id'] ?>" class="btn-delete" onclick="return confirm('Delete?');">🗑 Delete</a>
+                            <a href="delete_payment.php?id=<?= $p['id'] ?>" class="btn-delete" onclick="return confirm('Delete this payment?');">Delete</a>
                         </td>
                     </tr>
                     <?php endforeach; ?>

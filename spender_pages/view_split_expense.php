@@ -70,6 +70,7 @@
                 --primary: #7c3aed; --bg: #f8fafc; --card: #ffffff;
                 --text-main: #1e293b; --text-muted: #64748b;
                 --success: #22c55e; --danger: #ef4444; --border: #e2e8f0;
+                --accent-purple-light: #f5f0ff;
             }
 
             [data-theme="dark"] {
@@ -78,13 +79,14 @@
                 --text-main: #f8fafc;
                 --text-muted: #94a3b8;
                 --border: #2a2e39;
+                --accent-purple-light: #373250;
             }
             body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text-main); margin: 0; }
             
             html, body { height: 100%; margin: 0; padding: 0; -ms-overflow-style: none; scrollbar-width: none; }
             html::-webkit-scrollbar, body::-webkit-scrollbar { display: none; width: 0 !important; height: 0 !important; }
 
-            .container { width: 100%; padding: 0 20px; box-sizing: border-box; padding-top: 20px; }
+            .container { width: 100%; box-sizing: border-box; }
             .selector { width: 100%; padding: 14px; border-radius: 12px; border: 2px solid var(--border); background: var(--card); font-weight: 600; font-family: inherit; cursor: pointer; margin-bottom: 24px; }
             .split-container { display: flex; background: var(--card); border-radius: 24px; border: 1px solid var(--border); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); overflow: hidden; min-height: 460px; }
             .left-col { flex: 1; padding: 40px; background: linear-gradient(145deg, var(--primary), #4f46e5); color: white; display: flex; flex-direction: column; justify-content: center; }
@@ -119,9 +121,21 @@
 
             @media (max-width: 850px) { .split-container { flex-direction: column; } }
 
+.selection {
+    display: flex;
+}
+
+.field-label {
+    padding: 14px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    width: 20%;
+}
             /* Base styles for the selector */
 .selector {
-    width: 100%;
+    width: 80%;    
     padding: 14px;
     border-radius: 12px;
     border: 2px solid var(--border);
@@ -155,6 +169,21 @@
     color: #f8fafc;
     border-color: #2a2e39;
 }
+
+.header {
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header i {
+            font-size: 24px;
+            color: var(--accent-purple);
+            background: var(--accent-purple-light);
+            padding: 12px;
+            border-radius: 12px;
+        }
         </style>
     </head>
     <body>
@@ -183,16 +212,27 @@
         <?php endif; ?>
     </div>
 
+    <div class="header">
+        <i class="fa-solid fa-diagram-predecessor"></i> 
+        <div>
+            <h1 style="font-size: 24px; font-weight: 900; color: var(--text-main);">Splitting Breakdown</h1>
+            <p style="color: var(--text-muted); font-size: 14px;">See whose involved in splitting.</p>
+        </div>
+    </div>
+
     <div class="container">
         <form method="GET">
             <input type="hidden" name="page" value="view_split_expense">
-            <select name="expense_id" class="selector" onchange="this.form.submit()">
-                <?php foreach($all_expenses as $ex): ?>
-                    <option value="<?= $ex['id'] ?>" <?= $ex['id']==$expense_id?'selected':'' ?>>
-                        <?= htmlspecialchars($ex['description']) ?> (₱<?= number_format($ex['amount'], 2) ?>)
-                    </option>
-                <?php endforeach; ?>
-            </select>
+            <div class="selection">
+                <label for="expense_id" class="field-label"> Select Split Expense:</label>
+                <select name="expense_id" class="selector" onchange="this.form.submit()">
+                    <?php foreach($all_expenses as $ex): ?>
+                        <option value="<?= $ex['id'] ?>" <?= $ex['id']==$expense_id?'selected':'' ?>>
+                            <?= htmlspecialchars($ex['description']) ?> (₱<?= number_format($ex['amount'], 2) ?>)
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
         </form>
 
         <div class="split-container">

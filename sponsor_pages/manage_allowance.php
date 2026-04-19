@@ -115,7 +115,6 @@ function getStatusBadge($status) {
     }
 
     .main-content {
-        padding: 0 20px;
         width: 100%;
         margin: 0 auto;
     }
@@ -124,7 +123,7 @@ function getStatusBadge($status) {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 30px;
+        margin-bottom: 20px;
     }
 
     .header-section h1 {
@@ -450,7 +449,7 @@ function getStatusBadge($status) {
 </div>
 
 <div class="main-content">
-    <div class="header-section mt-4">
+    <div class="header-section">
         <div>
             <h1>Allowance Overview</h1>
             <p>Tracking all active allowance.</p>

@@ -219,7 +219,7 @@ if (!empty($searchTerm)) {
     <?php if (empty($inactiveBudgets)): ?>
         <div class="budget-group no-data">
             <i class="fa-solid fa-folder-open" style="font-size: 40px; margin-bottom: 15px; opacity: 0.3;"></i>
-            <p>No inactive budgets found in your history.</p>
+            <p>No inactive expense found in your history.</p>
         </div>
     <?php endif; ?>
 

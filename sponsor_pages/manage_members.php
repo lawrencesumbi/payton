@@ -64,8 +64,8 @@ $students = $stmt->fetchAll(PDO::FETCH_ASSOC);
         html, body { height: 100%; -ms-overflow-style: none; scrollbar-width: none; }
         html::-webkit-scrollbar, body::-webkit-scrollbar { display: none; }
 
-        .container { width: 100%; padding: 0 20px; box-sizing: border-box; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding-top: 20px; }
+        .container { width: 100%; box-sizing: border-box; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
         
         /* TOAST STYLES */
         .toast-container { position:fixed; top:20px; right:20px; z-index:9999; }

@@ -205,6 +205,8 @@ if ($prevMonthTotal > 0) {
       --accent-orange: #f89b1c;        /* A slightly richer orange for light mode */
       --accent-orange-light: #fff7ed;  /* The background you're currently using */
       --border-orange: #ffe2c3;
+      --header-bg: #fafafa;
+      --accent-red-border: #fee2e2;
     }
 
     [data-theme="dark"] {
@@ -224,12 +226,14 @@ if ($prevMonthTotal > 0) {
       --accent-green: #22c55e;
       --accent-green-light: #14532d;
       --accent-red: #ef4444;
-      --accent-red-light: #7f1d1d;
+      --accent-red-light: #451a1a;
       --shadow: rgba(0,0,0,0.2);
       --shadow-light: rgba(0,0,0,0.1);
       --accent-orange: #fb923c;        /* Vibrant orange for dark mode */
       --accent-orange-light: #2d1a10;  /* Deep brownish-orange background */
       --border-orange: #432719; 
+      --header-bg: #242833;
+      --accent-red-border: #7f1d1d;
     }
 
     * { margin:0; padding:0; box-sizing:border-box; }
@@ -288,10 +292,10 @@ if ($prevMonthTotal > 0) {
 
 .analytics-header i {
   font-size: 20px;
-  color: var(--accent-blue);
-  background: var(--accent-blue-light);
-  width: 48px;
-  height: 48px;
+  color: var(--accent-purple);
+  background: var(--accent-purple-light);
+  width: 42px;
+  height: 42px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -393,8 +397,8 @@ if ($prevMonthTotal > 0) {
   border: none;
 }
 
-.trend-up { color: var(--accent-green); font-weight:800; }
-.trend-down { color: var(--accent-red); font-weight:800; }
+.trend-up { color: var(--text-muted); font-weight:800; }
+.trend-down { color: var(--text-muted); font-weight:800; }
 
 .stat-label {
   font-size: 10px;
@@ -428,7 +432,7 @@ if ($prevMonthTotal > 0) {
 .stat-blue::before { background: var(--accent-blue); }
 
 .stat-purple {
-  background: var(--accent-purple-light);
+  
   border: 1px solid var(--border-light);
 }
 .stat-purple::before { background: var(--accent-purple); }
@@ -622,6 +626,14 @@ h2 {
   box-shadow: 0 6px 15px var(--shadow);
   border: 1px solid var(--border-color);
   transition: background 0.3s ease;
+  /* Hide scrollbar for Chrome, Safari and Opera */
+            &::-webkit-scrollbar {
+                display: none;
+            }
+
+            /* Hide scrollbar for IE, Edge and Firefox */
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
 }
 
 /* MODIFIED */
@@ -629,24 +641,15 @@ table {
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
+  
 }
 
 /* SAME */
-th, td { 
-  padding: 12px 15px;
-  text-align: left;
-  border-bottom: 1px solid var(--border-color);
-}
+th {position: sticky; top: 0;z-index: 10; background: var(--header-bg); padding: 12px 20px; text-align: left; font-size: 0.75rem; color: var(--text-muted); border-bottom: 1px solid var(--border-color); text-transform: uppercase; }
+td { padding: 16px 20px; border-bottom: 1px solid var(--border-color); font-size: 0.9rem; color: var(--text-main); }
+tr:hover { background: var(--table-hover); }
 
-/* MODIFIED (Sticky Header Added) */
-thead th {
-  position: sticky;
-  top: 0;
-  background: var(--accent-purple); /* must have background */
-  color: white;
-  font-weight: 700;
-  z-index: 5; /* keeps header above rows */
-}
+
 
 /* Keep rounded corners */
 thead th:first-child {
@@ -673,6 +676,8 @@ thead th:last-child {
   border-bottom: 1px solid var(--border-color); /* Updated */
 }
 
+
+
 .btn-edit,
 .btn-delete {
   padding: 6px 10px;
@@ -688,14 +693,15 @@ thead th:last-child {
 }
 
 .btn-edit {
-  background: var(--accent-purple-light);
-  color: var(--accent-purple);
-}
+            background: var(--border-light); /* Subtle background */
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+        }
 
-.btn-edit:hover {
-  background: var(--accent-purple);
-  color: white;
-}
+        .btn-edit:hover {
+            background: var(--border-color);
+            border-color: var(--text-muted);
+        }
 
 /* Receipt View Button (inside table) */
 .btn-view-receipt {
@@ -743,12 +749,10 @@ thead th:last-child {
 .btn-delete {
   background: var(--accent-red-light);
   color: var(--accent-red);
+  border: 1px solid var(--accent-red-border);
 }
 
-.btn-delete:hover {
-  background: var(--accent-red);
-  color: white;
-}
+
 
     /* FAB */
     .fab {
@@ -1491,7 +1495,7 @@ thead th:last-child {
         </div>
 
         <div class="analytics-grid">
-            <div class="stat-card stat-blue">
+            <div class="stat-card stat-purple">
                 <div class="stat-icon"><i class="fa-solid fa-wallet"></i></div>
                 <div class="stat-card-content">
                     <div class="stat-label">Total Allowance Left</div>
@@ -1512,7 +1516,7 @@ thead th:last-child {
                     <div class="stat-subtitle"><?= count($expenses) ?> transactions</div>
                 </div>
             </div>
-<div class="stat-card stat-green">
+<div class="stat-card stat-purple">
     <div class="stat-icon"><i class="fa-solid fa-layer-group"></i></div>
 
     <div class="stat-card-content">
@@ -1541,7 +1545,7 @@ thead th:last-child {
     </div>
   
 
-            <div class="stat-card stat-orange">
+            <div class="stat-card stat-purple">
                 <div class="stat-icon"><i class="fa-solid fa-calendar-days"></i></div>
                 <div class="stat-card-content">
                     <div class="stat-label">This Month</div>
@@ -1617,9 +1621,9 @@ thead th:last-child {
                                 data-amount="<?= $exp['amount'] ?>"
                                 data-payment="<?= $exp['payment_method_id'] ?>"
                                 data-receipt="<?= htmlspecialchars($exp['receipt_upload']) ?>">
-                                ✏️ Edit
+                                Edit
                             </a>
-                            <a href="delete_expense.php?id=<?= $exp['id'] ?>" class="btn-delete" onclick="return confirm('Delete this expense?');">🗑 Delete</a>
+                            <a href="delete_expense.php?id=<?= $exp['id'] ?>" class="btn-delete" onclick="return confirm('Delete this expense?');">Delete</a>
                         </td>
                     </tr>
                 <?php endforeach; ?>

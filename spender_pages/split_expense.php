@@ -82,6 +82,11 @@ $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
             --shadow: rgba(0,0,0,0.05);
             --accent-purple: #7c3aed;
             --accent-purple-dark: #8c3bf6;
+            --accent-purple-light: #f5f0ff;
+            --header-bg: #fafafa;
+            --accent-red: #ef4444;
+            --accent-red-light: #ffecec;
+            --accent-red-border: #fee2e2;
         }
 
         [data-theme="dark"] {
@@ -97,6 +102,11 @@ $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
             --shadow: rgba(0,0,0,0.2);
             --accent-purple: #a855f7;
             --accent-purple-dark: #a855f7;
+            --accent-purple-light: #373250;
+            --header-bg: #242833;
+            --accent-red: #ef4444;
+            --accent-red-light: #451a1a;
+            --accent-red-border: #7f1d1d;
         }
 
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text-main); margin: 0; transition: background 0.3s ease; }
@@ -115,17 +125,36 @@ $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
             height: 0 !important;
         }
 
-        .container { width:100%; padding: 0 24px; box-sizing: border-box;}
+        .container { width:100%;  box-sizing: border-box;}
         .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; padding-top: 20px; }
         .card { background: var(--bg-card); border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 4px 6px -1px var(--shadow); overflow: hidden; transition: background 0.3s ease; }
         table { width: 100%; border-collapse: collapse; }
-        th { background: var(--accent-purple-dark); padding: 14px 20px; text-align: left; font-size: 14px; text-transform: uppercase; color: white; font-weight: 700; }
-        td { padding: 18px 20px; border-bottom: 1px solid var(--border); color: var(--text-main); }
+        th {position: sticky; top: 0;z-index: 10; background: var(--header-bg); padding: 12px 20px; text-align: left; font-size: 0.75rem; color: var(--text-muted); border-bottom: 1px solid var(--border-color); text-transform: uppercase; }
+        td { padding: 16px 20px; border-bottom: 1px solid var(--border-color); font-size: 0.9rem; color: var(--text-main); }
+        tr:hover { background: var(--table-hover); }
         .btn { padding: 10px 16px; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 0.9rem; transition: 0.2s; border: none; display: inline-flex; align-items: center; gap: 8px; text-decoration: none; }
         .btn-main { background: var(--accent-purple); color: white; }
         .btn-icon { background: transparent; border: 1px solid var(--border); padding: 8px; border-radius: 8px; color: var(--text-main); }
-        .btn-icon:hover { background: var(--border-light); }
-        .btn-delete:hover { color: var(--danger); border-color: var(--danger-light); background: var(--danger-light); }
+        
+
+        .actions { display: flex; justify-content: center; gap: 8px; }
+        .btn-icon, .btn-edit, .btn-delete { padding: 6px 10px; border-radius: 8px; font-size: 13px; font-weight: 700; text-decoration: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; height: 34px; }
+        .btn-edit {
+                    background: var(--border-light); /* Subtle background */
+                    color: var(--text-main);
+                    border: 1px solid var(--border-color);
+                }
+
+                .btn-edit:hover {
+                    background: var(--border-color);
+                    border-color: var(--text-muted);
+                }
+        .btn-delete {
+        background: var(--accent-red-light);
+        color: var(--accent-red);
+        border: 1px solid var(--accent-red-border);
+        }
+
 
         #modalOverlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); justify-content:center; align-items:center; z-index: 9999; }
         .modal-card { background: var(--bg-card); padding: 32px; border-radius: 20px; width: 100%; max-width: 480px; transition: max-width 0.4s ease; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); transition: background 0.3s ease; }
@@ -157,6 +186,25 @@ $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
         .toast-title { font-weight:700; margin-bottom: 2px; }
         .toast-message { font-size:14px; color:#555; }
         .toast-close { margin-left:auto; cursor:pointer; border:none; background:none; font-size:16px; color: #999; }
+    
+        .header {
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            
+            
+        }
+
+        .header i {
+            font-size: 24px;
+            color: var(--accent-purple);
+            background: var(--accent-purple-light);
+            padding: 12px;
+            border-radius: 12px;
+        }
+
+        
     </style>
 </head>
 <body>
@@ -186,9 +234,16 @@ $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
 </div>
 
 <div class="container">
-    <div class="page-header">
-        <h1>Split Expenses</h1>
-        <button class="btn btn-main" onclick="openNewModal()">+ Add New Split</button>
+    <div class="header" style="display: flex; align-items: center; width: 100%;">
+        <i class="fa-solid fa-layer-group"></i> 
+        <div>
+            <h1 style="font-size: 24px; font-weight: 900; color: var(--text-main); margin: 0;">Split Expense</h1>
+            <p style="color: var(--text-muted); font-size: 14px; margin: 0;">Split with friends and manage shared costs.</p>
+        </div>
+
+        <div class="button" style="margin-left: auto;">
+            <button class="btn btn-main" onclick="openNewModal()">+ Add Split</button>
+        </div>
     </div>
 
     <div class="card">
@@ -220,12 +275,12 @@ $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <td style="font-weight:700;">₱<?= number_format($e['amount'], 2) ?></td>
                         <td><?= date("M d, Y", strtotime($e['expense_date'])) ?></td>
                         <td style="text-align:right; display:flex; justify-content:flex-end; gap:8px;">
-                            <a href="spender.php?page=view_split_expense&expense_id=<?= $e['id'] ?>" class="btn btn-icon">👁</a>
-                            <button class="btn btn-icon" onclick='openEditModal(<?= json_encode($e) ?>, <?= json_encode($shares) ?>)'>✏️</button>
+                            <a href="spender.php?page=view_split_expense&expense_id=<?= $e['id'] ?>" class="btn btn-icon">View</a>
+                            <button class="btn-edit" onclick='openEditModal(<?= json_encode($e) ?>, <?= json_encode($shares) ?>)'>Edit</button>
                             
                             <a href="process_split.php?delete_id=<?= $e['id'] ?>" 
-                            class="btn btn-icon btn-delete" 
-                            onclick="return confirm('Delete this split?')">🗑</a>
+                            class="btn-delete" 
+                            onclick="return confirm('Delete this split?')">Delete</a>
                         </td>
                     </tr>
                     <?php endforeach; ?>
