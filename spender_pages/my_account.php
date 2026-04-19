@@ -161,7 +161,7 @@ if (isset($_POST['remove_photo'])) {
 
         .acc-card h3 { font-size: 16px; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
 
-        .profile-section { display: flex; align-items: center; gap: 24px; padding-bottom: 20px; border-bottom: 1px solid var(--border); }
+        .profile-section { display: flex; align-items: center; gap: 24px; padding-bottom: 20px; }
         .profile-pic-container { position: relative; width: 100px; height: 100px; }
         .profile-pic-container img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 4px solid var(--bg-card); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
         

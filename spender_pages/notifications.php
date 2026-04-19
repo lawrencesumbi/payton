@@ -99,6 +99,7 @@ $notifications = $stmt->fetchAll(PDO::FETCH_ASSOC);
             --unread-border: #3b82f6; --text-main: #111827; --text-muted: #6b7280;
             --bg-body: #f9fafb; --bg-card: #ffffff; --border: #e5e7eb;
             --shadow: rgba(0,0,0,0.05);
+            --accent-purple-light: #f5f0ff;
         }
 
         [data-theme="dark"] {
@@ -110,13 +111,30 @@ $notifications = $stmt->fetchAll(PDO::FETCH_ASSOC);
             --unread-bg: #1e293b;
             --unread-border: #3b82f6;
             --shadow: rgba(0,0,0,0.2);
+            --accent-purple-light: #373250;
         }
+
+        .header {
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header i {
+            font-size: 24px;
+            color: var(--accent-purple);
+            background: var(--accent-purple-light);
+            padding: 12px;
+            border-radius: 12px;
+        }
+
 
         body { background: var(--bg-body); color: var(--text-main); transition: background 0.3s ease; }
         /* ... existing styles ... */
-        .notif-container { max-width: 800px; margin: 15px auto; padding: 0 20px; height: 75vh; overflow-y: auto; }
+        .notif-container {width: 100%; height: 75vh; overflow-y: auto; }
         .notification-card { background: var(--bg-card); padding: 20px; border-radius: 16px; margin-bottom: 12px; border: 1px solid var(--border); display: flex; gap: 16px; position: relative; transition: background 0.3s ease; box-shadow: 0 2px 4px var(--shadow); }
-        .page-header {display: flex;justify-content: space-between;align-items: center;margin-bottom: 20px;}
+        .page-header {display: flex;justify-content: space-between;align-items: center;}
         .mark-read {font-size: 0.9rem;color: var(--accent-purple);text-decoration: none; font-weight: 600;}
         .mark-read:hover {text-decoration: underline;}
         .notification-card.unread { background: var(--unread-bg); border-color: #dbeafe; }
@@ -130,7 +148,13 @@ $notifications = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 <div class="notif-container">
     <div class="page-header">
-        <h1>Notifications</h1>
+        <div class="header">
+            <i class="fa-solid fa-clock-rotate-left"></i>
+            <div>
+                <h1 style="font-size: 24px; font-weight: 900; color: var(--text-main);">Notifications</h1>
+                <p style="color: var(--text-muted); font-size: 14px;">View your messages and alerts.</p>
+            </div>
+        </div>
         
         <?php 
         $hasUnread = array_filter($notifications, fn($n) => $n['status'] == 'unread');

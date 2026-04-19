@@ -55,9 +55,9 @@ $notifications = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <style>
     /* Scoped to container to avoid interfering with dashboard layout */
         .notif-container { 
-    max-width: 700px; 
-    margin: 20px auto; 
-    padding: 0 20px;
+    width: 100%;
+    
+    
     
     /* --- ADD THESE LINES --- */
     height: 75vh; /* Limits height to 80% of the screen height */

@@ -73,6 +73,7 @@ function timeAgo($datetime) {
     --text-muted: #475569;
     --text-light: #94a3b8;
     --border-shadow: rgba(0,0,0,0.05);
+    --accent-purple-light: #f5f0ff;
 }
 
 [data-theme="dark"] {
@@ -82,10 +83,33 @@ function timeAgo($datetime) {
     --text-muted: #94a3b8;
     --text-light: #64748b;
     --border-shadow: rgba(0,0,0,0.2);
+    --accent-purple-light: #373250;
 }
 
+html::-webkit-scrollbar, 
+body::-webkit-scrollbar {
+    display: none;
+    width: 0 !important;
+}
+
+.header {
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header i {
+            font-size: 24px;
+            color: var(--accent-purple);
+            background: var(--accent-purple-light);
+            padding: 12px;
+            border-radius: 12px;
+        }
+
+
 body {font-family:'Segoe UI',sans-serif; background: var(--bg-body); margin:0; color: var(--text-main); transition: background 0.3s ease;}
-.container {max-width:900px; margin:30px auto;}
+.container {width: 100%;}
 h2 {margin-bottom:20px; padding: 0 10px;}
 .log-card {background: var(--bg-card); border-radius:12px; padding:15px 20px; margin-bottom:12px; display:flex; justify-content:space-between; align-items: center; box-shadow:0 2px 8px var(--border-shadow); transition: background 0.3s ease;}
 .left {display:flex; flex-direction:column; gap: 4px;}
@@ -105,7 +129,13 @@ h2 {margin-bottom:20px; padding: 0 10px;}
 </head>
 <body>
 <div class="container">
-<h2>📊 Activity Logs</h2>
+    <div class="header">
+        <i class="fa-solid fa-clock-rotate-left"></i>
+        <div>
+            <h1 style="font-size: 24px; font-weight: 900; color: var(--text-main);">Activity Logs</h1>
+            <p style="color: var(--text-muted); font-size: 14px;">Monitor your activity.</p>
+        </div>
+    </div>
 
 <?php if(!empty($logs)): ?>
     <?php foreach($logs as $row): 

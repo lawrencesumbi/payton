@@ -74,8 +74,26 @@ $upcomingStmt->execute([$user_id]);
 $upcomingPayments = $upcomingStmt->fetchAll(PDO::FETCH_ASSOC);
 
 /* =====================================================
-   4. MONTHLY TRENDS
+   4. MONTHLY TRENDS & LINE GRAPH DATA
 ===================================================== */
+// Fetch last 6 months of spending for the line graph
+$monthlyStmt = $conn->prepare("
+    SELECT 
+        DATE_FORMAT(expense_date, '%b') as month_label, 
+        SUM(amount) as total 
+    FROM expenses 
+    WHERE user_id = ? 
+      AND expense_date >= DATE_SUB(CURDATE(), INTERVAL 5 MONTH)
+    GROUP BY DATE_FORMAT(expense_date, '%Y-%m')
+    ORDER BY expense_date ASC
+");
+$monthlyStmt->execute([$user_id]);
+$monthlyTrends = $monthlyStmt->fetchAll(PDO::FETCH_ASSOC);
+
+$monthLabels = array_column($monthlyTrends, 'month_label');
+$monthTotals = array_column($monthlyTrends, 'total');
+
+// Existing Stats logic
 $thisMonth = date('Y-m-01');
 $lastMonth = date('Y-m-01', strtotime('-1 month'));
 $trendStmt = $conn->prepare("
@@ -180,9 +198,8 @@ $percChange = ($trends['lm'] > 0) ? (($trends['tm'] - $trends['lm']) / $trends['
         /* Content Layout */
         .dashboard-container { 
             display: grid; 
-            grid-template-columns: 1.6fr 1fr; 
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
             gap: 20px; 
-            align-items: start; /* Prevents panels from stretching unevenly */
         }
 
         .panel { 
@@ -191,7 +208,7 @@ $percChange = ($trends['lm'] > 0) ? (($trends['tm'] - $trends['lm']) / $trends['
             padding: 15px; 
             border: 1px solid var(--border-color); 
             box-shadow: 0 10px 30px var(--shadow);
-            height: 375px; /* Ensures panels look balanced */
+            height: 420px; /* Ensures panels look balanced */
             display: flex;
             flex-direction: column;
             transition: background 0.3s ease;
@@ -204,8 +221,8 @@ $percChange = ($trends['lm'] > 0) ? (($trends['tm'] - $trends['lm']) / $trends['
         .chart-container {
             position: relative;
             flex-grow: 1;
-            min-height: 300px;
             width: 100%;
+            min-height: 0; /* Important for Chart.js inside flexbox */
         }
 
         /* Payment UI */
@@ -304,7 +321,12 @@ $percChange = ($trends['lm'] > 0) ? (($trends['tm'] - $trends['lm']) / $trends['
                 <canvas id="mainChart"></canvas>
             </div>
         </div>
-
+        <div class="panel">
+            <div class="panel-header">Spending Trend</div>
+            <div class="chart-container">
+                <canvas id="lineChart"></canvas>
+            </div>
+        </div>
         <div class="panel">
             <div class="panel-header">Upcoming Payments</div>
             <div class="payment-list" style="max-height: 350px; overflow-y: auto; padding-right: 5px;">
@@ -330,38 +352,47 @@ $percChange = ($trends['lm'] > 0) ? (($trends['tm'] - $trends['lm']) / $trends['
 </div>
 
 <script>
-    const ctx = document.getElementById('mainChart').getContext('2d');
-    new Chart(ctx, {
+    // Polar Area Chart
+    const ctx1 = document.getElementById('mainChart').getContext('2d');
+    new Chart(ctx1, {
         type: 'polarArea',
         data: {
             labels: <?= json_encode(array_column($categoryData, 'category_name')) ?>,
             datasets: [{
                 data: <?= json_encode(array_column($categoryData, 'total')) ?>,
-                backgroundColor: [
-                    'rgba(124, 58, 237, 0.75)', 
-                    'rgba(59, 130, 246, 0.75)', 
-                    'rgba(245, 158, 11, 0.75)', 
-                    'rgba(16, 185, 129, 0.75)',
-                    'rgba(239, 68, 68, 0.75)'
-                ],
+                backgroundColor: ['rgba(124, 58, 237, 0.7)', 'rgba(59, 130, 246, 0.7)', 'rgba(245, 158, 11, 0.7)', 'rgba(16, 185, 129, 0.7)', 'rgba(239, 68, 68, 0.7)'],
                 borderWidth: 2,
-                borderColor: '#ffffff'
+                borderColor: '#fff'
+            }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } }, scales: { r: { ticks: { display: false }, grid: { color: '#8b43ff' } } } }
+    });
+
+    // Line Chart (Monthly Trends)
+    const ctx2 = document.getElementById('lineChart').getContext('2d');
+    new Chart(ctx2, {
+        type: 'line',
+        data: {
+            labels: <?= json_encode($monthLabels) ?>,
+            datasets: [{
+                label: 'Monthly Spending',
+                data: <?= json_encode($monthTotals) ?>,
+                borderColor: '#7c3aed',
+                backgroundColor: 'rgba(124, 58, 237, 0.1)',
+                fill: true,
+                tension: 0.4,
+                borderWidth: 3,
+                pointBackgroundColor: '#7c3aed',
+                pointRadius: 4
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            plugins: {
-                legend: { 
-                    position: 'bottom', 
-                    labels: { 
-                        font: { weight: '600' }, 
-                        padding: 15 
-                    } 
-                }
-            },
+            plugins: { legend: { display: false } },
             scales: {
-                r: { ticks: { display: false }, grid: { color: '#f1f5f9' } }
+                y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.03)' }, ticks: { font: { size: 10 } } },
+                x: { grid: { display: false }, ticks: { font: { size: 10 } } }
             }
         }
     });

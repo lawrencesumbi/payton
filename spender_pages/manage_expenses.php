@@ -95,7 +95,10 @@ foreach ($expenses as $exp) {
     $budgetExpenses += floatval($exp['amount']);
 }
 // ✅ Calculate remaining allowance (never negative)
-$budgetLeft = max(0, $budgetAmount - $budgetExpenses);
+$budgetLeft = $budgetAmount - $budgetExpenses;
+
+// ✅ New flag for UI alerts
+$isOverBudget = ($budgetLeft < 0);
 
 /* =====================================================
    TOTAL EXPENSES (ANALYTICS ONLY)

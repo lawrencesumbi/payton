@@ -435,7 +435,7 @@ $all_budgets = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <div class="row g-4 mb-4">
         <div class="col-lg-4">
             <div class="chart-container">
-                <h6 class="fw-bold mb-2">Budget Distribution</h6>
+                <h6 class="fw-bold mb-5">Allowance Distribution</h6>
                 <canvas id="allocationChart"></canvas>
             </div>
         </div>
@@ -494,7 +494,7 @@ $all_budgets = $stmt->fetchAll(PDO::FETCH_ASSOC);
             plugins: {
                 legend: { position: 'bottom', labels: { usePointStyle: true, padding: 20 } }
             },
-            cutout: '70%'
+            cutout: '50%'
         }
     });
 

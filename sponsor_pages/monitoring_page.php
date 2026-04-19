@@ -95,7 +95,7 @@ if ($selected_spender && $selected_allowance) {
     $stmtB = $conn->prepare("SELECT budget_amount FROM budget WHERE id = ?");
     $stmtB->execute([$selected_allowance]);
     $total_budget = (float) $stmtB->fetchColumn();
-    $allowance_left = max(0, $total_budget - $total_spent);
+    $allowance_left = $total_budget - $total_spent;
 }
 ?>
 
@@ -146,8 +146,11 @@ if ($selected_spender && $selected_allowance) {
     }
 
     .main-wrapper {
-        width: 100%;
-    }
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  
+}
 
     /* 3. LAYOUT CONTAINERS */
     .top-row {
@@ -201,9 +204,10 @@ if ($selected_spender && $selected_allowance) {
 
     /* 5. TABLE STYLES & DARK MODE FIXES */
     .table-scroll-container {
-        max-height: 400px;
+        flex: 1;
+        max-height: calc(100vh - 320px);
         overflow-y: auto;
-        position: relative;
+        overflow-x: auto;
     }
 
     .table { 
