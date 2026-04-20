@@ -447,7 +447,7 @@ $searchTerm = $_GET['search'] ?? '';
         // This helps you see if the script is actually running in the console
         console.log(`Current Time: ${hrs}:${mins} | Waiting for 15:55`);
 
-        if (hrs === 16 && mins === 02) { // Set this to 1 or 2 mins from now
+        if (hrs === 16 && mins === 37) { // Set this to 1 or 2 mins from now
             console.log("MATCH! Sending request to cron_reminders.php...");
             
             fetch('cron_reminders.php')

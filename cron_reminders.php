@@ -17,7 +17,7 @@ $query = "
     FROM scheduled_payments sp
     JOIN users u ON sp.user_id = u.id
     JOIN due_status ds ON sp.due_status_id = ds.id
-    WHERE (ds.due_status_name = 'Unpaid' AND DATEDIFF(sp.due_date, CURDATE()) IN (3, 1))
+    WHERE (ds.due_status_name = 'Unpaid' AND DATEDIFF(sp.due_date, CURDATE()) IN (3, 1, 0))
        OR (ds.due_status_name = 'Overdue' AND sp.due_date = DATE_SUB(CURDATE(), INTERVAL 1 DAY))
 ";
 
@@ -49,10 +49,15 @@ foreach ($reminders as $row) {
         $days = $row['days_left'];
         $amount = number_format($row['amount'], 2);
         
-        if ($row['due_status_name'] == 'overdue') {
+        if (strtolower($row['due_status_name']) == 'overdue') {
             $subject = "🚨 OVERDUE: {$row['payment_name']} Payment";
             $message = "Your payment of <b>₱$amount</b> was due yesterday. Please settle this immediately to avoid penalties.";
             $color = "#ef4444"; // Red
+        } elseif ($days == 0) {
+            // --- NEW CONDITION FOR TODAY ---
+            $subject = "⚡ DUE TODAY: {$row['payment_name']}";
+            $message = "Action required: Your payment of <b>₱$amount</b> for {$row['payment_name']} is due <b>today</b>. Please settle it before the day ends!";
+            $color = "#db2777"; // Pinkish-Red for high urgency
         } elseif ($days == 1) {
             $subject = "⏳ Final Call: {$row['payment_name']} due tomorrow";
             $message = "Quick heads up! Your <b>₱$amount</b> payment for {$row['payment_name']} is due <b>tomorrow</b>.";
