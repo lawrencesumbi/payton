@@ -65,26 +65,31 @@ foreach ($reminders as $row) {
 
         $mail->isHTML(true);
         $mail->Subject = $subject;
-        $mail->Body    = "
-            <div style='font-family: Arial, sans-serif; max-width: 600px; border: 1px solid #eee; padding: 20px;'>
+        $mail->Body = "
+            <div style='font-family: Arial, sans-serif; max-width: 600px; border: 1px solid #eee; padding: 20px; border-radius: 12px;'>
                 <h2 style='color: $color;'>Payton Payment Alert</h2>
                 <p>Hi <b>{$row['fullname']}</b>,</p>
                 <p>$message</p>
-                <div style='background: #f8fafc; padding: 15px; border-radius: 8px; margin: 20px 0;'>
+                <div style='background: #f8fafc; padding: 15px; border-radius: 8px; margin: 20px 0; border: 1px solid #e2e8f0;'>
                     <b>Bill:</b> {$row['payment_name']}<br>
                     <b>Amount:</b> ₱$amount<br>
                     <b>Due Date:</b> {$row['due_date']}
                 </div>
                 <p>Click below to view your dashboard and mark this as paid:</p>
-                <a href='http://localhost/payton/spender.php?page=manage_payments' 
-                   style='background: $color; color: white; padding: 12px 20px; text-decoration: none; border-radius: 5px; display: inline-block;'>
-                   Go to Dashboard
+                <a href='{$baseUrl}spender.php?page=manage_payments' 
+                   style='background: $color; color: white; padding: 12px 25px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold;'>
+                    Go to Dashboard
                 </a>
+                <p style='font-size: 11px; color: #94a3b8; margin-top: 20px;'>
+                    You are receiving this because you enabled smart reminders on Payton.
+                </p>
             </div>";
 
         $mail->send();
         echo "Sent: " . $row['payment_name'] . " to " . $row['email'] . "<br>";
+        
     } catch (Exception $e) {
         echo "Failed to send to {$row['email']}. Error: {$mail->ErrorInfo}<br>";
     }
 }
+?>

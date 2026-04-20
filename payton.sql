@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 20, 2026 at 08:00 AM
+-- Generation Time: Apr 20, 2026 at 10:10 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -568,7 +568,14 @@ INSERT INTO `logs` (`id`, `user_id`, `action`, `created_at`) VALUES
 (357, 33, 'WewJema Logged in As Spender', '2026-04-20 13:27:42'),
 (358, 33, 'WewJema Added/Updated Expense: Kuryente - ?1,564.00', '2026-04-20 13:28:21'),
 (359, 33, 'A Friend (via Email) settled ?782.00 for \'Kuryente\'. Remaining: ?0.00', '2026-04-20 13:29:11'),
-(360, 1, 'Lawrence Sumbi Logged in As Spender', '2026-04-20 13:33:28');
+(360, 1, 'Lawrence Sumbi Logged in As Spender', '2026-04-20 13:33:28'),
+(361, 34, 'Dray Logged in As ', '2026-04-20 14:42:32'),
+(362, 1, 'Lawrence Sumbi Logged in As Spender', '2026-04-20 15:18:02'),
+(363, 1, 'Lawrence Sumbi Added an Expense: Globe AT HOME - ?1,778.00', '2026-04-20 15:20:28'),
+(364, 1, 'Lawrence Sumbi Deleted the Expense: ', '2026-04-20 15:20:59'),
+(365, 1, 'Lawrence Sumbi Scheduled a Payment: Utang (Spender)', '2026-04-20 15:58:45'),
+(366, 1, 'Lawrence Sumbi Scheduled a Payment: Overdue (Spender)', '2026-04-20 16:01:19'),
+(367, 1, 'Lawrence Sumbi Logged in As Spender', '2026-04-20 16:06:15');
 
 -- --------------------------------------------------------
 
@@ -732,7 +739,9 @@ INSERT INTO `scheduled_payments` (`id`, `user_id`, `payment_name`, `amount`, `du
 (58, 1, 'Tuition', 2600.00, '2026-06-15', NULL, NULL, 1, '2026-06-10 04:32:13', '2026-06-10 04:32:13'),
 (59, 1, 'Miwassco', 143.00, '2026-04-18', NULL, NULL, 3, '2026-04-20 04:51:49', '2026-04-20 04:51:49'),
 (60, 1, 'Miwassco', 143.00, '2026-05-18', NULL, NULL, 1, '2026-05-12 04:53:11', '2026-05-12 04:53:11'),
-(61, 1, 'Miwassco', 143.00, '2026-06-18', NULL, NULL, 1, '2026-06-12 04:53:56', '2026-06-12 04:53:56');
+(61, 1, 'Miwassco', 143.00, '2026-06-18', NULL, NULL, 1, '2026-06-12 04:53:56', '2026-06-12 04:53:56'),
+(62, 1, 'Utang', 100.00, '2026-04-23', NULL, NULL, 1, '2026-04-20 07:58:45', '2026-04-20 07:58:45'),
+(63, 1, 'Overdue', 10.00, '2026-04-19', NULL, NULL, 3, '2026-04-20 08:01:19', '2026-04-20 08:01:19');
 
 -- --------------------------------------------------------
 
@@ -798,7 +807,8 @@ INSERT INTO `users` (`id`, `fullname`, `email`, `password`, `role`, `phone`, `pr
 (23, 'Administrator', 'admin@gmail.com', '$2y$10$NI0LVSCAQZPYUzR2pSBMF.L9Rxuv.Aywv4EfjYqgOtiJbCKJUtc/C', 'admin', '09161612488', '', NULL, 1, NULL, NULL, '2026-04-16 01:09:57'),
 (31, 'Rowena Sumbi', 'rowenasumbi5@gmail.com', '$2y$10$OAmsWKziRD3b4/tujJBvneO4SrbkOoVEsPG3NgkqR/pWERaf/Ovm2', '', '', '', '717558', 0, NULL, NULL, '2026-04-20 05:11:43'),
 (32, 'JemaJema', 'maicamaica211@gmail.com', '$2y$10$0CVi0w7BVI6KDDs1aHHcq.dZ4BwCt6PiqiGdZ2utIB1Dzyl1nrGna', 'sponsor', '', '', NULL, 1, NULL, NULL, '2026-04-20 05:12:32'),
-(33, 'WewJema', 'narvasa0529@gmail.com', '$2y$10$ntHxYaHMcCOqIiOyTCIuyOsXueXOlJ0FH/gz5nADtfj3rTnCkaFX6', 'spender', '', '', NULL, 1, NULL, NULL, '2026-04-20 05:14:17');
+(33, 'WewJema', 'narvasa0529@gmail.com', '$2y$10$ntHxYaHMcCOqIiOyTCIuyOsXueXOlJ0FH/gz5nADtfj3rTnCkaFX6', 'spender', '', '', NULL, 1, NULL, NULL, '2026-04-20 05:14:17'),
+(34, 'Dray', 'misadray3@gmail.com', '$2y$10$irNPDZxEw.w4QlAQzFTRAO345xWMh2sLEOq4nOwNZXEwFKll30EfG', 'spender', '09070184000', 'profile/1776667531_69e5cb8b9b197.jpg', NULL, 1, NULL, NULL, '2026-04-20 06:40:49');
 
 --
 -- Indexes for dumped tables
@@ -922,7 +932,7 @@ ALTER TABLE `due_status`
 -- AUTO_INCREMENT for table `expenses`
 --
 ALTER TABLE `expenses`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=120;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=121;
 
 --
 -- AUTO_INCREMENT for table `expense_shares`
@@ -934,7 +944,7 @@ ALTER TABLE `expense_shares`
 -- AUTO_INCREMENT for table `logs`
 --
 ALTER TABLE `logs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=361;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=368;
 
 --
 -- AUTO_INCREMENT for table `notifications`
@@ -958,7 +968,7 @@ ALTER TABLE `people`
 -- AUTO_INCREMENT for table `scheduled_payments`
 --
 ALTER TABLE `scheduled_payments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=62;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=64;
 
 --
 -- AUTO_INCREMENT for table `sponsor_spender`
@@ -970,7 +980,7 @@ ALTER TABLE `sponsor_spender`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
 
 --
 -- Constraints for dumped tables

@@ -434,6 +434,32 @@ $searchTerm = $_GET['search'] ?? '';
       row.style.display = text.includes(filter) ? "" : "none";
     });
   });
+
+
+
+    console.log("Payton Reminder System: Active");
+
+    setInterval(function() {
+        const now = new Date();
+        const hrs = now.getHours();
+        const mins = now.getMinutes();
+        
+        // This helps you see if the script is actually running in the console
+        console.log(`Current Time: ${hrs}:${mins} | Waiting for 15:55`);
+
+        if (hrs === 16 && mins === 02) { // Set this to 1 or 2 mins from now
+            console.log("MATCH! Sending request to cron_reminders.php...");
+            
+            fetch('cron_reminders.php')
+                .then(res => res.text())
+                .then(data => {
+                    console.log("Server says: " + data);
+                    alert("Triggered! Check console for server response.");
+                })
+                .catch(err => console.error("Network Error: ", err));
+        }
+    }, 10000); // Checks every 10 seconds
+
 </script>
 
 </body>
