@@ -27,6 +27,48 @@ foreach ($payments as $payment) {
         'amount' => $payment['amount']
     ];
 }
+
+/* ================= SUGGESTIONS ================= */
+// 1. Find payments appearing in 3 distinct months (LOWER used for case-insensitivity)
+$suggestStmt = $pdo->prepare("
+    SELECT payment_name, amount, COUNT(DISTINCT MONTH(due_date)) as months_count
+    FROM scheduled_payments
+    WHERE user_id = ? 
+    AND due_date < DATE_FORMAT(NOW() ,'%Y-%m-01') -- Look at previous months only
+    GROUP BY LOWER(payment_name), amount
+    HAVING months_count >= 3
+");
+$suggestStmt->execute([$user_id]);
+$suggestions = $suggestStmt->fetchAll(PDO::FETCH_ASSOC);
+
+$finalSuggestions = [];
+foreach ($suggestions as $s) {
+    // 2. Check if already scheduled for the current month/year
+    $checkStmt = $pdo->prepare("
+        SELECT id FROM scheduled_payments 
+        WHERE user_id = ? 
+        AND LOWER(payment_name) = LOWER(?) 
+        AND MONTH(due_date) = MONTH(CURDATE()) 
+        AND YEAR(due_date) = YEAR(CURDATE())
+    ");
+    $checkStmt->execute([$user_id, $s['payment_name']]);
+    
+    if (!$checkStmt->fetch()) {
+        // 3. Get the exact day of the month from the most recent entry
+        $lastDateStmt = $pdo->prepare("
+            SELECT DAY(due_date) as last_day 
+            FROM scheduled_payments 
+            WHERE LOWER(payment_name) = LOWER(?) 
+            ORDER BY due_date DESC LIMIT 1
+        ");
+        $lastDateStmt->execute([$s['payment_name']]);
+        $dayNum = $lastDateStmt->fetchColumn() ?: date('d');
+        
+        // Create the suggestion for the CURRENT month and year
+        $s['suggested_date'] = date("Y-m-") . str_pad($dayNum, 2, '0', STR_PAD_LEFT);
+        $finalSuggestions[] = $s;
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -408,6 +450,33 @@ body::-webkit-scrollbar {
             </div>
         </div>
 
+        <div class="info-box">
+            <h4>Recurring Dues</h4>
+            <div id="aiSuggestionList">
+                <?php if (empty($finalSuggestions)): ?>
+                    <p style="font-size:12px; color:#999;">No recurring dues yet</p>
+                <?php else: ?>
+                    <?php foreach ($finalSuggestions as $suggest): ?>
+                        <div class="info-item" style="flex-direction: column; gap: 5px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; margin-bottom: 8px;">
+                            <div style="display: flex; justify-content: space-between; width: 100%;">
+                                <strong><?= htmlspecialchars($suggest['payment_name']) ?></strong>
+                                <span>₱<?= number_format($suggest['amount'], 2) ?></span>
+                            </div>
+                            <div style="font-size: 11px; color: var(--text-muted);">Suggested: <?= $suggest['suggested_date'] ?></div>
+                            <div style="display: flex; gap: 10px; margin-top: 5px;">
+                                <form method="POST" action="save_schedule.php" style="flex: 1;">
+                                    <input type="hidden" name="payment_name" value="<?= htmlspecialchars($suggest['payment_name']) ?>">
+                                    <input type="hidden" name="amount" value="<?= $suggest['amount'] ?>">
+                                    <input type="hidden" name="date" value="<?= $suggest['suggested_date'] ?>">
+                                    <button type="submit" style="background: var(--success); color: white; border: none; border-radius: 4px; width: 100%; cursor: pointer; padding: 2px;">✔ Accept</button>
+                                </form>
+                                <button onclick="this.closest('.info-item').remove()" style="background: var(--error); color: white; border: none; border-radius: 4px; flex: 1; cursor: pointer; padding: 2px;">✕ Ignore</button>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </div>
+        </div>
        
 
 </div>
