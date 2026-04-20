@@ -80,11 +80,6 @@ foreach ($reminders as $row) {
                     <b>Amount:</b> ₱$amount<br>
                     <b>Due Date:</b> {$row['due_date']}
                 </div>
-                <p>Click below to view your dashboard and mark this as paid:</p>
-                <a href='{$baseUrl}spender.php?page=manage_payments' 
-                   style='background: $color; color: white; padding: 12px 25px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold;'>
-                    Go to Dashboard
-                </a>
                 <p style='font-size: 11px; color: #94a3b8; margin-top: 20px;'>
                     You are receiving this because you enabled smart reminders on Payton.
                 </p>

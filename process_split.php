@@ -136,6 +136,7 @@ if (isset($_POST['save_expense'])) {
  */
 function sendGmailNotification($toEmail, $toName, $desc, $amt, $sender, $expense_id, $pid) {
     $mail = new PHPMailer(true);
+    $mail->CharSet = 'UTF-8';
     try {
         $mail->isSMTP();
         $mail->Host       = 'smtp.gmail.com';
