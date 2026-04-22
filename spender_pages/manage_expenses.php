@@ -11,10 +11,10 @@ if (!isset($_SESSION['user_id'])) {
 $user_id = $_SESSION['user_id'];
 
 /* =====================================================
-   FETCH ACTIVE BUDGET
+   FETCH ACTIVE BUDGET (INCLUDE budget_name)
 ===================================================== */
 $budgetStmt = $conn->prepare("
-    SELECT id, budget_amount, start_date, end_date, status
+    SELECT id, budget_amount, start_date, end_date, status, budget_name
     FROM budget
     WHERE user_id = :user_id
       AND status = 'Active'
@@ -43,18 +43,31 @@ $budgetStart  = $activeBudget['start_date'] ?? null;
 $budgetEnd    = $activeBudget['end_date'] ?? null;
 
 /* =====================================================
-   CHECK IF BUDGET EXPIRED
+   DEFINE TODAY DATE (MUST BE BEFORE BUDGET CHECK)
 ===================================================== */
 $today = new DateTime();
-if ($budgetEnd) {
+
+/* =====================================================
+   CHECK IF BUDGET EXPIRED & UPDATE STATUS AUTOMATICALLY
+===================================================== */
+if ($budgetId && $budgetEnd) {
     $budgetEndDate = new DateTime($budgetEnd);
     $todayDate = (clone $today)->setTime(0,0,0);
+    
     if ($todayDate > $budgetEndDate) {
+        // Budget has expired - update status to Inactive
+        $updateStmt = $conn->prepare("
+            UPDATE budget 
+            SET status = 'Inactive' 
+            WHERE id = ?
+        ");
+        $updateStmt->execute([$budgetId]);
+        
         $budgetExpired = true;
         $budgetAmount = 0;
+        $activeBudget = null;
     }
 }
-
 /* =====================================================
    FETCH EXPENSES WITHIN ACTIVE BUDGET PERIOD
 ===================================================== */
@@ -896,34 +909,21 @@ tr:hover {
                     <div class="stat-subtitle"><?= count($expenses) ?> transactions</div>
                 </div>
             </div>
+<div class="stat-card stat-green">
+    <div class="stat-icon"><i class="fa-solid fa-layer-group"></i></div>
 
-            <div class="stat-card stat-green">
-                <div class="stat-icon"><i class="fa-solid fa-layer-group"></i></div>
+    <div class="stat-card-content">
+        <div class="stat-label">Allowance Period</div>
 
-                <div class="stat-card-content">
-                    <div class="stat-label">Allowance Period</div>
-
-                    <?php
-                    $stmt = $conn->prepare("
-                        SELECT budget_name 
-                        FROM budget 
-                        WHERE user_id = ? AND status = 'Active'
-                        ORDER BY created_at DESC 
-                        LIMIT 1
-                    ");
-                    $stmt->execute([$user_id]);
-                    $active = $stmt->fetch(PDO::FETCH_ASSOC);
-                    ?>
-
-                    <?php if ($active): ?>
-                        <div class="stat-value">
-                            <?= htmlspecialchars($active['budget_name']) ?>
-                        </div>
-                    <?php else: ?>
-                        <div class="stat-value">No active Allowance</div>
-                    <?php endif; ?>
-                </div>
+        <?php if ($activeBudget && !$budgetExpired): ?>
+            <div class="stat-value">
+                <?= htmlspecialchars($activeBudget['budget_name'] ?? 'No active Allowance') ?>
             </div>
+        <?php else: ?>
+            <div class="stat-value">No active Allowance</div>
+        <?php endif; ?>
+    </div>
+</div>
 
             <div class="stat-card stat-orange">
                 <div class="stat-icon"><i class="fa-solid fa-calendar-days"></i></div>
